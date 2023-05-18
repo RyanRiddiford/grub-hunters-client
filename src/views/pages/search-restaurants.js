@@ -5,11 +5,9 @@
  * Student ID: 20862086
  */
 
-import App from '../../App'
-import {html, render } from 'lit-html'
-import {gotoRoute, anchorRoute, routes} from '../../Router'
-import AuthAPI from '../../services/AuthAPI'
-import moment from 'moment'
+import App from '../../App';
+import {html, render } from 'lit-html';
+import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import enumUtils from '../../utils/enum.utils';
 import paginationUtils from '../../utils/pagination.utils';
@@ -41,7 +39,6 @@ class SearchRestaurantsView {
         const formData = e.detail.formData;
 
           this.keywords = formData.get("keywords");
-          console.log("keywords = " + this.keywords);
 
         let submitBtn = document.getElementById('search-submit-btn');
         submitBtn.setAttribute('loading', '');

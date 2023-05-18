@@ -190,7 +190,7 @@ sl-dialog::part(panel) {
             //Close the report ticket
     ReportAPI.closeTicket(AuthAPI.currentReport._id);
     //If profile is flagged, get user id from report
-    if (AuthAPI.currentReport.targetType == "") {
+    if (AuthAPI.currentReport.targetType == "restaurant") {
 UserAPI.giveDemerit(AuthAPI.currentReport.targetId);
     }
     //If restaurant review is flagged, get user id from review
@@ -217,53 +217,3 @@ UserAPI.giveDemerit(AuthAPI.currentReport.targetId);
 
 
 export default new ReportView();
-
-
-
-{/* <app-header title=${document.title} user="${JSON.stringify(AuthAPI.currentUser)}"></app-header>
-
-    
-<sl-dialog id="report-target-dialog" label="Flagged Content" class="dialog-overview">
-  ${flaggedContent}
-<sl-button @click="${() => {this.shadowRoot.getElementById('report-target-dialog').hide();}}" slot="footer">Close</sl-button>
-</sl-dialog>
-
-<div class="page-content">
-
-<div id="report-container">
-  <h1>Report Ticket</h1>
-  <div class="top">
-    <div class="reporter-container"><span class="bold-text">Reporter</span><span>${AuthAPI.currentReport.authorId}</span></div>
-    <div class="topic-container"><span class="bold-text">Topic</span><span>${AuthAPI.currentReport.topic}</span></div>
-    <div class="comment-container">
-      <h3>Comment</h3>
-      <p>${AuthAPI.currentReport.text}</p>
-    </div>
-  </div>
-  <div class="mid">
-    <h3>Flagged Content</h3>
-
-  </div>
-  <div class="bot">
-  <sl-button id="close-ticket-btn" @click=${()=> ReportAPI.closeTicket(AuthAPI.currentReport._id)} >Close Ticket</sl-button>
-  <sl-button id="disciplinary-btn" @click=${()=> {
-        //Close the report ticket
-ReportAPI.closeTicket(AuthAPI.currentReport._id);
-//If profile is flagged, get user id from report
-if (AuthAPI.currentReport.targetType == "") {
-UserAPI.giveDemerit(AuthAPI.currentReport.targetId);
-}
-//If restaurant review is flagged, get user id from review
-else if (AuthAPI.currentReport.targetType == "review") {
-  UserAPI.giveDemerit(AuthAPI.currentTarget.authorId);
-}
-  }}>Disciplinary Action</sl-button>
-  </div>
-</div>
-<ul>
-  <li>${AuthAPI.currentReport._id}</li>
-  <li>${AuthAPI.currentReport.targetId}</li>
-</ul>
-</div>
-
-<app-footer title=${document.title}></app-footer> */}

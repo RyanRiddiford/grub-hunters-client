@@ -174,7 +174,7 @@ if (this.user)
           //Setup reviewer and restaurant level navigation
     if (this.user.accessLevel == enumUtils.accessLevels.reviewer || this.user.accessLevel == enumUtils.accessLevels.restaurant) {
 headerLinks = html`
-<a href="/search" @click="${anchorRoute}">Search Restaurants</a> 
+<a href="/search-restaurants" @click="${anchorRoute}">Search Restaurants</a> 
 <a href="/reviews" @click="${anchorRoute}">Your Reviews</a> 
 <a href="/profile" @click="${anchorRoute}">Your Profile</a> 
 `;
@@ -182,8 +182,8 @@ headerLinks = html`
     //Setup admin level navigation
     else if (this.user.accessLevel == enumUtils.accessLevels.administrator) {
       headerLinks = html`
-      <a href="/search" @click="${anchorRoute}">Search Restaurants</a> 
-      <a href="/active-tickets" @click="${anchorRoute}">Search Tickets</a> 
+      <a href="/search-restaurants" @click="${anchorRoute}">Search Restaurants</a> 
+      <a href="/search-tickets" @click="${anchorRoute}">Search Tickets</a> 
       <a href="/profile" @click="${anchorRoute}">Your Profile</a> 
       `;
     }

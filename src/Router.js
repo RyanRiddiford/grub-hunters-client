@@ -11,16 +11,12 @@ import errorView from './views/pages/404'
 import loginView from './views/pages/auth'
 import profileView from './views/pages/profile'
 import searchView from './views/pages/search-restaurants';
-
-//import ticketHistory from './views/pages/admin/search-reports';
-import activeTickets from './views/pages/admin/search-reports';
-import report from './views/pages/admin/report';
-
+import searchTicketsView from './views/pages/admin/search-reports';
+import reportView from './views/pages/admin/report';
 import editProfileView from './views/pages/edit-profile';
 import reviewsView from './views/pages/reviews';
 import restaurantView from './views/pages/restaurant';
-
-import introduction from './views/pages/introduction';
+import introductionView from './views/pages/introduction';
 
 // define routes
 const routes = {
@@ -33,10 +29,9 @@ const routes = {
 	'/edit-profile': editProfileView,
 	'/reviews':reviewsView,
 	'/restaurant':restaurantView,
-	'/active-tickets':activeTickets,
-//'/ticket-history':ticketHistory,
-'/report':report,
-'/intro': introduction
+	'/search-tickets':searchTicketsView,
+'/report':reportView,
+'/intro': introductionView
 }
 
 class Router {

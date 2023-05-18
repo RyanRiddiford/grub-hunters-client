@@ -34,9 +34,9 @@ customElements.define('register-form', class RegisterForm extends LitElement {
         submitBtn.setAttribute('loading', '');
         console.log("signing up");
         // sign in using Auth    
-        Auth.signUp(formData, () => {
-          submitBtn.removeAttribute('loading');
-        })
+        Auth.signUp(formData, () => {        
+        });
+        submitBtn.removeAttribute('loading');
       }
 
 

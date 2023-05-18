@@ -7,7 +7,7 @@
 
 //Import dependencies
 import App from './../../App'
-import {TemplateResult, html, render } from 'lit-html'
+import {html, render } from 'lit-html'
 import AuthAPI from '../../services/AuthAPI'
 import UserAPI from '../../services/UserAPI';
 import ReviewAPI from '../../services/ReviewAPI';

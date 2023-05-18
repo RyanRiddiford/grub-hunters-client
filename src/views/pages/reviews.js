@@ -5,17 +5,10 @@
  * Student ID: 20862086
  */
 
-import App from './../../App'
-import {Template, TemplateResult, html, isIterable, render, requestUpdate } from 'lit-html'
-import {gotoRoute, anchorRoute} from './../../Router'
-import AuthAPI from '../../services/AuthAPI'
-import moment from 'moment'
+import App from './../../App';
+import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import ReviewAPI from '../../services/ReviewAPI';
-import {until} from 'lit-html/directives/until.js';
-import { asyncAppend } from 'lit/directives/async-append.js';
-import { LitElement } from '@polymer/lit-element';
-import enumUtils from '../../utils/enum.utils';
 import paginationUtils from '../../utils/pagination.utils';
 
 
