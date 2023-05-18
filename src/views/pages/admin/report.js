@@ -183,8 +183,11 @@ sl-dialog::part(panel) {
           <h3>Comment</h3>
           <p>${AuthAPI.currentReport.text}</p>
         </div>
-      </div>
+      </div> 
+      ${(AuthAPI.currentReport.status == "closed") ?
+      html`
       <div class="bot">
+       
       <sl-button id="close-ticket-btn" @click=${()=> ReportAPI.closeTicket(AuthAPI.currentReport._id)} >Close Ticket</sl-button>
       <sl-button id="disciplinary-btn" @click=${()=> {
             //Close the report ticket
@@ -198,7 +201,12 @@ UserAPI.giveDemerit(AuthAPI.currentReport.targetId);
       UserAPI.giveDemerit(AuthAPI.currentTarget.authorId);
     }
       }}>Disciplinary Action</sl-button>
-      </div>
+      </div>      
+      ` :
+      html``
+      }
+
+
     </div>
 
     </div>

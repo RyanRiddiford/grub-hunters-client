@@ -51,9 +51,7 @@ class ProfileView {
  */
   async warningReceived(e) {
     e.preventDefault();
-    const warningBtn = document.getElementById("warning-btn");
     let warningDialog = document.getElementById("warning-dialog");
-    warningBtn.setAttribute('loading', '');
     //Set warning status to false on server
     try {
       const updatedUser = await UserAPI.updateById(AuthAPI.currentUser._id, JSON.stringify({"warningStatus":false}), true);      
@@ -63,7 +61,6 @@ class ProfileView {
     }catch(err){      
       console.log(err);
     }
-     warningBtn.removeAttribute('loading');
     warningDialog.hide(); 
   }
 
@@ -91,15 +88,13 @@ class ProfileView {
        
          const template = html`
 
-
-
 <sl-dialog id="warning-dialog" label="Confirmation" class="dialog-overview">
    <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>
   <sl-form @sl-submit=${this.warningReceived.bind(this)}>
 <input type="hidden" value=${false} name="warningStatus">
-<sl-button id="warning-btn" type="primary" class="submit-btn" submit>Okay</sl-button>
+<sl-button id="warning-btn" type="primary" class="submit-btn" slot="footer" submit>Ok</sl-button>
   </sl-form>
-  <sl-button @click="${() => {this.shadowRoot.getElementById('warning-dialog').hide();}}" slot="footer">Ok</sl-button>
+ 
 </sl-dialog>
 
            <app-header title=${document.title} user="${JSON.stringify(AuthAPI.currentUser)}"></app-header>
