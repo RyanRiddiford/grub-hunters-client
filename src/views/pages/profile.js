@@ -51,17 +51,17 @@ class ProfileView {
  */
   async warningReceived(e) {
     e.preventDefault();
-    const formData = e.detail.formData;
     const warningBtn = document.getElementById("warning-btn");
     let warningDialog = document.getElementById("warning-dialog");
     warningBtn.setAttribute('loading', '');
     //Set warning status to false on server
     try {
-      const response = await UserAPI.updateWarningStatus(AuthAPI.currentUser._id, formData);          
-      Auth.currentUser = updatedUser;
-      console.log(response);
+      const updatedUser = await UserAPI.updateById(AuthAPI.currentUser._id, JSON.stringify({"warningStatus":false}), true);      
+      delete updatedUser.password;       
+      AuthAPI.currentUser = updatedUser;     
+      AuthAPI.currentUser = updatedUser;
     }catch(err){      
-      Toast.show(err, 'error');
+      console.log(err);
     }
      warningBtn.removeAttribute('loading');
     warningDialog.hide(); 

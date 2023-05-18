@@ -15063,17 +15063,19 @@ class ProfileView {
    */
   async warningReceived(e) {
     e.preventDefault();
-    const formData = e.detail.formData;
     const warningBtn = document.getElementById("warning-btn");
     let warningDialog = document.getElementById("warning-dialog");
     warningBtn.setAttribute('loading', '');
     //Set warning status to false on server
     try {
-      const response = await _UserAPI.default.updateWarningStatus(_AuthAPI.default.currentUser._id, formData);
-      Auth.currentUser = updatedUser;
-      console.log(response);
+      const updatedUser = await _UserAPI.default.updateById(_AuthAPI.default.currentUser._id, JSON.stringify({
+        "warningStatus": false
+      }), true);
+      delete updatedUser.password;
+      _AuthAPI.default.currentUser = updatedUser;
+      _AuthAPI.default.currentUser = updatedUser;
     } catch (err) {
-      _Toast.default.show(err, 'error');
+      console.log(err);
     }
     warningBtn.removeAttribute('loading');
     warningDialog.hide();
@@ -17185,7 +17187,6 @@ class IntrodoctionView {
    */
   async unsetIntroFlag() {
     try {
-      new FormData().append("showIntro", false);
       const updatedUser = await _UserAPI.default.updateById(_AuthAPI.default.currentUser._id, JSON.stringify({
         "showIntro": false
       }), true);
@@ -18539,7 +18540,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61267" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65316" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

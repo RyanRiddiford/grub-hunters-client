@@ -26,7 +26,6 @@ class IntrodoctionView {
  */
   async unsetIntroFlag() {
             try {
-              new FormData().append("showIntro",false);
       const updatedUser = await UserAPI.updateById(AuthAPI.currentUser._id, JSON.stringify({"showIntro":false}), true);      
       delete updatedUser.password;       
       AuthAPI.currentUser = updatedUser;     
