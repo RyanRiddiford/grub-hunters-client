@@ -9,7 +9,6 @@ import App from './../../App';
 import {html, render } from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
-import { remove } from '../../../../backend/models/review.model';
 import enumUtils from '../../utils/enum.utils';
 
 //Introduction page
