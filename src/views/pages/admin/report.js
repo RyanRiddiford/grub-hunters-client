@@ -184,7 +184,7 @@ sl-dialog::part(panel) {
           <p>${AuthAPI.currentReport.text}</p>
         </div>
       </div> 
-      ${(AuthAPI.currentReport.status == "closed") ?
+      ${(AuthAPI.currentReport.status == "active") ?
       html`
       <div class="bot">
        
