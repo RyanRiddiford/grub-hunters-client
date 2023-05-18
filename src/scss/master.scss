@@ -1,0 +1,39 @@
+@import 'vars';
+@import 'base';
+@import 'shoelace';
+@import 'toast';
+
+body {
+    padding: 0;  
+    color: var(--base-txt-color);
+    font-family: var(--base-font-family);
+    // font-weight: 300;
+    background: var(--body-bg);
+    height: 100vh;
+    margin: 0 auto;
+    width:100vw;
+}
+
+
+// root ---------------
+#root {
+    display:flex;
+    flex-direction: column;
+  }
+
+
+
+.page-content {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+padding-top:200px;
+padding-bottom: 200px;   
+
+
+}
+
+

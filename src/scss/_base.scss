@@ -1,0 +1,227 @@
+// Base
+  
+  body {
+    padding: 0;  
+    margin: 0;
+    color: var(--base-txt-color);
+    font-family: var(--base-font-family);
+    font-weight: 300;
+    font-size:16px;
+    background: var(--body-bg);
+    height: 100vh;
+  }
+  
+  
+  //Headings ------------
+  h1,h2,h3 {
+    margin: 0 0 .5em;
+    color: var(--heading-txt-color);
+  }
+
+  h1 {
+    font-size: var(--h1-font-size);
+    font-weight:var(--h1-font-weight);
+    font-family:var(--heading-font-family);
+  }
+
+  h2 {
+    font-size: var(--h2-font-size);
+    font-weight:var(--h2-font-weight);
+    font-family:var(--heading-font-family);
+  }
+
+  h3 {
+    font-size: var(--h3-font-size);
+    font-weight:var(--h3-font-weight);
+    font-family:var(--heading-font-family);
+  }
+
+
+
+  
+  //Links ---------------
+  a {
+    color: var(--link-color);
+  }
+
+
+
+
+
+
+//Pagination ---------------
+    .hidden {
+      display:none;
+    }
+
+    .pagination {
+      width:50%;
+      padding-left:20px;
+      padding-right:20px;
+    }
+      
+    .prev-page-btn {
+    width:100px;
+     float:left;
+    }
+    
+    .next-page-btn {
+      width:100px;
+     float:right;
+    }
+
+
+
+//Your Reviews view ---------------
+#reviews-container {
+    display: flex;
+    flex-direction:column;
+    width:700px;
+    gap:20px;
+    }
+    
+
+    //Reviews section of public restaurant view ---------------
+    #reviews-section {
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        align-items:center; 
+                width: 800px;
+                   padding:20px;
+                border-radius:20px;
+                box-shadow: var(--main-content-box-shadow);
+                margin-top:50px;
+      }
+
+    #reviews-section .top {
+    display:flex;
+    flex-direction:row;
+    width:80%;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+
+  }
+  
+  #reviews-section .top h2 {
+    align-self:center;
+  }
+  
+   .create-review-btn {
+    margin-left:200px;
+  }   
+
+
+
+
+//Introduction/User Guide view ---------------
+      .intro-guide {
+        display:flex;
+        flex-direction: column;
+        justify-content:center;
+        gap:40px;
+        width: 700px;
+        align-items: center;
+        border: 4px solid var(--brand-color);
+        background:var(--body-bg);
+        margin:auto;
+        border-radius: 20px;
+        padding:30px;
+      }
+
+      .intro-guide div {
+        width:80%;
+        padding:40px;
+        box-shadow:var(--main-content-box-shadow);
+      }
+    
+      .intro-guide div p {
+         width:50%;
+      }
+
+      .intro-guide div h2 {
+        text-align: center;
+      }
+
+
+
+//Search Reports/Your Reviews Views ---------------
+      #reports-container, #restaurants-container, #reviews-container {
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .search-container {
+        border:var(--main-content-border);
+        border-radius:20px;
+        padding:40px;
+        padding-top:20px;
+        align-items: center;
+      }
+
+      .form-search {
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+      }
+
+      //Margin between dropdowns and search button for report search page
+      .dropdown-container {
+        margin-bottom:20px;
+      }
+
+
+#search-submit-btn {
+  width:100%;
+}
+
+
+
+
+// RESPONSIVE - MOBILE -------------------
+@media all and (max-width: 768px){ 
+
+
+
+  //Introduction/User Guide view ---------------
+  .intro-guide {
+    width: 100vw;
+    margin:0;
+    border: none;
+    border-radius: 0;
+    align-items:center;
+  }
+
+  .intro-guide div {
+    width:80%;
+    box-shadow: none;
+  }
+
+  .intro-guide div p {
+     width:100%;
+     font-size:var(--body-font-size);
+     font-weight:var(--body-font-weight);
+  }
+
+.intro-guide .overview-container p {
+text-align: center;
+}
+
+
+
+  //Active Reports/Search Reports View ---------------
+.search-container {
+  border:none;
+  border-radius:0px;
+}
+
+h1 {
+  text-align:center;
+}
+
+
+  }
+  
