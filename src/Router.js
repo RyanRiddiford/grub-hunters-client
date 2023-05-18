@@ -10,7 +10,7 @@
 import errorView from './views/pages/404'
 import loginView from './views/pages/auth'
 import profileView from './views/pages/profile'
-import searchView from './views/pages/search-restaurants';
+import searchRestaurantsView from './views/pages/search-restaurants';
 import searchTicketsView from './views/pages/admin/search-reports';
 import reportView from './views/pages/admin/report';
 import editProfileView from './views/pages/edit-profile';
@@ -25,7 +25,7 @@ const routes = {
 	'/profile': profileView,
 	'404' : errorView,
 	'/login': loginView,	
-	'/search': searchView,
+	'/search-restaurants': searchRestaurantsView,
 	'/edit-profile': editProfileView,
 	'/reviews':reviewsView,
 	'/restaurant':restaurantView,
