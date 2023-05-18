@@ -8,7 +8,7 @@
 
 //Import dependencies
 import { LitElement, html, css } from '@polymer/lit-element';
-import Auth from '../../../services/AuthAPI';
+import AuthAPI from '../../../services/AuthAPI';
 
 
 //Define custom element
@@ -28,8 +28,8 @@ customElements.define('login-form', class LoginForm extends LitElement {
         const formData = e.detail.formData;
         const submitBtn = this.shadowRoot.querySelector('#login-btn');
         submitBtn.setAttribute('loading', '');
-        // sign in using Auth    
-        Auth.signIn(formData, () => {
+        // sign in using AuthAPI    
+        AuthAPI.signIn(formData, () => {
           submitBtn.removeAttribute('loading');
         });
       }
