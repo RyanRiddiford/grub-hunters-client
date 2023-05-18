@@ -100,14 +100,18 @@ console.log(userData);
   async signIn(userData, fail = false){
 
 
+    let email = userData.get("email");
+    let password = userData.get("password");
+
+    let bodyData = {email:email, password:password};
 
 
     const response = await fetch(`${App.apiBase}/auth/signin`, {
       method: 'POST',   
-      // headers: {
-      //   'Content-Type':'multipart/form-data'
-      // },
-      body: userData
+      headers: {
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify(bodyData)
     });
 
     // if response not ok

@@ -7286,12 +7286,18 @@ class AuthAPI {
    */
   async signIn(userData) {
     let fail = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    let email = userData.get("email");
+    let password = userData.get("password");
+    let bodyData = {
+      email: email,
+      password: password
+    };
     const response = await fetch("".concat(_App.default.apiBase, "/auth/signin"), {
       method: 'POST',
-      // headers: {
-      //   'Content-Type':'multipart/form-data'
-      // },
-      body: userData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyData)
     });
 
     // if response not ok
@@ -18533,7 +18539,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59356" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61267" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
