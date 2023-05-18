@@ -1,5 +1,5 @@
 /**
- * Report endpoint HTTP service
+ * Report endpoint API service
  * 
  * Author: Ryan Riddiford
  * Student ID: 20862086
@@ -22,8 +22,6 @@ class ReportAPI {
  * @returns The new report
  */
   async create(reportData) {
-
-    console.log("in report create method");
 
     //If parameter values are missing, exit function
     if (!reportData)
@@ -130,12 +128,7 @@ class ReportAPI {
  */
 async getNumPages(report_status, target_type) {
 
-  console.log("getting num pages");
-  console.log(report_status);
-  console.log(target_type);
-
   let endpoint = `${App.apiBase}/report/num/page/qty/${report_status}/${target_type}`;
-  console.log(endpoint);
 
   //Fetch json
   const response = await fetch(endpoint, {
@@ -147,10 +140,10 @@ async getNumPages(report_status, target_type) {
 //If response is not ok
 if(!response.ok){ 
    //Log error to console
-   const err = await response.json()
-   if(err) console.log(err)
+   const err = await response.json();
+   if(err) console.log(err);
    //Throw new error  
-   throw new Error('Problem getting number of review pages')
+   throw new Error('Problem getting number of review pages');
  }
 
 
@@ -193,13 +186,6 @@ if (err) {
 throw new Error('Failed to delete report');
 }
 
-//Log response message to console
-console.log(await response.json());
-
-//TODO remove this TODOTODO
-console.log('report deleted');
-
-
 Toast.show('report deleted');
     
 }
@@ -207,8 +193,7 @@ Toast.show('report deleted');
 
 //Close a report ticket
 async closeTicket(reportId) {
-  console.log("closing ticket");
-  console.log(reportId);
+
     //If parameter values are missing, exit function
     if(!reportId) 
                         return;
@@ -247,10 +232,6 @@ async closeTicket(reportId) {
  */
 async getPage(page, reportStatus, targetType) {
 
-  console.log(page);
-  console.log(reportStatus);
-  console.log(targetType);
-
        //Fetch json array
        const response = await fetch(`${App.apiBase}/report/${page}/${reportStatus}/${targetType}`, {
         headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
@@ -259,27 +240,22 @@ async getPage(page, reportStatus, targetType) {
     //If response is not ok
     if(!response.ok){ 
         //Log error to console
-        const err = await response.json()
-        if(err) console.log(err)
+        const err = await response.json();
+        if(err) console.log(err);
         //Throw new error  
-        throw new Error('Problem getting reports')
+        throw new Error('Problem getting reports');
       }
 
     //Convert json and store as data
     const data = await response.json();
-
-      //TODO REMOVE THIS CONSOLE LOG
-    console.log(data);
     
     //Return data
     return data;
 
 }
 
-
-
 }
 
 
 //Export this api service for reports
-export default new ReportAPI()
+export default new ReportAPI();

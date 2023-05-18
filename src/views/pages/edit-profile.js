@@ -8,11 +8,7 @@
 //Import dependencies
 import App from '../../App';
 import {html, render } from 'lit-html';
-import {gotoRoute, anchorRoute} from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
-import UserAPI from '../../services/UserAPI';
-import Toast from '../../Toast';
-import moment from 'moment';
 
 
 //Edit profile view
@@ -49,4 +45,5 @@ class EditProfileView {
 
 }
 
+//Export the view
 export default new EditProfileView();

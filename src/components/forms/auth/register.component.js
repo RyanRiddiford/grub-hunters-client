@@ -19,6 +19,7 @@ customElements.define('register-form', class RegisterForm extends LitElement {
 
   constructor(){
     super();
+    //Set reviewer register form as default
     this.currentForm = "Reviewer";    
   }
 
@@ -29,14 +30,11 @@ customElements.define('register-form', class RegisterForm extends LitElement {
     registerSubmitHandler(e){
         e.preventDefault();
         const formData = e.detail.formData;
-        console.log(formData);
         const submitBtn = this.shadowRoot.querySelector('#register-btn');
-        submitBtn.setAttribute('loading', '');
-        console.log("signing up");
-        // sign in using Auth    
-        Auth.signUp(formData, () => {        
-        });
-        submitBtn.removeAttribute('loading');
+        submitBtn.setAttribute('loading', '');  
+        Auth.signUp(formData,() => {}).then(() => {
+          submitBtn.removeAttribute('loading');
+        });    
       }
 
 

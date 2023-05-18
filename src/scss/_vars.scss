@@ -18,10 +18,6 @@
     --light-link-color: #{$light-txt-color};
     --light-txt-color: #{$light-txt-color};
 
-
-
-
-
     //Nav Link Font
     $nav-font-size:1.1rem;
     $nav-font-weight:600;
@@ -86,14 +82,12 @@
     --mid-rating:yellow;
     --low-rating:red;
     
-    // app header
+    //App header
     --app-header-height: 60px;
     --app-header-txt-color: #fff;
     --app-header-title-font-size: 1.6em;
   
-    // shoelace tokens
-    // full list here:
-    // https://github.com/shoelace-style/shoelace/blob/current/src/styles/base.scss
+    //Shoelace tokens
     --sl-color-primary-50: #6F7A82;
     --sl-color-primary-100: #{lighten($brand-color, 40%)};
     --sl-color-primary-200: #{lighten($brand-color, 30%)};
@@ -110,7 +104,7 @@
 
 
 
-    //borders/box shadows
+    //Borders/Box shadows
     --main-content-border: 4px solid #{$brand-color};
     --main-content-box-shadow:0 0 8px #e3e3e3;
     --dialog-box-shadow: 0 0 10px #252424;

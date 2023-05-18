@@ -7,10 +7,7 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
-import Auth from '../../services/AuthAPI';
-import App from '../../App';
+import { LitElement, html } from '@polymer/lit-element';
 
 
 //Define the footer element as a custom element
@@ -28,11 +25,6 @@ customElements.define('app-footer', class AppFooter extends LitElement {
         type:String
       }
     }
-  }
-
-
-  firstUpdated(){
-    super.firstUpdated(); 
   }
 
   /**

@@ -5,6 +5,7 @@
  * Student ID: 20862086
  */
 
+//Imports
 import App from '../../App';
 import {html, render } from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
@@ -18,6 +19,10 @@ import paginationUtils from '../../utils/pagination.utils';
 class SearchRestaurantsView {
 
 
+
+  /**
+   * Initialise the view
+   */
   init(){
     document.title = 'Search Restaurants';    
     this.render();   
@@ -39,13 +44,10 @@ class SearchRestaurantsView {
         const formData = e.detail.formData;
 
           this.keywords = formData.get("keywords");
-
-        let submitBtn = document.getElementById('search-submit-btn');
-        submitBtn.setAttribute('loading', '');
-
-        this.loadData();
-
-          submitBtn.removeAttribute('loading');
+          let submitBtn = document.querySelector('.submit-btn');
+          submitBtn.setAttribute('loading', '');
+          this.loadData();
+            submitBtn.removeAttribute('loading');
         
       }
 
@@ -148,5 +150,5 @@ render(template, App.rootEl);
 
 }
 
-
+//Export the view
 export default new SearchRestaurantsView();

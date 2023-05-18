@@ -5,6 +5,8 @@
  * Student ID: 20862086
  */
 
+
+//Import dependencies
 import App from './../../App';
 import {html, render } from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
@@ -13,6 +15,11 @@ import enumUtils from '../../utils/enum.utils';
 
 //Introduction page
 class IntrodoctionView {
+
+
+  /**
+   * Initialise the view
+   */
   init(){
     document.title = 'Introduction';    
     this.render();
@@ -145,7 +152,9 @@ class IntrodoctionView {
   }
 
 
-
+/**
+ * Render the view
+ */
   render(){
 
     let content;
@@ -179,4 +188,6 @@ ${content}
   }
 }
 
+
+//Export the view
 export default new IntrodoctionView();

@@ -7,10 +7,9 @@
 
 
 //Import dependencies
-import { LitElement, html, css, TemplateResult } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import { LitElement, html, TemplateResult } from '@polymer/lit-element';
+import gotoRoute from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
-import ReportAPI from '../../services/ReportAPI';
 import App from '../../App';
 import enumUtils from '../../utils/enum.utils';
 import UserAPI from '../../services/UserAPI';
@@ -65,7 +64,6 @@ type:String
      * Find and setup template for average restaurant rating
      */
     async getAvgRating() {
-      console.log("restaurant id: " + this.restaurant._id);
       const data = await ReviewAPI.getAvgReviewScore(this.restaurant._id);
       this.avgRating = data.avgRating;
       this.numReviewsMsg = data.message;
@@ -80,7 +78,6 @@ type:String
      * @returns Template for average rating display
      */
   buildRatingDisplay() {
-    console.log("avg rating: " + this.avgRating);
 //Render no rating display
 if(this.avgRating == 0) {
     return html`
@@ -117,7 +114,6 @@ return html`
     background:var(--high-rating);
   }
 </style><span class="rating-display-text">${this.avgRating}/10</span>`;
-
   }
 
     /**
@@ -130,7 +126,6 @@ return html`
       let deleteAccountBtn = html``;
       let reportAccountBtn = html``;
       let editProfileBtn = html``;
-
 
       //Render UI if this is your profile
       if (this.is_visitor == "false") {  

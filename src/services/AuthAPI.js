@@ -1,18 +1,17 @@
 /**
- * Auth endpoint HTTP service
+ * Auth endpoint API service
  * 
  * Author: Ryan Riddiford
  * Student ID: 20862086
  */
 
 //Import dependencies
-import App from '../App'
-import Router, { gotoRoute } from '../Router'
-import {html, render } from 'lit-html'
-import Toast from '../Toast'
+import App from '../App';
+import Router, { gotoRoute } from '../Router';
+import Toast from '../Toast';
 import enumUtils from '../utils/enum.utils';
 
-//Auth endpoint HTTP service
+//Auth endpoint API service
 class AuthAPI {
 
   constructor(){
@@ -33,44 +32,10 @@ class AuthAPI {
    */
   async signUp(userData, fail = false){  
 
-
-    console.log(userData.get('avatar'));
-    console.log(userData);
-
     if (userData.get("avatar")) { 
-      console.log("found the form avatar name");
           let filename = userData.get("avatar").name;
-console.log(filename);
     userData.append("filename", filename);
     }
-    // const avatarFile = userData.get('avatar');
-
-    // const uploadResponse = await fetch(`${App.apiBase}/upload-avatar`, {
-    //   method: 'POST',      
-    //   body: userData
-    // });
-
-
-    //   // if uploadResponse not ok
-    //   if(!uploadResponse.ok){      
-    //     // console log error
-    //     const err = await uploadResponse.json();
-    //     if(err) console.log(err);
-    //     // show error      
-    //     Toast.show(`Failed to upload image: ${uploadResponse.status}`);   
-    //     // run fail() functon if set
-    //     if(typeof fail == 'function') fail();
-    //   }
-
-    //   const filename = await uploadResponse.json();
-
-    // console.log(filename.filename);
-
-    // userData.set("avatar", filename.filename);
-
-console.log(userData);
-
-    //TODOTODOTODO CONTINUE MULTER UPLOAD
 
     const response = await fetch(`${App.apiBase}/user/`, {
       method: 'POST',      
@@ -99,12 +64,9 @@ console.log(userData);
    */
   async signIn(userData, fail = false){
 
-
     let email = userData.get("email");
     let password = userData.get("password");
-
     let bodyData = {email:email, password:password};
-
 
     const response = await fetch(`${App.apiBase}/auth/signin`, {
       method: 'POST',   
@@ -166,13 +128,12 @@ Toast.show(`Welcome,  ${data.user.firstName}`);
 //Welcome a restaurant
 else if (data.user.accessLevel == enumUtils.accessLevels.restaurant)
 Toast.show(`Welcome,  ${data.user.restaurantName}`);
-    // save access token (jwt) to local storage
+    //Save access token (jwt) to local storage
     localStorage.setItem('accessToken', data.accessToken)
-    // set current user
+    //Set current user
     this.currentUser = data.user            
-    // redirect to home
+    //Redirect to home
     Router.init();
-
     //Direct to the intro page on first time login
     if (this.currentUser.showIntro == true)
     gotoRoute('/intro');
@@ -193,42 +154,42 @@ Toast.show(`Welcome,  ${data.user.restaurantName}`);
    */
   async check(success){
     
-    // check local token is there
+    //Check local token is there
     if(!localStorage.accessToken){
-      // no local token!
+      //No local token!
       Toast.show("Please sign in")    
-      // redirect to sign in page      
+      //Redirect to sign in page      
       gotoRoute('/login')
-      return
+      return;
     }
     
-    // token must exist - validate token via the backend
+    //Token must exist - validate token via the backend
     const response = await fetch(`${App.apiBase}/auth/validate`, {
       method: 'GET',
       headers: {        
         "Authorization": `Bearer ${localStorage.accessToken}`
       }
-    })
+    });
     
-    // if response not ok
+    //If response not ok
     if(!response.ok){        
-      // console log error
-      const err = await response.json()
-      if(err) console.log(err)
-      // delete local token
-      localStorage.removeItem('accessToken')
-      Toast.show("session expired, please sign in")
-      // redirect to sign in      
-      gotoRoute('/login')
-      return
+      //Console log error
+      const err = await response.json();
+      if(err) console.log(err);
+      //Delete local token
+      localStorage.removeItem('accessToken');
+      Toast.show("session expired, please sign in");
+      //Redirect to sign in      
+      gotoRoute('/login');
+      return;
     }
     
-    // token is valid!
-    const data = await response.json()
-    // set currentUser obj
-    this.currentUser = data.user
-    // run success
-    success()
+    //Token is valid!
+    const data = await response.json();
+    //Set currentUser obj
+    this.currentUser = data.user;
+    //Run success
+    success();
   }
 
   /**
@@ -236,13 +197,13 @@ Toast.show(`Welcome,  ${data.user.restaurantName}`);
    * @param {*} message 
    */
   signOut(message = "You are signed out"){
-    Toast.show(message)
+    Toast.show(message);
     // delete local token
     localStorage.removeItem('accessToken');
     //Clear the entire local storage
     localStorage.clear();       
     // redirect to sign in    
-    gotoRoute('/login')
+    gotoRoute('/login');
     //Unset global objects
     this.currentUser = null;
     this.currentRestaurant = null;
@@ -252,4 +213,6 @@ Toast.show(`Welcome,  ${data.user.restaurantName}`);
   }
 }
 
+
+//Export API Service
 export default new AuthAPI();

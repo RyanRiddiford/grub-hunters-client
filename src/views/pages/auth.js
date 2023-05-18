@@ -11,7 +11,6 @@ import {html, render } from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 
 
-
 /**
  * Sign-in/Sign-up page which contains both the login and register forms
  */
@@ -55,4 +54,6 @@ class AuthView {
 
 }
 
+
+//Export the view
  export default new AuthView();     

@@ -7,7 +7,6 @@ body {
     padding: 0;  
     color: var(--base-txt-color);
     font-family: var(--base-font-family);
-    // font-weight: 300;
     background: var(--body-bg);
     height: 100vh;
     margin: 0 auto;
@@ -28,12 +27,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-
-padding-top:200px;
-padding-bottom: 200px;   
-
-
+    padding-top:200px;
+    padding-bottom: 200px;   
 }
 
 

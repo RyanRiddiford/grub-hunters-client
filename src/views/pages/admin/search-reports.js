@@ -7,11 +7,9 @@
 
 
 //Import dependencies
-import App from '../../../App'
-import {html, render } from 'lit-html'
-import {gotoRoute, anchorRoute, routes} from '../../../Router'
-import AuthAPI from '../../../services/AuthAPI'
-import moment from 'moment'
+import App from '../../../App';
+import {html, render} from 'lit-html';
+import AuthAPI from '../../../services/AuthAPI';
 import UserAPI from '../../../services/UserAPI';
 import enumUtils from '../../../utils/enum.utils';
 import ReportAPI from '../../../services/ReportAPI';
@@ -21,7 +19,7 @@ import paginationUtils from '../../../utils/pagination.utils';
 
 
 //Search reports view
-class ActiveTicketsView {
+class SearchTicketsView {
 
 
   /**
@@ -46,11 +44,9 @@ class ActiveTicketsView {
     const targetTypeDropdown = document.querySelector('#target-type-dropdown');
     statusDropdown.addEventListener('sl-select', event => {
       this.status = event.detail.item.value;
-      console.log(this.status);
     });
     targetTypeDropdown.addEventListener('sl-select', event => {
       this.targetType = event.detail.item.value;
-      console.log(this.targetType);
     });
   }
 
@@ -62,19 +58,11 @@ class ActiveTicketsView {
       async searchSubmitHandler(e) {
         if (!this.currPage)
         this.currPage = 0; 
-
         e.preventDefault();
-        //const formData = e.detail.formData;
-          //this.status = document.getElementById().value;
-          //this.targetType = formData.get("target-type");
-          console.log("submit begin");
-          console.log(this.status);
-          console.log(this.targetType);
-        let submitBtn = document.getElementById('search-submit-btn');
+        let submitBtn = document.querySelector('.submit-btn');
         submitBtn.setAttribute('loading', '');
         this.loadData();
-          submitBtn.removeAttribute('loading');
-        
+          submitBtn.removeAttribute('loading');       
       }
 
 
@@ -208,4 +196,5 @@ render(template, App.rootEl);
 }
 
 
-export default new ActiveTicketsView();
+//Export the view
+export default new SearchTicketsView();

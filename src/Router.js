@@ -18,7 +18,7 @@ import reviewsView from './views/pages/reviews';
 import restaurantView from './views/pages/restaurant';
 import introductionView from './views/pages/introduction';
 
-// define routes
+//Paths to views
 const routes = {
 	'/': profileView,	
 	'/home':profileView,
@@ -34,56 +34,72 @@ const routes = {
 '/intro': introductionView
 }
 
+
+//Responsible for routing between views of the SPA
 class Router {
+
+
+	//Instantiate route paths as class variable
 	constructor(){
 		this.routes = routes
 	}
 	
-	init(){
-		// initial call
-		this.route(window.location.pathname)
 
-		// on back/forward
+	/**
+	 * Initialise
+	 */
+	init(){
+		//Initial call
+		this.route(window.location.pathname);
+		//Triggers on back/forward
 		window.addEventListener('popstate', () => {
-			this.route(window.location.pathname)
-		})
+			this.route(window.location.pathname);
+		});
 	}
 	
+	
+	/**
+	 * Initialises the view being routed to
+	 * @param {*} fullPathname The path to route to
+	 */
 	route(fullPathname){
-		// extract path without params
-		const pathname = fullPathname.split('?')[0]
-		const route = this.routes[pathname]
+		//Extract path without params
+		const pathname = fullPathname.split('?')[0];
+		const route = this.routes[pathname];
 		
 		if(route){
-			// if route exists, run init() of the view
-			this.routes[window.location.pathname].init()
+			//If route exists, run init() of the view
+			this.routes[window.location.pathname].init();
 		}else{			
-			// show 404 view instead
-			this.routes['404'].init()			
+			//Show 404 view instead
+			this.routes['404'].init();			
 		}
 	}
 
+	/**
+	 * Specifies where to route next
+	 * @param {*} pathname 
+	 */
 	gotoRoute(pathname){
-		
 		window.history.pushState({}, pathname, window.location.origin + pathname);
-		this.route(pathname)
+		this.route(pathname);
 	}	
 }
 
-// create appRouter instance and export
+//Create appRouter instance and export
 const AppRouter = new Router()
-export default AppRouter
+export default AppRouter;
 
 
-// programmatically load any route
+//Programmatically load any route
 export function gotoRoute(pathname){
 	AppRouter.gotoRoute(pathname);
 }
 
 
-// allows anchor <a> links to load routes
+//Allows anchor <a> links to load routes
 export function anchorRoute(e){
-	e.preventDefault()	
-	const pathname = e.target.closest('a').pathname
-	AppRouter.gotoRoute(pathname)
+	e.preventDefault();
+	const pathname = e.target.closest('a').pathname;
+	AppRouter.gotoRoute(pathname);
 }

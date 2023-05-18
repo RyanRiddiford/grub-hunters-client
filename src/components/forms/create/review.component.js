@@ -7,10 +7,7 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../../Router';
-import Auth from '../../../services/AuthAPI';
-import App from '../../../App';
+import { LitElement, html } from '@polymer/lit-element';
 import Toast from '../../../Toast';
 import ReviewAPI from '../../../services/ReviewAPI';
 import AuthAPI from '../../../services/AuthAPI';
@@ -45,7 +42,6 @@ customElements.define('review-form', class ReviewForm extends LitElement {
     submitBtn.setAttribute('loading', '');
     try {
       const response = await ReviewAPI.create(formData);      
-      console.log(response);
       Toast.show('review created');
     }catch(err){      
       Toast.show(err, 'error');

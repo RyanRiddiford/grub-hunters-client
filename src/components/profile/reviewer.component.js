@@ -7,11 +7,10 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import { LitElement, html } from '@polymer/lit-element';
+import gotoRoute from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
 import App from '../../App';
-import moment from 'moment';
 import UserAPI from '../../services/UserAPI';
 
 

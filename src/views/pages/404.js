@@ -39,4 +39,6 @@ class ErrorView {
   }
 }
 
+
+//Export the view
 export default new ErrorView();

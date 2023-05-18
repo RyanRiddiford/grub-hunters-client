@@ -5,15 +5,11 @@
  * Student ID: 20862086
  */
 
-import App from './../../App'
-import {html, render } from 'lit-html'
-import {gotoRoute, anchorRoute} from './../../Router'
-import AuthAPI from '../../services/AuthAPI'
-import moment from 'moment'
+import App from './../../App';
+import {html, render } from 'lit-html';
+import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import enumUtils from '../../utils/enum.utils';
-import Toast from '../../Toast';
-import mascot from '../partials/mascot.partial';
 
 
 //Profile view
@@ -26,8 +22,7 @@ class ProfileView {
     document.title = 'Profile';    
     this.render();    
     //Show warning dialog to user with first demerit
-    this.showWarning();
-    
+    this.showWarning(); 
   }
 
 
@@ -114,4 +109,6 @@ class ProfileView {
 
 }
 
+
+//Export the view
 export default new ProfileView();

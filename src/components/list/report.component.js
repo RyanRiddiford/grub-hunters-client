@@ -8,17 +8,12 @@
 
 //Import dependencies
 import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import gotoRoute from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
-import App from '../../App';
-import ReviewAPI from '../../services/ReviewAPI';
-import Toast from '../../Toast';
-import enumUtils from '../../utils/enum.utils';
 
 
 //Define custom element
 customElements.define('report-listing', class ReportListing extends LitElement {
-
 
   constructor(){
     super();  
@@ -43,7 +38,6 @@ customElements.define('report-listing', class ReportListing extends LitElement {
    * @returns Render of report listing
    */
   render(){
-
 
     return html`
 

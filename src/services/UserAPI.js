@@ -1,5 +1,5 @@
 /**
- * User endpoint HTTP service
+ * User endpoint API service
  * 
  * Author: Ryan Riddiford
  * Student ID: 20862086
@@ -9,9 +9,6 @@
 //Import dependencies
 import App from '../App';
 import AuthAPI from './AuthAPI';
-import Toast from '../Toast';
-import { query } from '@polymer/lit-element';
-
 
 
 //User API request methods
@@ -25,7 +22,6 @@ class UserAPI {
    * @returns The updated user
    */
   async updateById(userId, userData, isJson){
-
 
 
     let headerOptions;
@@ -43,9 +39,7 @@ class UserAPI {
                       headerOptions = { "Authorization": `Bearer ${localStorage.accessToken}`}  
                       
     if (userData.get("avatar")) { 
-      console.log("found the form avatar name");
           let filename = userData.get("avatar").name;
-console.log(filename);
     userData.append("filename", filename);
     }
                       
@@ -62,7 +56,6 @@ console.log(filename);
 
     //If response is not ok
     if(!response.ok){
-
       //Log error to console
       const err = await response.json();
       if(err) console.log(err);
@@ -97,61 +90,16 @@ console.log(filename);
       
       
           //If response is not ok
-          if(!response.ok){
-      
+          if(!response.ok){     
             //Log error to console
             const err = await response.json();
             if(err) console.log(err);
             //Throw new error   
             throw new Error('Problem giving user a demerit');
           }
-      
-          console.log("gave user demerit!");
+
           //Convert to json and store as data
           const data = await response.json();
-          
-          console.log(data.message);
-
-          //Return data
-          return data;
-        }
-
-
-
-    async updateWarningStatus(userId, userData) {
-
-
-      let headerOptions = { "Authorization": `Bearer ${localStorage.accessToken}`,
-      "Content-Type": "application/json",                          
-      }     
-
-    //If parameter values are missing, exit function
-    if(!userId || !userData) 
-                        return;
-          
-          //Await PUT request on server
-          const response = await fetch(`${App.apiBase}/user/warning-status/${userId}`, {
-            method: "PUT",
-              headers: headerOptions,
-              body:userData
-          });
-      
-      
-          //If response is not ok
-          if(!response.ok) {
-      
-            //Log error to console
-            const err = await response.json();
-            if(err) console.log(err);
-            //Throw new error   
-            throw new Error('Problem updating warning status');
-          }
-      
-          console.log("updated warning status!");
-          //Convert to json and store as data
-          const data = await response.json();
-          
-          console.log(data.message);
 
           //Return data
           return data;
@@ -165,9 +113,6 @@ console.log(filename);
    * @returns The user associated with the user id
    */
   async getById(userId){
-
-    
-    console.log("getting user by id now");
 
     //If parameter values are missing, exit function
     if(!userId) return;
@@ -222,10 +167,6 @@ if (err) {
 throw new Error('Failed to delete user');
 }
 
-//Log response message to console
-console.log(await response.json());
-
-
 //Sign the user out
 AuthAPI.signOut("Your account has been deleted");
 
@@ -242,20 +183,18 @@ AuthAPI.signOut("Your account has been deleted");
  */
 async getPage(page, accessLevel, keywords = "") {
 
-  console.log(keywords);
-
        //Fetch json array
        const response = await fetch(`${App.apiBase}/user/${page}/${accessLevel}/${keywords}`, {
         headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
-      })
+      });
 
     //If response is not ok
     if(!response.ok){ 
         //Log error to console
-        const err = await response.json()
-        if(err) console.log(err)
+        const err = await response.json();
+        if(err) console.log(err);
         //Throw new error  
-        throw new Error('Problem getting restaurants')
+        throw new Error('Problem getting restaurants');
       }
 
     //Convert json and store as data
@@ -275,7 +214,7 @@ async getNumPages(keywords = "", userType) {
   //Fetch json array
   const response = await fetch(`${App.apiBase}/user/${userType}/${keywords}`, {
    headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
- })     
+ });   
 
 
 
@@ -283,15 +222,11 @@ async getNumPages(keywords = "", userType) {
 //If response is not ok
 if(!response.ok){ 
    //Log error to console
-   const err = await response.json()
-   if(err) console.log(err)
+   const err = await response.json();
+   if(err) console.log(err);
    //Throw new error  
-   throw new Error('Problem getting number of review pages')
+   throw new Error('Problem getting number of review pages');
  }
-
-
-
- console.log("here is the data");
 
 
 //Convert json and store as data
@@ -331,4 +266,4 @@ async getRestaurantName(restaurantId) {
 
 
 //Export this api service for users
-export default new UserAPI()
+export default new UserAPI();

@@ -5,6 +5,7 @@
  * Student ID: 20862086
  */
 
+//Imports
 import App from './../../App';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
@@ -12,6 +13,7 @@ import ReviewAPI from '../../services/ReviewAPI';
 import paginationUtils from '../../utils/pagination.utils';
 
 
+//Displays your reviews as paginated listings
 class ReviewsView {
 
 
@@ -113,5 +115,5 @@ render(template, App.rootEl);
 
 }
 
-
+//Export the reviews view
 export default new ReviewsView();

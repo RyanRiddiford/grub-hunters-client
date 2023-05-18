@@ -1,5 +1,5 @@
 /**
- * Review endpoint HTTP service
+ * Review endpoint API service
  * 
  * Author: Ryan Riddiford
  * Student ID: 20862086
@@ -15,13 +15,6 @@ import enumUtils from '../utils/enum.utils';
 
 //Review API request methods
 class ReviewAPI {
-
-  constructor() {
-    this.reviews = [];
-    this.activeReview = {};
-  }
-
-
 
     /**
  * Create a new review
@@ -102,10 +95,6 @@ Toast.show(err.message,'error')
                         }
 
 
-
-
-
-
     //If response is not ok
     if(!response.ok){
 
@@ -129,9 +118,6 @@ Toast.show(err.message,'error')
    * @returns The review associated with the review id
    */
   async getById(reviewId){
-
-    console.log("getting review");
-    console.log(reviewId);
     
     //If parameter values are missing, exit function
     if(!reviewId) return;
@@ -218,12 +204,6 @@ if (err) {
 throw new Error('Failed to delete review');
 }
 
-//Log response message to console
-console.log(await response.json());
-
-//TODO remove this TODOTODO
-console.log('Review deleted');
-
 
 Toast.show('Review deleted');
     
@@ -243,25 +223,20 @@ async getPage(page, restaurantId, accessLevel) {
              //Fetch json array
        const response = await fetch(`${App.apiBase}/review/${restaurantId}/${page}/${accessLevel}`, {
         headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
-      })     
+      });     
   
-
-
 
     //If response is not ok
     if(!response.ok){ 
         //Log error to console
-        const err = await response.json()
-        if(err) console.log(err)
+        const err = await response.json();
+        if(err) console.log(err);
         //Throw new error  
-        throw new Error('Problem getting reviews')
+        throw new Error('Problem getting reviews');
       }
 
     //Convert json and store as data
     const data = await response.json();
-
-      //TODO REMOVE THIS CONSOLE LOG
-    console.log(data);
     
     //Return data
     return data;
@@ -278,7 +253,7 @@ async getNumPages(id) {
              //Fetch json array
              const response = await fetch(`${App.apiBase}/review/${id}/${AuthAPI.currentUser.accessLevel}`, {
               headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
-            })     
+            });     
         
       
       
@@ -286,19 +261,16 @@ async getNumPages(id) {
           //If response is not ok
           if(!response.ok){ 
               //Log error to console
-              const err = await response.json()
-              if(err) console.log(err)
+              const err = await response.json();
+              if(err) console.log(err);
               //Throw new error  
-              throw new Error('Problem getting number of review pages')
+              throw new Error('Problem getting number of review pages');
             }
 
 
       
           //Convert json and store as data
           const data = await response.json();
-      
-            //TODO REMOVE THIS CONSOLE LOG
-          console.log(data);
           
           //Return data
           return data;
@@ -331,9 +303,6 @@ async getRestaurantReviews(page) {
 
     //Convert json and store as data
     const data = await response.json();
-
-      //TODO REMOVE THIS CONSOLE LOG
-    console.log(data);
     
     //Return data
     return data;
@@ -343,11 +312,7 @@ async getRestaurantReviews(page) {
 
 
 
-
-
-
 }
-
 
 
 

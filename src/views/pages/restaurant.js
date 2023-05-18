@@ -137,5 +137,5 @@ render(listingTemplates, document.getElementById("reviews-container"));
 }
 
 
-
+//Export the view
 export default new RestaurantView();

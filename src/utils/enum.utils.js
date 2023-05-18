@@ -5,6 +5,8 @@
  * Student ID: 20862086
  */
 
+
+//Collection of enums for global use
 class EnumUtils {
 
 //Enum of access levels

@@ -7,10 +7,8 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import { LitElement, html } from '@polymer/lit-element';
 import AuthAPI from '../../services/AuthAPI';
-import App from '../../App';
 import ReviewAPI from '../../services/ReviewAPI';
 import Toast from '../../Toast';
 import UserAPI from '../../services/UserAPI';
@@ -61,7 +59,6 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
   async updateReviewSubmitHandler(e){
     e.preventDefault();
     const formData = e.detail.formData;
-console.log(this.review._id);
     try {
       const response = await ReviewAPI.updateById(this.review._id, formData);     
       console.log(response);
@@ -132,9 +129,6 @@ return html`
    * @param {*} review 
    */
   async voteReview(vote) {
-console.log(this.review.downvoters);
-console.log(this.shadowRoot.getElementById('downvote-btn'));
-console.log(this.shadowRoot.getElementById('upvote-btn'));
 //Upvote the review, remove downvote if it exists
     if (vote == "upvote") {
       this.review.upvotes++;
@@ -143,7 +137,6 @@ if (this.review.downvoters.includes(AuthAPI.currentUser._id)) {
   this.review.downvotes--;
 this.review.downvoters = this.review.downvoters.slice(AuthAPI.currentUser._id, -1);  
 }
-
 this.shadowRoot.getElementById('upvote-btn').removeAttribute('disabled');
 this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled','');
     }
@@ -155,13 +148,12 @@ if (this.review.upvoters.includes(AuthAPI.currentUser._id)) {
   this.review.upvotes--;
 this.review.upvoters = this.review.upvoters.slice(AuthAPI.currentUser._id, -1);  
 }
-
 this.shadowRoot.getElementById('downvote-btn').removeAttribute('disabled');
 this.shadowRoot.getElementById('upvote-btn').setAttribute('disabled','');
     }
-    else return;
-
-    
+    else 
+      return;
+ 
 await ReviewAPI.updateById(this.review._id, JSON.stringify(this.review), true);
 
   }
