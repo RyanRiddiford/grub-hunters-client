@@ -66,6 +66,9 @@ class Router {
 		//Extract path without params
 		const pathname = fullPathname.split('?')[0];
 		const route = this.routes[pathname];
+		console.log(window.location.pathname);
+		console.log(pathname);
+		console.log(route);
 		
 		if(route){
 			//If route exists, run init() of the view

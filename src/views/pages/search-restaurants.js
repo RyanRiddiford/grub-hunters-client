@@ -44,7 +44,7 @@ class SearchRestaurantsView {
         const formData = e.detail.formData;
 
           this.keywords = formData.get("keywords");
-          let submitBtn = document.querySelector('.submit-btn');
+          let submitBtn = document.querySelector('#search-restaurants-submit-btn');
           submitBtn.setAttribute('loading', '');
           this.loadData();
             submitBtn.removeAttribute('loading');
@@ -115,7 +115,7 @@ async renderListings(data) {
      <sl-form class="form-search" @sl-submit=${this.searchSubmitHandler.bind(this)}>       
         
                <sl-input name="keywords" type="text" placeholder="Restaurant Name"></sl-input>
-            <sl-button class="submit-btn" id="search-submit-btn" type="primary" submit>Search Restaurants</sl-button>
+            <sl-button class="submit-btn" id="search-resaurants-submit-btn" type="primary" submit>Search Restaurants</sl-button>
            </sl-form>      
     </div>
 
