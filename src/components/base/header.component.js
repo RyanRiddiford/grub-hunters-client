@@ -340,7 +340,7 @@ p, span, a {
     html` 
 
     <a class="header-logo" href="/" 
-    @click="${() => {document.querySelector('.active').classList.remove('active');anchorRoute} }">
+    @click="${() => anchorRoute }">
     <div class="header-logo-container">
     ${mascot}
    <h1>Grub Hunters</h1>
