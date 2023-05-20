@@ -38,7 +38,7 @@ class EditProfileView {
       </div>
 
       <app-footer title=${document.title}></app-footer>
-    `
+    `;
     render(template, App.rootEl);
   }
 

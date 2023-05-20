@@ -49,8 +49,7 @@ type:String
     submitBtn.setAttribute('loading', '');
     try {
       const response = await ReportAPI.create(formData); 
-      console.log(response);
-      Toast.show('report created')
+      Toast.show('Report created')
     }catch(err){      
       Toast.show(err, 'error')
     }

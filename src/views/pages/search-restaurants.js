@@ -7,7 +7,10 @@
 
 //Imports
 import App from '../../App';
-import {html, render } from 'lit-html';
+import {
+	html, render
+}
+from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import enumUtils from '../../utils/enum.utils';
@@ -20,90 +23,90 @@ class SearchRestaurantsView {
 
 
 
-  /**
-   * Initialise the view
-   */
-  init(){
-    document.title = 'Search Restaurants';    
-    this.render();   
-    paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
-  }
+	/**
+	 * Initialise the view
+	 */
+	init() {
+		document.title = 'Search Restaurants';
+		this.render();
+		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
+	}
 
 
-   /**
-   * Send form data for searching data
-   * @param {*} e The event object
-   */
-      async searchSubmitHandler(e){
+	/**
+	 * Send form data for searching data
+	 * @param {*} e The event object
+	 */
+	async searchSubmitHandler(e) {
 
-        if (!this.currPage)
-        this.currPage = 0; 
+		if (!this.currPage)
+			this.currPage = 0;
 
-        e.preventDefault();
+		e.preventDefault();
 
-        const formData = e.detail.formData;
+		const formData = e.detail.formData;
 
-          this.keywords = formData.get("keywords");
-          let submitBtn = document.getElementById('search-submit-btn');
-          submitBtn.setAttribute('loading', '');
-  
-          this.loadData();
-  
-            submitBtn.removeAttribute('loading');
-        
-      }
+		this.keywords = formData.get("keywords");
+		let submitBtn = document.getElementById('search-submit-btn');
+		submitBtn.setAttribute('loading', '');
 
+		this.loadData();
 
+		submitBtn.removeAttribute('loading');
 
-      /**
- * Load a page of data
- * @param {*} isNextPage 
- */
-async loadData(isNextPage) {
-  //If loading a subsequent page
-  if (isNextPage == true || isNextPage == false) {
-      //Increment for next page
-      if (isNextPage == true) {   
-        paginationUtils.incrementPage();
-          }
-          //Decrement for previous page
-          else if (isNextPage == false) {  
-             paginationUtils.decrementPage();
-          }
-  }
-    //Find number of pages
-    const numPages = await UserAPI.getNumPages(this.keywords, enumUtils.accessLevels.restaurant);
-  //Disable/enable pagination buttons
-  paginationUtils.updatePaginationButtons(numPages);
-      //Get page of data
-      const data = await UserAPI.getPage(this.currPage, enumUtils.accessLevels.restaurant, this.keywords);
-      //Render data listing array to container element
-this.renderListings(data);
-}
+	}
 
 
-/**
- * Render the data listings to container element
- * @param {*} data array of data to render listings with
- */
-async renderListings(data) {
-        //Build template array of restaurant listings
-          const listingTemplates = [];
-          for (const item of data) {
-        listingTemplates.push(html`<restaurant-listing restaurant=${JSON.stringify(item)}></restaurant-listing>`);
-          }
 
-        //Render review listing template array to restaurants container
-  render(listingTemplates, document.getElementById("restaurants-container"));
-}
+	/**
+	 * Load a page of data
+	 * @param {*} isNextPage 
+	 */
+	async loadData(isNextPage) {
+		//If loading a subsequent page
+		if (isNextPage == true || isNextPage == false) {
+			//Increment for next page
+			if (isNextPage == true) {
+				paginationUtils.incrementPage();
+			}
+			//Decrement for previous page
+			else if (isNextPage == false) {
+				paginationUtils.decrementPage();
+			}
+		}
+		//Find number of pages
+		const numPages = await UserAPI.getNumPages(this.keywords, enumUtils.accessLevels.restaurant);
+		//Disable/enable pagination buttons
+		paginationUtils.updatePaginationButtons(numPages);
+		//Get page of data
+		const data = await UserAPI.getPage(this.currPage, enumUtils.accessLevels.restaurant, this.keywords);
+		//Render data listing array to container element
+		this.renderListings(data);
+	}
 
 
-      /**
-       * Render the view
-       */
-  render() {
+	/**
+	 * Render the data listings to container element
+	 * @param {*} data array of data to render listings with
+	 */
+	async renderListings(data) {
+		//Build template array of restaurant listings
+		const listingTemplates = [];
+		for (const item of data) {
+			listingTemplates.push(html `<restaurant-listing restaurant=${JSON.stringify(item)}></restaurant-listing>`);
+		}
 
-    const template = html`
+		//Render review listing template array to restaurants container
+		render(listingTemplates, document.getElementById("restaurants-container"));
+	}
+
+
+	/**
+	 * Render the view
+	 */
+	render() {
+
+		const template = html `
 
     <app-header title="${document.title}" user="${JSON.stringify(AuthAPI.currentUser)}"></app-header>
 
@@ -131,7 +134,7 @@ async renderListings(data) {
 
 
            <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> {this.loadData(false)}} class="prev">Previous</sl-button>
+        <sl-button class="prev-page-btn" @click=${()=> {this.loadData(false);}} class="prev">Previous</sl-button>
         <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
       </div>
            
@@ -143,10 +146,10 @@ async renderListings(data) {
     `;
 
 
-render(template, App.rootEl);
+		render(template, App.rootEl);
 
 
-  }
+	}
 
 
 

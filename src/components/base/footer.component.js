@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
 import Auth from '../../services/AuthAPI';
 import App from '../../App';
 
@@ -17,27 +23,27 @@ import App from '../../App';
 customElements.define('app-footer', class AppFooter extends LitElement {
 
 
-  constructor(){
-    super();    
-  }
+	constructor() {
+		super();
+	}
 
-  //Configure the element's custom properties
-  static get properties(){
-    return {
-      title: {
-        type:String
-      }
-    }
-  }
+	//Configure the element's custom properties
+	static get properties() {
+		return {
+			title: {
+				type: String
+			}
+		};
+	}
 
-  /**
-   * Renders the footer
-   * @returns The footer component render
-   */
-  render(){  
-    
-    //Return the header component
-    return html`
+	/**
+	 * Renders the footer
+	 * @returns The footer component render
+	 */
+	render() {
+
+		//Return the header component
+		return html `
 
     <style> 
     footer {
@@ -66,6 +72,6 @@ customElements.define('app-footer', class AppFooter extends LitElement {
 </footer>
     `;
 
-}
- 
+	}
+
 });

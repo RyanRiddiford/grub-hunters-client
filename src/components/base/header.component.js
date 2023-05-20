@@ -368,6 +368,6 @@ p, span, a {
     <div class="header-logo-container">${mascot}<h1>Grub Hunters</h1></div>`
   }  
 </header>
-    `
+    `;
   }
 });

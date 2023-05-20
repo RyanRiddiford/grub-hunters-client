@@ -235,11 +235,11 @@ sl-switch {
                   
 
        
-              <sl-input class="required" label="Email" name="email" type="email" value="nick@reviewer.com.au" placeholder="Email" required></sl-input>
+              <sl-input class="required" label="Email" name="email" type="email" placeholder="Email" required></sl-input>
      
 
    
-              <sl-input class="required" label="Password" name="password" type="password" value="reviewer123" placeholder="Password" required toggle-password></sl-input>
+              <sl-input class="required" label="Password" name="password" type="password" placeholder="Password" required toggle-password></sl-input>
      
 
 

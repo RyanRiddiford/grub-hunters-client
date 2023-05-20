@@ -69,12 +69,6 @@ Toast.show(err.message,'error')
    */
   async updateById(reviewId, reviewData, isVote){
 
-
-
-    console.log("UPDATING REVIEW");
-    console.log(reviewId);
-    console.log(reviewData);
-
     let response;
 
     //If parameter values are missing, exit function
@@ -90,9 +84,7 @@ Toast.show(err.message,'error')
         body: reviewData
     });                     
                         }
-
                         else {
-                          console.log("is not json");
               //Await PUT request on server
     response = await fetch(`${App.apiBase}/review/${reviewId}`, {
       method: "PUT",
@@ -260,9 +252,7 @@ async getNumPages(id) {
              //Fetch json array
              const response = await fetch(`${App.apiBase}/review/${id}/${AuthAPI.currentUser.accessLevel}`, {
               headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
-            });     
-        
-      
+            });        
       
       
           //If response is not ok
@@ -273,8 +263,6 @@ async getNumPages(id) {
               //Throw new error  
               throw new Error('Problem getting number of review pages');
             }
-
-
       
           //Convert json and store as data
           const data = await response.json();

@@ -112,7 +112,6 @@ async renderListings(data) {
       target = await ReviewAPI.getById(item.targetId);  
     else if (item.targetType == enumUtils.reportTargetType.restaurant) {
        target = await UserAPI.getById(item.targetId);
-       console.log("this is a restaurant: " + target);
     }
         
 

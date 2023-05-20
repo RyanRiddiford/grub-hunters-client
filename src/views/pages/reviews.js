@@ -7,7 +7,10 @@
 
 //Imports
 import App from './../../App';
-import {html, render } from 'lit-html';
+import {
+	html, render
+}
+from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import ReviewAPI from '../../services/ReviewAPI';
@@ -18,67 +21,67 @@ import paginationUtils from '../../utils/pagination.utils';
 class ReviewsView {
 
 
-  /**
-   * Initialise
-   */
-    init() {
-        document.title = 'Your Reviews';    
-this.render(); 
-paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
-this.loadData();
-    }
+	/**
+	 * Initialise
+	 */
+	init() {
+		document.title = 'Your Reviews';
+		this.render();
+		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
+		this.loadData();
+	}
 
-/**
- * Load a page of data
- * @param {*} isNextPage 
- */
-async loadData(isNextPage) {
-  //If loading a subsequent page
-  if (isNextPage == true || isNextPage == false) {
-      //Increment for next page
-      if (isNextPage == true) {   
-        paginationUtils.incrementPage();
-          }
-          //Decrement for previous page
-          else if (isNextPage == false) {  
-             paginationUtils.decrementPage();
-          }
-  }
+	/**
+	 * Load a page of data
+	 * @param {*} isNextPage 
+	 */
+	async loadData(isNextPage) {
+		//If loading a subsequent page
+		if (isNextPage == true || isNextPage == false) {
+			//Increment for next page
+			if (isNextPage == true) {
+				paginationUtils.incrementPage();
+			}
+			//Decrement for previous page
+			else if (isNextPage == false) {
+				paginationUtils.decrementPage();
+			}
+		}
 
-     //Find number of pages
-   const numPages = await ReviewAPI.getNumPages(AuthAPI.currentUser._id);
+		//Find number of pages
+		const numPages = await ReviewAPI.getNumPages(AuthAPI.currentUser._id);
 
-  //Disable/enable pagination buttons
-  paginationUtils.updatePaginationButtons();
-const data = await ReviewAPI.getPage(this.currPage, AuthAPI.currentUser._id, AuthAPI.currentUser.accessLevel);  
-      //Render data listing array to container element
-this.renderListings(data);  
-}
+		//Disable/enable pagination buttons
+		paginationUtils.updatePaginationButtons(numPages);
+		const data = await ReviewAPI.getPage(this.currPage, AuthAPI.currentUser._id, AuthAPI.currentUser.accessLevel);
+		//Render data listing array to container element
+		this.renderListings(data);
+	}
 
-/**
- * Render the data listings to container element
- * @param {*} data array of data to render listings with
- */
-async renderListings(data) {
-        //Build template array of review listings
-        const listingTemplates = [];
-        for (const item of data) {
-          const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
+	/**
+	 * Render the data listings to container element
+	 * @param {*} data array of data to render listings with
+	 */
+	async renderListings(data) {
+		//Build template array of review listings
+		const listingTemplates = [];
+		for (const item of data) {
+			const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
 
-          listingTemplates.push(html`<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
-        }
+			listingTemplates.push(html `<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
+		}
 
-        //Render review listing template array to reviews container
-  render(listingTemplates, document.getElementById("reviews-container"));
-}
+		//Render review listing template array to reviews container
+		render(listingTemplates, document.getElementById("reviews-container"));
+	}
 
 
-/**
- * Render review page
- */
-    render() {
+	/**
+	 * Render review page
+	 */
+	render() {
 
-        const template = html`
+		const template = html `
        
        
         <app-header title="Reviews" user=${JSON.stringify(AuthAPI.currentUser)}></app-header>
@@ -108,9 +111,9 @@ async renderListings(data) {
         
         `;
 
-render(template, App.rootEl);
+		render(template, App.rootEl);
 
-    }
+	}
 
 
 

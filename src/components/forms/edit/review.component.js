@@ -39,18 +39,14 @@ customElements.define('edit-review-form', class EditReviewForm extends LitElemen
    * @param {*} reviewId 
    */
   async updateReviewSubmitHandler(e, reviewId){
-    console.log("in update review submit handler");
     e.preventDefault();
     const formData = e.detail.formData;
-    console.log(formData);
-    console.log(reviewId);
     const submitBtn = document.querySelector('.submit-btn');
     submitBtn.setAttribute('loading', '');
     try {
       const updatedReview = await ReviewAPI.updateById(reviewId, formData, false);      
-      console.log(updatedReview);
       this.render();
-      Toast.show('review updated');
+      Toast.show('Review updated');
     }catch(err){      
       Toast.show(err, 'error');
     }

@@ -73,12 +73,9 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
   async updateReviewSubmitHandler(e){
     e.preventDefault();
     const formData = e.detail.formData;
-
-    console.log(formData);
     try {
       const response = await ReviewAPI.updateById(this.review._id, formData, false);     
-      console.log(response);
-      Toast.show('review created');   
+      Toast.show('Review created');   
     this.shadowRoot.getElementById('edit-dialog').hide();   
     }catch(err){      
       Toast.show(err, 'error');

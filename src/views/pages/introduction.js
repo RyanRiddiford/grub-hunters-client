@@ -37,7 +37,6 @@ class IntrodoctionView {
       delete updatedUser.password;       
       AuthAPI.currentUser = updatedUser;     
       AuthAPI.currentUser = updatedUser;
-      console.log("removed intro flag from user");
     }catch(err){      
       console.log(err);
     }  
