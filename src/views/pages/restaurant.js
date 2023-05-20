@@ -72,7 +72,7 @@ async renderListings(data) {
   for (const item of data) {
     const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
 
-    listingTemplates.push(html`<review-listing restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
+    listingTemplates.push(html`<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
   }
 
   //Render review listing template array to reviews container

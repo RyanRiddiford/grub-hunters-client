@@ -39,8 +39,11 @@ customElements.define('edit-review-form', class EditReviewForm extends LitElemen
    * @param {*} reviewId 
    */
   async updateReviewSubmitHandler(e, reviewId){
-    e.preventDefault()
+    console.log("in update review submit handler");
+    e.preventDefault();
     const formData = e.detail.formData;
+    console.log(formData);
+    console.log(reviewId);
     const submitBtn = document.querySelector('.submit-btn');
     submitBtn.setAttribute('loading', '');
     try {

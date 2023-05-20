@@ -42,10 +42,9 @@ class ProfileView {
 
 /**
  * Unsets warning flag once the user has acknowledged the warning
- * @param {*} e 
  */
-  async warningReceived(e) {
-    e.preventDefault();
+  async warningReceived() {
+    console.log("inside warning received handler");
     let warningDialog = document.getElementById("warning-dialog");
     //Set warning status to false on server
     try {
@@ -83,13 +82,9 @@ class ProfileView {
        
          const template = html`
 
-<sl-dialog id="warning-dialog" label="Confirmation" class="dialog-overview">
+<sl-dialog @sl-after-hide=${() => {this.warningReceived()}} id="warning-dialog" label="Confirmation" class="dialog-overview">
    <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>
-  <sl-form @sl-submit=${this.warningReceived.bind(this)}>
-<input type="hidden" value=${false} name="warningStatus">
-<sl-button id="warning-btn" type="primary" class="submit-btn" slot="footer" submit>Ok</sl-button>
-  </sl-form>
- 
+<sl-button id="warning-btn" slot="footer" submit>Ok</sl-button>
 </sl-dialog>
 
            <app-header title=${document.title} user="${JSON.stringify(AuthAPI.currentUser)}"></app-header>

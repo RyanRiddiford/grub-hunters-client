@@ -69,6 +69,12 @@ Toast.show(err.message,'error')
    */
   async updateById(reviewId, reviewData, isVote){
 
+
+
+    console.log("UPDATING REVIEW");
+    console.log(reviewId);
+    console.log(reviewData);
+
     let response;
 
     //If parameter values are missing, exit function
@@ -86,6 +92,7 @@ Toast.show(err.message,'error')
                         }
 
                         else {
+                          console.log("is not json");
               //Await PUT request on server
     response = await fetch(`${App.apiBase}/review/${reviewId}`, {
       method: "PUT",

@@ -23,14 +23,9 @@ class UserAPI {
    */
   async updateById(userId, userData, isJson){
 
-
+console.log("updating the user");
     let headerOptions;
 
-
-    if (userData.get("avatar")) { 
-      let filename = userData.get("avatar").name;
-userData.append("filename", filename);
-}
 
     //If parameter values are missing, exit function
     if(!userId || !userData) 
@@ -43,8 +38,9 @@ userData.append("filename", filename);
                       }
                       else {
                       headerOptions = { "Authorization": `Bearer ${localStorage.accessToken}`}  
-                      
+
     if (userData.get("avatar")) { 
+      console.log("passed usedata.get");
           let filename = userData.get("avatar").name;
     userData.append("filename", filename);
     }

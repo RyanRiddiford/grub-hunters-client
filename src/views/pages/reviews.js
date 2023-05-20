@@ -7,6 +7,7 @@
 
 //Imports
 import App from './../../App';
+import {html, render } from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import ReviewAPI from '../../services/ReviewAPI';
@@ -64,7 +65,7 @@ async renderListings(data) {
         for (const item of data) {
           const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
 
-          listingTemplates.push(html`<review-listing restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
+          listingTemplates.push(html`<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
         }
 
         //Render review listing template array to reviews container

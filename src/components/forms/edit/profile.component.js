@@ -190,7 +190,7 @@ h1 {
 
 
 
-          <sl-form class="form-edit-profile" @sl-submit=${this.updateProfileSubmitHandler.bind(this)}>
+          <sl-form class="form-edit-profile" @sl-submit=${this.updateProfileSubmitHandler.bind(this)} enctype="multipart/form-data">
 <h1>${document.title}</h1>
           <div class="avatar-input-container">
                                ${(AuthAPI.currentUser.avatar) ? html`
@@ -250,9 +250,9 @@ sl-input::part(form-control) {
 
 </style>
 
-<sl-input label="First Name" type="text" name="firstName" value="${AuthAPI.currentUser.firstName}" placeholder="First Name"></sl-input>
-<sl-input label="Surname" type="text" name="lastName" value="${AuthAPI.currentUser.lastName}" placeholder="Surname"></sl-input>
-<sl-input label="Username" type="text" name="username" value="${AuthAPI.currentUser.username}" placeholder="Username"></sl-input>
+<sl-input label="First Name" type="text" name="firstName" value="${AuthAPI.currentUser.firstName}" placeholder="First Name" required></sl-input>
+<sl-input label="Surname" type="text" name="lastName" value="${AuthAPI.currentUser.lastName}" placeholder="Surname" required></sl-input>
+<sl-input label="Username" type="text" name="username" value="${AuthAPI.currentUser.username}" placeholder="Username" required></sl-input>
 `;
   }
 
@@ -297,13 +297,12 @@ sl-input::part(form-control) {
 
 </style>
 
-<sl-input label="Restaurant Name" type="text" name="restaurantName" value="${AuthAPI.currentUser.restaurantName}" placeholder="Restaurant Name"></sl-input>
-<sl-input label="Phone Number" type="text" name="phoneNumber" value="${AuthAPI.currentUser.phoneNumber}" placeholder="Phone Number"></sl-input>
-<sl-input label="Location" type="text" name="location" value="${AuthAPI.currentUser.location}" placeholder="Location"></sl-input>
-<sl-input label="Established" type="text" name="established" value="${AuthAPI.currentUser.established}" placeholder="Established"></sl-input>
-<sl-input label="Owner" type="text" name="owner" value="${AuthAPI.currentUser.owner}" placeholder="Owner"></sl-input>
-<sl-input label="Cuisine" type="text" name="cuisine" value="${AuthAPI.currentUser.cuisine}" placeholder="Cuisine"></sl-input>
-<sl-input label="Demerits" type="text" name="demerits" value="${AuthAPI.currentUser.demerits}" placeholder="Demerits"></sl-input>
+<sl-input label="Restaurant Name" type="text" name="restaurantName" value="${AuthAPI.currentUser.restaurantName}" placeholder="Restaurant Name" required></sl-input>
+<sl-input label="Phone Number" type="text" name="phoneNumber" value="${AuthAPI.currentUser.phoneNumber}" placeholder="Phone Number" required></sl-input>
+<sl-input label="Location" type="text" name="location" value="${AuthAPI.currentUser.location}" placeholder="Location" required></sl-input>
+<sl-input label="Established" type="text" name="established" value="${AuthAPI.currentUser.established}" placeholder="Established" required></sl-input>
+<sl-input label="Owner" type="text" name="owner" value="${AuthAPI.currentUser.owner}" placeholder="Owner" required></sl-input>
+<sl-input label="Cuisine" type="text" name="cuisine" value="${AuthAPI.currentUser.cuisine}" placeholder="Cuisine" required></sl-input>
 
 `;
   }
@@ -344,10 +343,10 @@ sl-input::part(form-control) {
 </style>
 
 
-<sl-input label="First Name" type="text" name="firstName" value="${AuthAPI.currentUser.firstName}" placeholder="First Name"></sl-input>
-<sl-input label="Surname" type="text" name="lastName" value="${AuthAPI.currentUser.lastName}" placeholder="Surname"></sl-input>
+<sl-input label="First Name" type="text" name="firstName" value="${AuthAPI.currentUser.firstName}" placeholder="First Name" required></sl-input>
+<sl-input label="Surname" type="text" name="lastName" value="${AuthAPI.currentUser.lastName}" placeholder="Surname" required></sl-input>
 
-<sl-input  label="Username" type="text" name="username" value="${AuthAPI.currentUser.username}" placeholder="Username"></sl-input>  
+<sl-input  label="Username" type="text" name="username" value="${AuthAPI.currentUser.username}" placeholder="Username" required></sl-input>  
 `;
   }
 });

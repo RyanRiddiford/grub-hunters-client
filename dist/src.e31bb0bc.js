@@ -7152,6 +7152,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
 //Collection of enums for global use
 class EnumUtils {
   constructor() {
+    //S3 path to images
+    _defineProperty(this, "BUCKET_URI", "https://grub-hunters-bucket.s3.us-west-2.amazonaws.com");
     //Enum of access levels
     _defineProperty(this, "accessLevels", {
       reviewer: 1,
@@ -7509,6 +7511,7 @@ class UserAPI {
    * @returns The updated user
    */
   async updateById(userId, userData, isJson) {
+    console.log("updating the user");
     let headerOptions;
 
     //If parameter values are missing, exit function
@@ -7523,6 +7526,7 @@ class UserAPI {
         "Authorization": "Bearer ".concat(localStorage.accessToken)
       };
       if (userData.get("avatar")) {
+        console.log("passed usedata.get");
         let filename = userData.get("avatar").name;
         userData.append("filename", filename);
       }
@@ -7782,10 +7786,9 @@ class ProfileView {
 
   /**
    * Unsets warning flag once the user has acknowledged the warning
-   * @param {*} e 
    */
-  async warningReceived(e) {
-    e.preventDefault();
+  async warningReceived() {
+    console.log("inside warning received handler");
     let warningDialog = document.getElementById("warning-dialog");
     //Set warning status to false on server
     try {
@@ -7816,7 +7819,9 @@ class ProfileView {
     }
     //Render administrator profile content
     else if (_AuthAPI.default.currentUser.accessLevel == _enum.default.accessLevels.administrator) content = (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["<admin-profile></admin-profile>"])));
-    const template = (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n\n<sl-dialog id=\"warning-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n   <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>\n  <sl-form @sl-submit=", ">\n<input type=\"hidden\" value=", " name=\"warningStatus\">\n<sl-button id=\"warning-btn\" type=\"primary\" class=\"submit-btn\" slot=\"footer\" submit>Ok</sl-button>\n  </sl-form>\n \n</sl-dialog>\n\n           <app-header title=", " user=\"", "\"></app-header>\n\n           <div class=\"page-content\">\n             ", "\n           </div>\n           \n           <app-footer title=", "></app-footer>\n         "])), this.warningReceived.bind(this), false, document.title, JSON.stringify(_AuthAPI.default.currentUser), content, document.title);
+    const template = (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n\n<sl-dialog @sl-after-hide=", " id=\"warning-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n   <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>\n<sl-button id=\"warning-btn\" slot=\"footer\" submit>Ok</sl-button>\n</sl-dialog>\n\n           <app-header title=", " user=\"", "\"></app-header>\n\n           <div class=\"page-content\">\n             ", "\n           </div>\n           \n           <app-footer title=", "></app-footer>\n         "])), () => {
+      this.warningReceived();
+    }, document.title, JSON.stringify(_AuthAPI.default.currentUser), content, document.title);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
@@ -7956,7 +7961,7 @@ class SearchRestaurantsView {
     e.preventDefault();
     const formData = e.detail.formData;
     this.keywords = formData.get("keywords");
-    let submitBtn = document.querySelector('.submit-btn');
+    let submitBtn = document.getElementById('search-submit-btn');
     submitBtn.setAttribute('loading', '');
     this.loadData();
     submitBtn.removeAttribute('loading');
@@ -8334,6 +8339,9 @@ class ReviewAPI {
    * @returns The updated review
    */
   async updateById(reviewId, reviewData, isVote) {
+    console.log("UPDATING REVIEW");
+    console.log(reviewId);
+    console.log(reviewData);
     let response;
 
     //If parameter values are missing, exit function
@@ -8349,6 +8357,7 @@ class ReviewAPI {
         body: reviewData
       });
     } else {
+      console.log("is not json");
       //Await PUT request on server
       response = await fetch("".concat(_App.default.apiBase, "/review/").concat(reviewId), {
         method: "PUT",
@@ -8694,6 +8703,7 @@ var _AuthAPI = _interopRequireDefault(require("../../../services/AuthAPI"));
 var _UserAPI = _interopRequireDefault(require("../../../services/UserAPI"));
 var _ReportAPI = _interopRequireDefault(require("../../../services/ReportAPI"));
 var _enum = _interopRequireDefault(require("../../../utils/enum.utils"));
+var _Toast = _interopRequireDefault(require("../../../Toast"));
 var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -8713,30 +8723,55 @@ class ReportView {
   }
 
   /**
+   * Closes the ticket and optionally gives offender a demerit
+   * @param {*} action Denotes whether to give the target user a demerit
+   */
+  reportActionHandler(action) {
+    //Close ticket and give user a demerit
+    if (action == "demerit") {
+      const btn = document.getElementById('disciplinary-btn');
+      btn.setAttribute('loading', '');
+      //Close the report ticket
+      _ReportAPI.default.closeTicket(_AuthAPI.default.currentReport._id);
+      //If profile is flagged, get user id from report
+      if (_AuthAPI.default.currentReport.targetType == "restaurant") {
+        _UserAPI.default.giveDemerit(_AuthAPI.default.currentReport.targetId).then(() => {
+          btn.removeAttribute('loading');
+          _Toast.default.show('User has been given a demerit');
+        });
+      }
+      //If restaurant review is flagged, get user id from review
+      else if (_AuthAPI.default.currentReport.targetType == "review") {
+        _UserAPI.default.giveDemerit(_AuthAPI.default.currentTarget.authorId).then(() => {
+          btn.removeAttribute('loading');
+          _Toast.default.show('User has been given a demerit');
+        });
+      }
+    }
+    //Close ticket with no consequences
+    else if (action == "close") {
+      const btn = document.getElementById('close-ticket-btn');
+      btn.setAttribute('loading', '');
+      _ReportAPI.default.closeTicket(_AuthAPI.default.currentReport._id).then(() => {
+        btn.removeAttribute('loading');
+        _Toast.default.show('Closed report with no consequences');
+      });
+    }
+  }
+
+  /**
    * Renders the restaurant page
    */
   render() {
     let flaggedContent;
     if (_AuthAPI.default.currentReport.targetType == _enum.default.reportTargetType.review) {
-      console.log(this.restaurantName);
-      flaggedContent = (0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing review=", "></review-listing>"])), JSON.stringify(_AuthAPI.default.currentTarget));
+      flaggedContent = (0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing is_report=\"true\" review=", "></review-listing>"])), JSON.stringify(_AuthAPI.default.currentTarget));
     } else if (_AuthAPI.default.currentReport.targetType == _enum.default.reportTargetType.restaurant) {
       flaggedContent = (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<restaurant-profile is_report=\"true\" is_visitor=\"true\" restaurant=", "></restaurant-profile>"])), JSON.stringify(_AuthAPI.default.currentTarget));
     }
     const template = (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["   \n\n\n<style>\n\n\n      #report-container {\n        display: flex;\n        flex-direction: column;\n      align-items: center;\n      justify-content: center;\n      width: 700px;\n      border: 4px solid var(--brand-color);\n         padding:20px;\n\n      border-radius:20px;\n      }\n\n.top, #show-btn { \n              gap:40px;              \n              margin-bottom:20px;\n            }\n\n\n\n            .mid {\n                          display:flex;\n              flex-direction:column;\n              align-items:start;   \n              width:90%;   \n              margin-bottom:20px;\n              margin-top:20px;\n            }\n\n\n\n\n            .mid .top {\n              display:flex;\n              flex-direction:column;\n              align-items:start;  \n              width:fit-content;\n              padding:10px;\n              box-shadow: var(--main-content-box-shadow); \n            }\n\n\n            .mid .bot {\n              display:flex;\n              flex-direction:column;\n              align-items:start;    \n              padding:10px;\n              box-shadow: var(--main-content-box-shadow); \n            }\n\n            .bot {\n              display:flex;\n              flex-direction:row;\n              justify-content:space-between;\n              width:80%;\n              align-items:center;\n            }\n\n            #show-flagged-content-btn {\n              width:200px;\n            }\n\n\n            sl-dialog::part(header) {\nwidth:100%;\n            }\n\n       \nsl-dialog::part(panel) {\n    width:95vw;\n    align-items:center;\n\n}\n\n\n.bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n@media all and (max-width: 768px) { \n\n  #report-container {\n      width: 90vw;\n      border: none;\n      }\n\n            .bot {\n              flex-direction:column;\n              gap:20px;\n            }\n\n            sl-dialog::part(panel) {\n    width:100vw;\n}\n\n\n\n\n  }\n  \n\n</style>\n\n\n\n    <app-header title=", " user=\"", "\"></app-header>\n\n    \n    <sl-dialog id=\"report-target-dialog\" label=\"Flagged Content\" class=\"dialog-overview\">\n      ", "\n  <sl-button @click=\"", "\" slot=\"footer\">Close</sl-button>\n</sl-dialog>\n\n    <div class=\"page-content\">\n\n    <div id=\"report-container\">\n             <h1>Report Ticket</h1>     \n\n      <div class=\"mid\">\n       <sl-button id=\"show-btn\" @click=\"", "\">View Flagged Content</sl-button>     \n        <div class=\"top\">\n                   \n        <div class=\"reporter-container\"><span class=\"bold-text\">Reporter ID: </span><span>", "</span></div>\n        <div class=\"topic-container\"><span class=\"bold-text\">Topic: </span><span>", "</span></div>\n        </div>  \n        <div class=\"comment-container bot\">\n          <h3>Comment</h3>\n          <p>", "</p>\n        </div>\n      </div> \n      ", "\n\n\n    </div>\n\n    </div>\n    \n    <app-footer title=", "></app-footer>\n    \n    "])), document.title, JSON.stringify(_AuthAPI.default.currentUser), flaggedContent, () => {
       document.getElementById('report-target-dialog').hide();
-    }, () => document.getElementById('report-target-dialog').show(), _AuthAPI.default.currentReport.authorId, _AuthAPI.default.currentReport.topic, _AuthAPI.default.currentReport.text, _AuthAPI.default.currentReport.status == "active" ? (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n      <div class=\"bot\">\n       \n      <sl-button id=\"close-ticket-btn\" @click=", " >Close Ticket</sl-button>\n      <sl-button id=\"disciplinary-btn\" @click=", ">Disciplinary Action</sl-button>\n      </div>      \n      "])), () => _ReportAPI.default.closeTicket(_AuthAPI.default.currentReport._id), () => {
-      //Close the report ticket
-      _ReportAPI.default.closeTicket(_AuthAPI.default.currentReport._id);
-      //If profile is flagged, get user id from report
-      if (_AuthAPI.default.currentReport.targetType == "restaurant") {
-        _UserAPI.default.giveDemerit(_AuthAPI.default.currentReport.targetId);
-      }
-      //If restaurant review is flagged, get user id from review
-      else if (_AuthAPI.default.currentReport.targetType == "review") {
-        _UserAPI.default.giveDemerit(_AuthAPI.default.currentTarget.authorId);
-      }
-    }) : (0, _litHtml.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral([""]))), document.title);
+    }, () => document.getElementById('report-target-dialog').show(), _AuthAPI.default.currentReport.authorId, _AuthAPI.default.currentReport.topic, _AuthAPI.default.currentReport.text, _AuthAPI.default.currentReport.status == "active" ? (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n      <div class=\"bot\">\n       \n      <sl-button id=\"close-ticket-btn\" @click=", " >Close Ticket</sl-button>\n      <sl-button id=\"disciplinary-btn\" @click=", ">Disciplinary Action</sl-button>\n      </div>      \n      "])), () => this.reportActionHandler('close'), () => this.reportActionHandler('demerit')) : (0, _litHtml.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral([""]))), document.title);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
@@ -8744,7 +8779,7 @@ class ReportView {
 //Export the view
 var _default = new ReportView();
 exports.default = _default;
-},{"../../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../services/UserAPI":"services/UserAPI.js","../../../services/ReportAPI":"services/ReportAPI.js","../../../utils/enum.utils":"utils/enum.utils.js"}],"views/pages/edit-profile.js":[function(require,module,exports) {
+},{"../../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../services/UserAPI":"services/UserAPI.js","../../../services/ReportAPI":"services/ReportAPI.js","../../../utils/enum.utils":"utils/enum.utils.js","../../../Toast":"Toast.js"}],"views/pages/edit-profile.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8792,6 +8827,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _App = _interopRequireDefault(require("./../../App"));
+var _litHtml = require("lit-html");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _UserAPI = _interopRequireDefault(require("../../services/UserAPI"));
 var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
@@ -8852,26 +8888,26 @@ class ReviewsView {
     const listingTemplates = [];
     for (const item of data) {
       const restaurant = await _UserAPI.default.getRestaurantName(item.restaurantId);
-      listingTemplates.push(html(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing restaurant_name=", " review=", "></review-listing>"])), restaurant.restaurantName, JSON.stringify(item)));
+      listingTemplates.push((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing is_report=\"false\" restaurant_name=", " review=", "></review-listing>"])), restaurant.restaurantName, JSON.stringify(item)));
     }
 
     //Render review listing template array to reviews container
-    render(listingTemplates, document.getElementById("reviews-container"));
+    (0, _litHtml.render)(listingTemplates, document.getElementById("reviews-container"));
   }
 
   /**
    * Render review page
    */
   render() {
-    const template = html(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n       \n       \n        <app-header title=\"Reviews\" user=", "></app-header>\n        <div class=\"page-content main-container\">\n      \n  <h1>Your Reviews</h1>\n\n  <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n\n      <div id=\"reviews-container\">\n      </div>\n\n\n      <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n        </div>\n<app-footer title=", "></app-footer>\n\n\n        \n        "])), JSON.stringify(_AuthAPI.default.currentUser), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
-    render(template, _App.default.rootEl);
+    const template = (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n       \n       \n        <app-header title=\"Reviews\" user=", "></app-header>\n        <div class=\"page-content main-container\">\n      \n  <h1>Your Reviews</h1>\n\n  <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n\n      <div id=\"reviews-container\">\n      </div>\n\n\n      <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n        </div>\n<app-footer title=", "></app-footer>\n\n\n        \n        "])), JSON.stringify(_AuthAPI.default.currentUser), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
+    (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
 
 //Export the reviews view
 var _default = new ReviewsView();
 exports.default = _default;
-},{"./../../App":"App.js","../../services/AuthAPI":"services/AuthAPI.js","../../services/UserAPI":"services/UserAPI.js","../../services/ReviewAPI":"services/ReviewAPI.js","../../utils/pagination.utils":"utils/pagination.utils.js"}],"views/pages/restaurant.js":[function(require,module,exports) {
+},{"./../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../services/AuthAPI":"services/AuthAPI.js","../../services/UserAPI":"services/UserAPI.js","../../services/ReviewAPI":"services/ReviewAPI.js","../../utils/pagination.utils":"utils/pagination.utils.js"}],"views/pages/restaurant.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8943,7 +8979,7 @@ class RestaurantView {
     const listingTemplates = [];
     for (const item of data) {
       const restaurant = await _UserAPI.default.getRestaurantName(item.restaurantId);
-      listingTemplates.push((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing restaurant_name=", " review=", "></review-listing>"])), restaurant.restaurantName, JSON.stringify(item)));
+      listingTemplates.push((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing is_report=\"false\" restaurant_name=", " review=", "></review-listing>"])), restaurant.restaurantName, JSON.stringify(item)));
     }
 
     //Render review listing template array to reviews container
@@ -9137,6 +9173,7 @@ class Router {
    * @param {*} pathname 
    */
   gotoRoute(pathname) {
+    console.log(pathname);
     window.history.pushState({}, pathname, window.location.origin + pathname);
     this.route(pathname);
   }
@@ -9180,8 +9217,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class App {
   constructor() {
     this.name = "Grub Hunters";
-    this.version = "1.0.0"; //'http://localhost:3000'
-    this.apiBase = 'https://grub-hunters-api.herokuapp.com';
+    this.version = "1.0.0"; //'https://grub-hunters-api.herokuapp.com'
+    this.apiBase = 'http://localhost:3000';
     this.rootEl = document.getElementById("root");
   }
   init() {
@@ -10712,8 +10749,9 @@ exports.default = _default;
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../Router"));
+var _Router = require("../../Router");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
+var _App = _interopRequireDefault(require("../../App"));
 var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
 var _mascot = _interopRequireDefault(require("../../views/partials/mascot.partial"));
 var _gsap = _interopRequireDefault(require("gsap"));
@@ -10854,22 +10892,26 @@ customElements.define('app-header', class AppHeader extends _litElement.LitEleme
     if (this.user)
       //Setup reviewer and restaurant level navigation
       if (this.user.accessLevel == _enum.default.accessLevels.reviewer || this.user.accessLevel == _enum.default.accessLevels.restaurant) {
-        headerLinks = (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n<a href=\"/search-restaurants\" @click=\"", "\">Search Restaurants</a> \n<a href=\"/reviews\" @click=\"", "\">Your Reviews</a> \n<a href=\"/profile\" @click=\"", "\">Your Profile</a> \n"])), _Router.default, _Router.default, _Router.default);
+        headerLinks = (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n<a href=\"/search-restaurants\" @click=\"", "\">Search Restaurants</a> \n<a href=\"/reviews\" @click=\"", "\">Your Reviews</a> \n<a href=\"/profile\" @click=\"", "\">Your Profile</a> \n"])), _Router.anchorRoute, _Router.anchorRoute, _Router.anchorRoute);
       }
       //Setup admin level navigation
       else if (this.user.accessLevel == _enum.default.accessLevels.administrator) {
-        headerLinks = (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <a href=\"/search-restaurants\" @click=\"", "\">Search Restaurants</a> \n      <a href=\"/search-tickets\" @click=\"", "\">Search Tickets</a> \n      <a href=\"/profile\" @click=\"", "\">Your Profile</a> \n      "])), _Router.default, _Router.default, _Router.default);
+        headerLinks = (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <a href=\"/search-restaurants\" @click=\"", "\">Search Restaurants</a> \n      <a href=\"/search-tickets\" @click=\"", "\">Search Tickets</a> \n      <a href=\"/profile\" @click=\"", "\">Your Profile</a> \n      "])), _Router.anchorRoute, _Router.anchorRoute, _Router.anchorRoute);
       }
 
     //Return the header component
-    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n    <style>\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--light-txt-color);\n  margin:0;\n}\n\n\n\n    header {\n      overflow: hidden;\n      position:fixed;\n      top:0;\n      z-index: 1;\n       width:100%;\n      height: 150px;\n      background: var(--brand-color);\n        display:flex;\n       flex-direction:row;\n      justify-content: space-between; \n       align-items: center;\n       margin-bottom: 50px;\n       padding:10px;\n    }\n\n.header-logo {\n  color:var(--heading-txt-color);\n  text-align: center;\n  text-decoration: none;\n}\n\n    .header-logo-container {\n      display:flex;\n      flex-direction:column;\n      align-items:center;\n    }\n\n\np, span, a {\n  font-family:var(--txt-font-family);\n}\n    \n\n\n    nav {    \n      display: flex;\n      flex-direction: row;\n      align-items:center;\n      justify-content:space-between;\n      padding-right:20px;\n      width:500px;\n    }\n\n    .nav-links {\n      display: flex;\n      flex-direction: row;\n      width:500px;\n      gap:5px;\n    }\n\n   .nav-links a {\n      display:flex;\n      flex-direction:column;\n      width:140px;\n      height: 50px;\n      background: #FFFFFF;\n      margin-left: 15px;\n      margin-right: 15px;\n      padding:5px;\n      border-radius: 20px;\n      text-align: center;\n      justify-content: center;\n      font-weight: var(--nav-font-weight);\n      font-size: var(--nav-font-size);\n      color:var(--base-txt-color);\n    }\n\n    .nav-links a, .header-logo {\n      text-decoration:none;\n    }\n\n    .signout-link {\n      font-size:var(--signout-font-size);\n      font-weight:var(--signout-font-weight);\n      color:var(--light-txt-color);\n          align-self:start;\n          position:fixed;\n          top:10px;\n          right:20px;\n    }\n\n\n\n\n\n\n    .active {\n      background:var(--secondary-brand-color);\n    }\n\n\n    /* RESPONSIVE - MOBILE -------------------*/\n@media all and (max-width: 768px)  { \n\n  .header-logo h1 {\n    display:none;\n  }\n\n  .header-logo {\n    float: none;\n    display: block;\n  }\n\n  nav {\n    width:100vw;\n    justify-content:center;\n  }\n\n  .nav-links {\n    width:100%;\n  }\n\n\n\n  header {\n    display:flex;\n    flex-direction:column;\n    gap:5px;\n    padding:5px;\n  }\n\n\n  .signout-link {\n    margin-left:15px;\n  }\n\n  }\n\n\n\n    </style>\n\n    <header class=\"app-header\">\n    ", "  \n</header>\n    "])), localStorage.getItem('accessToken') ? (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral([" \n\n    <a class=\"header-logo\" href=\"/\" \n    @click=\"", "\">\n    <div class=\"header-logo-container\">\n    ", "\n   <h1>Grub Hunters</h1>\n  </div>\n</a>\n\n        <nav class=\"app-top-nav\">  \n          <div class=\"nav-links\">\n     ", "       \n          </div>    \n    </nav>\n    <a class=\"signout-link\" href=\"#\" @click=\"", "\">Sign Out</a>\n    "])), () => _Router.default, _mascot.default, headerLinks, () => _AuthAPI.default.signOut()) : (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n    \n    <style>\n  header {\n             margin:0;   \n      justify-content:center;        \n  }\n    </style>\n\n    \n    <div class=\"header-logo-container\">", "<h1>Grub Hunters</h1></div>"])), _mascot.default));
+    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n    <style>\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--light-txt-color);\n  margin:0;\n}\n\n\n\n    header {\n      overflow: hidden;\n      position:fixed;\n      top:0;\n      z-index: 1;\n       width:100%;\n      height: 150px;\n      background: var(--brand-color);\n        display:flex;\n       flex-direction:row;\n      justify-content: space-between; \n       align-items: center;\n       margin-bottom: 50px;\n       padding:10px;\n    }\n\n.header-logo {\n  color:var(--heading-txt-color);\n  text-align: center;\n  text-decoration: none;\n}\n\n    .header-logo-container {\n      display:flex;\n      flex-direction:column;\n      align-items:center;\n    }\n\n\np, span, a {\n  font-family:var(--txt-font-family);\n}\n    \n\n\n    nav {    \n      display: flex;\n      flex-direction: row;\n      align-items:center;\n      justify-content:space-between;\n      padding-right:20px;\n      width:500px;\n    }\n\n    .nav-links {\n      display: flex;\n      flex-direction: row;\n      width:500px;\n      gap:5px;\n    }\n\n   .nav-links a {\n      display:flex;\n      flex-direction:column;\n      width:140px;\n      height: 50px;\n      background: #FFFFFF;\n      margin-left: 15px;\n      margin-right: 15px;\n      padding:5px;\n      border-radius: 20px;\n      text-align: center;\n      justify-content: center;\n      font-weight: var(--nav-font-weight);\n      font-size: var(--nav-font-size);\n      color:var(--base-txt-color);\n    }\n\n    .nav-links a, .header-logo {\n      text-decoration:none;\n    }\n\n    .signout-link {\n      font-size:var(--signout-font-size);\n      font-weight:var(--signout-font-weight);\n      color:var(--light-txt-color);\n          align-self:start;\n          position:fixed;\n          top:10px;\n          right:20px;\n    }\n\n\n\n\n\n\n    .active {\n      background:var(--secondary-brand-color);\n    }\n\n\n    /* RESPONSIVE - MOBILE -------------------*/\n@media all and (max-width: 768px)  { \n\n  .header-logo h1 {\n    display:none;\n  }\n\n  .header-logo {\n    float: none;\n    display: block;\n  }\n\n  nav {\n    width:100vw;\n    justify-content:center;\n  }\n\n  .nav-links {\n    width:100%;\n  }\n\n\n\n  header {\n    display:flex;\n    flex-direction:column;\n    gap:5px;\n    padding:5px;\n  }\n\n\n  .signout-link {\n    margin-left:15px;\n  }\n\n  }\n\n\n\n    </style>\n\n    <header class=\"app-header\">\n    ", "  \n</header>\n    "])), localStorage.getItem('accessToken') ? (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral([" \n\n    <a class=\"header-logo\" href=\"/\" \n    @click=\"", "\">\n    <div class=\"header-logo-container\">\n    ", "\n   <h1>Grub Hunters</h1>\n  </div>\n</a>\n\n        <nav class=\"app-top-nav\">  \n          <div class=\"nav-links\">\n     ", "       \n          </div>    \n    </nav>\n    <a class=\"signout-link\" href=\"#\" @click=\"", "\">Sign Out</a>\n    "])), () => _Router.anchorRoute, _mascot.default, headerLinks, () => _AuthAPI.default.signOut()) : (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n    \n    <style>\n  header {\n             margin:0;   \n      justify-content:center;        \n  }\n    </style>\n\n    \n    <div class=\"header-logo-container\">", "<h1>Grub Hunters</h1></div>"])), _mascot.default));
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../utils/enum.utils":"utils/enum.utils.js","../../views/partials/mascot.partial":"views/partials/mascot.partial.js","gsap":"../node_modules/gsap/index.js"}],"components/base/footer.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js","../../utils/enum.utils":"utils/enum.utils.js","../../views/partials/mascot.partial":"views/partials/mascot.partial.js","gsap":"../node_modules/gsap/index.js"}],"components/base/footer.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
+var _Router = require("../../Router");
+var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
+var _App = _interopRequireDefault(require("../../App"));
 var _templateObject;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
                                                                                                                                                                                          * Footer component
                                                                                                                                                                                          * 
@@ -10900,7 +10942,7 @@ customElements.define('app-footer', class AppFooter extends _litElement.LitEleme
     return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n    <style> \n    footer {\n    position: fixed;\n    width:100%;\n    bottom:0px;    \n    z-index:1;\n    height: 100px;\n    background: var(--brand-color);\n  }\n\n\n  \n@media all and (max-width: 768px){ \n\n  footer {\n    position: sticky;\n   z-index:0;\n  }\n  \n }\n\n    </style>\n\n<footer>\n</footer>\n    "])));
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js"}],"components/forms/auth/login.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js"}],"components/forms/auth/login.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
@@ -10987,7 +11029,7 @@ customElements.define('register-form', class RegisterForm extends _litElement.Li
   * Send form data for signing in
   * @param {*} e The event object
   */
-  registerSubmitHandler(e) {
+  async registerSubmitHandler(e) {
     e.preventDefault();
     const formData = e.detail.formData;
     const submitBtn = this.shadowRoot.querySelector('#register-btn');
@@ -11016,10 +11058,26 @@ customElements.define('register-form', class RegisterForm extends _litElement.Li
     //If restaurant fields are enabled
     if (revFields.classList.contains('hidden')) {
       accessLevelInput.value = 2;
+      //Turn required on for restaurant fields
+      for (let field of resFields.querySelectorAll('.required')) {
+        field.setAttribute("required", "");
+      }
+      //Turn required off for review fields
+      for (let field of revFields.querySelectorAll('.required')) {
+        field.removeAttribute("required");
+      }
     }
     //If review fields are enabled
     else if (resFields.classList.contains('hidden')) {
       accessLevelInput.value = 1;
+      //Turn required off for restaurant fields
+      for (let field of resFields.querySelectorAll('.required')) {
+        field.removeAttribute("required");
+      }
+      //Turn required on for review fields
+      for (let field of revFields.querySelectorAll('.required')) {
+        field.setAttribute("required", "");
+      }
     }
   }
 
@@ -11029,11 +11087,11 @@ customElements.define('register-form', class RegisterForm extends _litElement.Li
    */
   render() {
     //Reviewer fields
-    this.reviewerFields = (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n  <div id=\"reviewer-fields\">\n<sl-input label=\"First Name\" name=\"firstName\" type=\"text\" placeholder=\"First Name\"></sl-input>\n<sl-input label=\"Surname\" name=\"lastName\" type=\"text\" placeholder=\"Surname\"></sl-input>\n<sl-input label=\"Username\" name=\"username\" type=\"text\" placeholder=\"Username\"></sl-input>\n  </div>\n  "])));
+    this.reviewerFields = (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n  <div id=\"reviewer-fields\">\n<sl-input class=\"required\" label=\"First Name\" name=\"firstName\" type=\"text\" placeholder=\"First Name\" required></sl-input>\n<sl-input class=\"required\" label=\"Surname\" name=\"lastName\" type=\"text\" placeholder=\"Surname\" required></sl-input>\n<sl-input class=\"required\" label=\"Username\" name=\"username\" type=\"text\" placeholder=\"Username\" required></sl-input>\n  </div>\n  "])));
 
     //Restaurant fields
-    this.restaurantFields = (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n\n      <div id=\"restaurant-fields\" class=\"hidden\">\n\n        <sl-input label=\"Restaurant Name\" name=\"restaurantName\" type=\"text\" placeholder=\"Restaurant Name\"></sl-input>\n\n\n        <sl-input label=\"Phone Number\" name=\"phoneNumber\" type=\"tel\" placeholder=\"Phone Number\"></sl-input>\n\n\n        <sl-input label=\"Location\" name=\"location\" type=\"text\" placeholder=\"Location\"></sl-input>\n\n\n        <sl-input label=\"Date Established\" name=\"established\" type=\"text\" placeholder=\"Date Established\"></sl-input>\n\n\n        <sl-input label=\"Owner\" name=\"owner\" type=\"text\" placeholder=\"Owner\"></sl-input>\n\n\n        <sl-input label=\"Cuisine\" name=\"cuisine\" type=\"text\" placeholder=\"Cuisine\"></sl-input>\n\n      </div>"])));
-    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n<style>\n\n.hidden {\n    visibility: hidden;\n    display:none;\n}\n\n.form-signup {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\nsl-input , sl-textarea {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-large);  \n}\n\n\nlabel, sl-input, sl-textarea {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label), sl-textarea::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control), sl-textarea::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:1.5rem;\n  font-weight:600; \n  \n}\n\nsl-switch {\n  --width:100px;\n  --height:50px;\n  --thumb-size:40px;\n  margin-bottom: var(--sl-spacing-large);\n}\n\n</style>\n\n\n\n\n\n<sl-form class=\"form-signup\" @sl-submit=", " enctype=\"multipart/form-data\">  \n\n\n<sl-switch checked @sl-change=\"", "\">", "</sl-switch><br>\n\n              <input id=\"access-level-input\" name=\"accessLevel\" type=\"hidden\" value=\"1\" required>\n\n                  <label>Avatar\n                     <input type=\"file\" name=\"avatar\" />\n                  </label>\n               \n                  \n\n       \n              <sl-input label=\"Email\" name=\"email\" type=\"email\" value=\"nick@reviewer.com.au\" placeholder=\"Email\" required></sl-input>\n     \n\n   \n              <sl-input label=\"Password\" name=\"password\" type=\"password\" value=\"reviewer123\" placeholder=\"Password\" required toggle-password></sl-input>\n     \n\n\n<sl-textarea label=\"Bio\" rows=\"2\" resize=\"none\" name=\"bio\" type=\"text\" placeholder=\"Bio\" required></sl-textarea>\n\n\n\n\n  ", "\n  ", "\n\n\n  <sl-button id=\"register-btn\" type=\"primary\" class=\"submit-btn\" submit>Register</sl-button>\n\n          \n          </sl-form>"])), this.registerSubmitHandler, this.updateFormFields, this.currentForm, this.reviewerFields, this.restaurantFields);
+    this.restaurantFields = (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n\n      <div id=\"restaurant-fields\" class=\"hidden\">\n\n        <sl-input class=\"required\" label=\"Restaurant Name\" name=\"restaurantName\" type=\"text\" placeholder=\"Restaurant Name\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Phone Number\" name=\"phoneNumber\" type=\"tel\" placeholder=\"Phone Number\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Location\" name=\"location\" type=\"text\" placeholder=\"Location\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Date Established\" name=\"established\" type=\"text\" placeholder=\"Date Established\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Owner\" name=\"owner\" type=\"text\" placeholder=\"Owner\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Cuisine\" name=\"cuisine\" type=\"text\" placeholder=\"Cuisine\"></sl-input>\n\n      </div>"])));
+    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n<style>\n\n.hidden {\n    visibility: hidden;\n    display:none;\n}\n\n.form-signup {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\nsl-input , sl-textarea {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-large);  \n}\n\n\nlabel, sl-input, sl-textarea {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label), sl-textarea::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control), sl-textarea::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:1.5rem;\n  font-weight:600; \n  \n}\n\nsl-switch {\n  --width:100px;\n  --height:50px;\n  --thumb-size:40px;\n  margin-bottom: var(--sl-spacing-large);\n}\n\n</style>\n\n\n\n\n\n<sl-form class=\"form-signup\" @sl-submit=", " enctype=\"multipart/form-data\">  \n\n\n<sl-switch checked @sl-change=\"", "\">", "</sl-switch><br>\n\n              <input id=\"access-level-input\" name=\"accessLevel\" type=\"hidden\" value=\"1\">\n\n                  <label>Avatar\n                     <input type=\"file\" name=\"avatar\" />\n                  </label>\n               \n                  \n\n       \n              <sl-input class=\"required\" label=\"Email\" name=\"email\" type=\"email\" value=\"nick@reviewer.com.au\" placeholder=\"Email\" required></sl-input>\n     \n\n   \n              <sl-input class=\"required\" label=\"Password\" name=\"password\" type=\"password\" value=\"reviewer123\" placeholder=\"Password\" required toggle-password></sl-input>\n     \n\n\n<sl-textarea class=\"required\" label=\"Bio\" rows=\"2\" resize=\"none\" name=\"bio\" type=\"text\" placeholder=\"Bio\" required></sl-textarea>\n\n\n\n\n  ", "\n  ", "\n\n\n  <sl-button id=\"register-btn\" type=\"primary\" class=\"submit-btn\" submit>Register</sl-button>\n\n          \n          </sl-form>"])), this.registerSubmitHandler, this.updateFormFields, this.currentForm, this.reviewerFields, this.restaurantFields);
   }
 });
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js"}],"components/forms/create/report.component.js":[function(require,module,exports) {
@@ -11105,6 +11163,8 @@ customElements.define('report-form', class ReportForm extends _litElement.LitEle
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
+var _Router = require("../../../Router");
+var _App = _interopRequireDefault(require("../../../App"));
 var _Toast = _interopRequireDefault(require("../../../Toast"));
 var _ReviewAPI = _interopRequireDefault(require("../../../services/ReviewAPI"));
 var _AuthAPI = _interopRequireDefault(require("../../../services/AuthAPI"));
@@ -11157,15 +11217,16 @@ customElements.define('review-form', class ReviewForm extends _litElement.LitEle
     return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-input {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-medium);  \n}\n\n\nlabel, sl-input {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\n</style>\n\n\n<sl-form class=\"page-form\" @sl-submit=", ">\n \n<input type=\"hidden\" name=\"authorId\" value=\"", "\" >\n<input type=\"hidden\" name=\"targetType\" value=\"", "\" >\n<input type=\"hidden\" name=\"restaurantId\" value=\"", "\" >\n\n<sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" required></sl-input>\n<sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"I found this restaurant to be...\" required></sl-input>\n\n\n<sl-range label=\"Rating\" min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" required></sl-range>\n\n            <sl-button id=\"review-btn\" type=\"primary\" class=\"submit-btn\" submit>Post Review</sl-button>\n          </sl-form>"])), this.createReviewSubmitHandler.bind(this), _AuthAPI.default.currentUser._id, _AuthAPI.default.currentUser.accessLevel, _AuthAPI.default.currentRestaurant._id);
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Toast":"Toast.js","../../../services/ReviewAPI":"services/ReviewAPI.js","../../../services/AuthAPI":"services/AuthAPI.js"}],"components/forms/edit/profile.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../App":"App.js","../../../Toast":"Toast.js","../../../services/ReviewAPI":"services/ReviewAPI.js","../../../services/AuthAPI":"services/AuthAPI.js"}],"components/forms/edit/profile.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../../Router"));
+var _Router = require("../../../Router");
 var _AuthAPI = _interopRequireDefault(require("../../../services/AuthAPI"));
 var _App = _interopRequireDefault(require("../../../App"));
 var _Toast = _interopRequireDefault(require("../../../Toast"));
 var _UserAPI = _interopRequireDefault(require("../../../services/UserAPI"));
+var _enum = _interopRequireDefault(require("../../../utils/enum.utils"));
 var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -11203,7 +11264,7 @@ customElements.define('edit-profile-form', class EditProfileForm extends _litEle
       _AuthAPI.default.currentUser = updatedUser;
       this.render();
       _Toast.default.show('profile updated');
-      (0, _Router.default)('/profile');
+      (0, _Router.gotoRoute)('/profile');
     } catch (err) {
       _Toast.default.show(err, 'error');
     }
@@ -11216,7 +11277,7 @@ customElements.define('edit-profile-form', class EditProfileForm extends _litEle
   render() {
     let content;
     if (_AuthAPI.default.currentUser.type == "reviewer") content = this.reviewerTemplate();else if (_AuthAPI.default.currentUser.type == "restaurant") content = this.restaurantTemplate();else if (_AuthAPI.default.currentUser.type == "admin") content = this.adminTemplate();
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\n\n\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n  label, sl-input, sl-textarea {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\n\n\n.form-edit-profile {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n  border:var(--main-content-border);\n  width:700px;\n  border-radius:20px;\n  padding:40px;\n}\n\n\nsl-textarea {\n--label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-large);\n  overflow-y:scroll;\n}\n\n\nsl-textarea::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\nsl-textarea::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:1.5rem;\n  font-weight:600;\n}\n\n.avatar-input-container {\n  display:flex;\n  flex-direction:row;\n}\n\n.avatar-input-container label {\npadding-right:80px;\n}\n\n\nh1 {\n  text-align:center;\n}\n\n\n@media all and (max-width: 768px){ \n\n\n\n\n  .form-edit-profile {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n  border:none;\n  width:100vw;\n  border-radius:0px;\n  padding:20px;\n}\n\n}\n \n</style>\n\n\n\n\n          <sl-form class=\"form-edit-profile\" @sl-submit=", ">\n<h1>", "</h1>\n          <div class=\"avatar-input-container\">\n                               ", "   \n          </div>\n\n                  \n\n\n          <sl-textarea label=\"Bio\" rows=\"2\" resize=\"none\" type=\"text\" name=\"bio\" value=\"", "\" placeholder=\"Bio\"></sl-textarea>\n          ", "\n            <sl-button id=\"edit-profile-submit-btn\" type=\"primary\" class=\"submit-btn\" submit>Update Profile</sl-button>\n          </sl-form>\n    "])), this.updateProfileSubmitHandler.bind(this), document.title, _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n<sl-avatar image=\"", "/images/", "\"></sl-avatar>\n    <label for=\"avatar\">Avatar</label><br>   \n<input type=\"file\" name=\"avatar\" />\n"])), _App.default.apiBase, _AuthAPI.default.currentUser.avatar) : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n    <label for=\"avatar\">Avatar</label><br>   \n<input type=\"file\" name=\"avatar\" />\n"]))), _AuthAPI.default.currentUser.bio, content);
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\n\n\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n  label, sl-input, sl-textarea {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\n\n\n.form-edit-profile {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n  border:var(--main-content-border);\n  width:700px;\n  border-radius:20px;\n  padding:40px;\n}\n\n\nsl-textarea {\n--label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-large);\n  overflow-y:scroll;\n}\n\n\nsl-textarea::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\nsl-textarea::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:1.5rem;\n  font-weight:600;\n}\n\n.avatar-input-container {\n  display:flex;\n  flex-direction:row;\n}\n\n.avatar-input-container label {\npadding-right:80px;\n}\n\n\nh1 {\n  text-align:center;\n}\n\n\n@media all and (max-width: 768px){ \n\n\n\n\n  .form-edit-profile {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n  border:none;\n  width:100vw;\n  border-radius:0px;\n  padding:20px;\n}\n\n}\n \n</style>\n\n\n\n\n          <sl-form class=\"form-edit-profile\" @sl-submit=", " enctype=\"multipart/form-data\">\n<h1>", "</h1>\n          <div class=\"avatar-input-container\">\n                               ", "   \n          </div>\n\n                  \n\n\n          <sl-textarea label=\"Bio\" rows=\"2\" resize=\"none\" type=\"text\" name=\"bio\" value=\"", "\" placeholder=\"Bio\"></sl-textarea>\n          ", "\n            <sl-button id=\"edit-profile-submit-btn\" type=\"primary\" class=\"submit-btn\" submit>Update Profile</sl-button>\n          </sl-form>\n    "])), this.updateProfileSubmitHandler.bind(this), document.title, _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n<sl-avatar image=\"", "/", "\"></sl-avatar>\n    <label for=\"avatar\">Avatar</label><br>   \n<input type=\"file\" name=\"avatar\" />\n"])), _enum.default.BUCKET_URI, _AuthAPI.default.currentUser.avatar) : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n    <label for=\"avatar\">Avatar</label><br>   \n<input type=\"file\" name=\"avatar\" />\n"]))), _AuthAPI.default.currentUser.bio, content);
   }
 
   /**
@@ -11224,7 +11285,7 @@ customElements.define('edit-profile-form', class EditProfileForm extends _litEle
   * @returns Render of reviewer-specific form inputs
   */
   reviewerTemplate() {
-    return (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["   \n\n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n</style>\n\n<sl-input label=\"First Name\" type=\"text\" name=\"firstName\" value=\"", "\" placeholder=\"First Name\"></sl-input>\n<sl-input label=\"Surname\" type=\"text\" name=\"lastName\" value=\"", "\" placeholder=\"Surname\"></sl-input>\n<sl-input label=\"Username\" type=\"text\" name=\"username\" value=\"", "\" placeholder=\"Username\"></sl-input>\n"])), _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.username);
+    return (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["   \n\n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n</style>\n\n<sl-input label=\"First Name\" type=\"text\" name=\"firstName\" value=\"", "\" placeholder=\"First Name\" required></sl-input>\n<sl-input label=\"Surname\" type=\"text\" name=\"lastName\" value=\"", "\" placeholder=\"Surname\" required></sl-input>\n<sl-input label=\"Username\" type=\"text\" name=\"username\" value=\"", "\" placeholder=\"Username\" required></sl-input>\n"])), _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.username);
   }
 
   /**
@@ -11232,7 +11293,7 @@ customElements.define('edit-profile-form', class EditProfileForm extends _litEle
    * @returns Render of restaurant-specific form inputs
    */
   restaurantTemplate() {
-    return (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["   \n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\n\n\n\n\n\n</style>\n\n<sl-input label=\"Restaurant Name\" type=\"text\" name=\"restaurantName\" value=\"", "\" placeholder=\"Restaurant Name\"></sl-input>\n<sl-input label=\"Phone Number\" type=\"text\" name=\"phoneNumber\" value=\"", "\" placeholder=\"Phone Number\"></sl-input>\n<sl-input label=\"Location\" type=\"text\" name=\"location\" value=\"", "\" placeholder=\"Location\"></sl-input>\n<sl-input label=\"Established\" type=\"text\" name=\"established\" value=\"", "\" placeholder=\"Established\"></sl-input>\n<sl-input label=\"Owner\" type=\"text\" name=\"owner\" value=\"", "\" placeholder=\"Owner\"></sl-input>\n<sl-input label=\"Cuisine\" type=\"text\" name=\"cuisine\" value=\"", "\" placeholder=\"Cuisine\"></sl-input>\n<sl-input label=\"Demerits\" type=\"text\" name=\"demerits\" value=\"", "\" placeholder=\"Demerits\"></sl-input>\n\n"])), _AuthAPI.default.currentUser.restaurantName, _AuthAPI.default.currentUser.phoneNumber, _AuthAPI.default.currentUser.location, _AuthAPI.default.currentUser.established, _AuthAPI.default.currentUser.owner, _AuthAPI.default.currentUser.cuisine, _AuthAPI.default.currentUser.demerits);
+    return (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["   \n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\n\n\n\n\n\n</style>\n\n<sl-input label=\"Restaurant Name\" type=\"text\" name=\"restaurantName\" value=\"", "\" placeholder=\"Restaurant Name\" required></sl-input>\n<sl-input label=\"Phone Number\" type=\"text\" name=\"phoneNumber\" value=\"", "\" placeholder=\"Phone Number\" required></sl-input>\n<sl-input label=\"Location\" type=\"text\" name=\"location\" value=\"", "\" placeholder=\"Location\" required></sl-input>\n<sl-input label=\"Established\" type=\"text\" name=\"established\" value=\"", "\" placeholder=\"Established\" required></sl-input>\n<sl-input label=\"Owner\" type=\"text\" name=\"owner\" value=\"", "\" placeholder=\"Owner\" required></sl-input>\n<sl-input label=\"Cuisine\" type=\"text\" name=\"cuisine\" value=\"", "\" placeholder=\"Cuisine\" required></sl-input>\n\n"])), _AuthAPI.default.currentUser.restaurantName, _AuthAPI.default.currentUser.phoneNumber, _AuthAPI.default.currentUser.location, _AuthAPI.default.currentUser.established, _AuthAPI.default.currentUser.owner, _AuthAPI.default.currentUser.cuisine);
   }
 
   /**
@@ -11240,14 +11301,16 @@ customElements.define('edit-profile-form', class EditProfileForm extends _litEle
   * @returns Render of admin-specific form inputs
   */
   adminTemplate() {
-    return (0, _litElement.html)(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral([" \n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n</style>\n\n\n<sl-input label=\"First Name\" type=\"text\" name=\"firstName\" value=\"", "\" placeholder=\"First Name\"></sl-input>\n<sl-input label=\"Surname\" type=\"text\" name=\"lastName\" value=\"", "\" placeholder=\"Surname\"></sl-input>\n\n<sl-input  label=\"Username\" type=\"text\" name=\"username\" value=\"", "\" placeholder=\"Username\"></sl-input>  \n"])), _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.username);
+    return (0, _litElement.html)(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral([" \n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n</style>\n\n\n<sl-input label=\"First Name\" type=\"text\" name=\"firstName\" value=\"", "\" placeholder=\"First Name\" required></sl-input>\n<sl-input label=\"Surname\" type=\"text\" name=\"lastName\" value=\"", "\" placeholder=\"Surname\" required></sl-input>\n\n<sl-input  label=\"Username\" type=\"text\" name=\"username\" value=\"", "\" placeholder=\"Username\" required></sl-input>  \n"])), _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.username);
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js","../../../Toast":"Toast.js","../../../services/UserAPI":"services/UserAPI.js"}],"components/forms/edit/review.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js","../../../Toast":"Toast.js","../../../services/UserAPI":"services/UserAPI.js","../../../utils/enum.utils":"utils/enum.utils.js"}],"components/forms/edit/review.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _ReviewAPI = _interopRequireDefault(require("../../../services/ReviewAPI"));
+var _Router = require("../../../Router");
+var _AuthAPI = _interopRequireDefault(require("../../../services/AuthAPI"));
+var _App = _interopRequireDefault(require("../../../App"));
 var _templateObject;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -11280,12 +11343,15 @@ customElements.define('edit-review-form', class EditReviewForm extends _litEleme
    * @param {*} reviewId 
    */
   async updateReviewSubmitHandler(e, reviewId) {
+    console.log("in update review submit handler");
     e.preventDefault();
     const formData = e.detail.formData;
+    console.log(formData);
+    console.log(reviewId);
     const submitBtn = document.querySelector('.submit-btn');
     submitBtn.setAttribute('loading', '');
     try {
-      const updatedReview = await _ReviewAPI.default.updateById(reviewId, formData, false);
+      const updatedReview = await ReviewAPI.updateById(reviewId, formData, false);
       console.log(updatedReview);
       this.render();
       Toast.show('review updated');
@@ -11303,10 +11369,12 @@ customElements.define('edit-review-form', class EditReviewForm extends _litEleme
     return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n          <sl-form class=\"page-form\" @sl-submit=", ">\n            ", "\n            <sl-button type=\"primary\" class=\"submit-btn\" submit>Update Review</sl-button>\n          </sl-form>\n    "])), this.updateReviewSubmitHandler.bind(this, this.review._id), content);
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../services/ReviewAPI":"services/ReviewAPI.js"}],"components/list/review.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js"}],"components/list/review.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
+var _Router = require("../../Router");
+var _App = _interopRequireDefault(require("../../App"));
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
 var _Toast = _interopRequireDefault(require("../../Toast"));
@@ -11340,6 +11408,9 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
       },
       downvotes: {
         type: Number
+      },
+      is_report: {
+        type: String
       }
     };
   }
@@ -11367,8 +11438,9 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
   async updateReviewSubmitHandler(e) {
     e.preventDefault();
     const formData = e.detail.formData;
+    console.log(formData);
     try {
-      const response = await _ReviewAPI.default.updateById(this.review._id, formData);
+      const response = await _ReviewAPI.default.updateById(this.review._id, formData, false);
       console.log(response);
       _Toast.default.show('review created');
       this.shadowRoot.getElementById('edit-dialog').hide();
@@ -11395,9 +11467,12 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
    * @returns Template of review actions
    */
   buildReviewActions() {
+    //Build actions for author
     if (_AuthAPI.default.currentUser._id == this.review.authorId) {
       return (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["       \n      <sl-button id=\"edit-btn\" @click=\"", "\">Edit</sl-button>  \n <sl-button id=\"delete-btn\" @click=\"", "\">Delete</sl-button>"])), () => this.shadowRoot.getElementById('edit-dialog').show(), () => this.shadowRoot.getElementById('delete-dialog').show());
-    } else {
+    }
+    //Build actions for non-authors and not viewed in report
+    else if (_AuthAPI.default.currentUser._id != this.review.authorId && this.is_report != "true") {
       return (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["<sl-button id=\"report-btn\" @click=\"", "\">Report</sl-button>"])), () => this.shadowRoot.getElementById('report-dialog').show());
     }
   }
@@ -11419,9 +11494,9 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
         this.review.downvoters = this.review.downvoters.slice(_AuthAPI.default.currentUser._id, -1);
         this.downvotes--;
       }
-      //Disable downvoting, enable upvoting
-      this.shadowRoot.getElementById('upvote-btn').removeAttribute('disabled');
-      this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled', '');
+      //Disable upvoting, enable downvoting
+      this.shadowRoot.getElementById('downvote-btn').removeAttribute('disabled');
+      this.shadowRoot.getElementById('upvote-btn').setAttribute('disabled', '');
     }
     //Downvote the review, remove upvote if it exists
     else if (vote == "downvote") {
@@ -11434,9 +11509,9 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
         this.review.upvoters = this.review.upvoters.slice(_AuthAPI.default.currentUser._id, -1);
         this.upvotes--;
       }
-      //Disable upvoting, enable downvoting
-      this.shadowRoot.getElementById('downvote-btn').removeAttribute('disabled');
-      this.shadowRoot.getElementById('upvote-btn').setAttribute('disabled', '');
+      //Disable downvoting, enable upvoting
+      this.shadowRoot.getElementById('upvote-btn').removeAttribute('disabled');
+      this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled', '');
     } else return;
 
     //Update the review with updated voting fields
@@ -11448,8 +11523,8 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
    * @returns Template of vote display
    */
   buildVoteDisplay() {
-    //Disable voting for author
-    if (this.review.authorId == _AuthAPI.default.currentUser._id) {
+    //Disable voting for author and as flagged content in report
+    if (this.review.authorId == _AuthAPI.default.currentUser._id || this.is_report == "true") {
       return (0, _litElement.html)(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["    \n      <div class=\"vote-container\"><sl-button id=\"upvote-btn\" disabled>Upvote</sl-button><div>Upvotes: ", "</div></div>\n  <div class=\"vote-container\"><sl-button id=\"downvote-btn\" disabled>Downvote</sl-button><div>Downvotes: ", "</div></div>"])), this.review.upvotes, this.review.downvotes);
     }
     //Enable voting for non-authors 
@@ -11477,20 +11552,21 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
     let ratingDisplay = this.buildRatingDisplay();
     //Upvote and downvote UI display
     let voteDisplay = this.buildVoteDisplay();
-    return (0, _litElement.html)(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["\n\n<style>\n\n\np {\n  font-family: var(--base-font-family);\n    font-weight: 300;\n}\n\n  h1,h2,h3 {\n    margin: 0 0 .5em;\n    color: var(--heading-txt-color);\n  }\n\n  h1 {\n    font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n  }\n\n  h2 {\n    font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n  }\n\n  h3 {\n    font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  } \n\n\n\n.rating-display {\n  display:flex;\n  flex-direction:column;\n  justify-content:center;\n  width:80px;\n  height:80px;\n  border:4px solid var(--brand-color);\n  border-radius:80px;\n  text-align:center; \n}\n\n.review-listing {\n  display:flex;\n  flex-direction: column;\n  width:500px;\n  margin:10px;\n  justify-content: space-evenly;\n  align-items:center;\n  box-shadow: var(--main-content-box-shadow);\n  border-radius: 10px;\n}\n\n.top {\n  display:flex;\n  flex-direction: row;\n  width:100%;\n  margin:20px;\n  justify-content: space-evenly;\n  align-items:center;\n  padding-bottom:20px;\n  border-bottom:var(--main-content-border);\n}\n\n\n.bot {\ndisplay:flex;\nflex-direction:column;\nwidth:100%;\n}\n\n.bot h3, .bot p {\n  padding-left:20px;\n  padding-right:20px;\n  text-align:left;\n}\n\n.top .left .bot {\n  display:flex;\n  flex-direction:row;\n  gap:10px;\n}\n\n.top .right {\n  display:flex;\n  flex-direction:column;\n  justify-content:left;\n  gap:20px;\n}\n\n\n#delete-btn {\n  /*Right-align element to parent */\n  margin-left: auto; \nmargin-right: 0;\n\nwidth:150px;\npadding:5px;\nheight: auto;\ntext-align:center;\n\n}\n\n#delete-btn::part(base) {\nbackground:red;\nborder: 2px solid black;\nborder-radius:10px;\ncolor:black;\nfont-weight:600;\n}\n\nsl-dialog::part(panel) {\n  border-radius:20px;\n  box-shadow:var(--dialog-box-shadow);\n}\nsl-dialog::part(overlay) {\n  height:100vh;\n}\nsl-dialog::part(header) {\n  padding:5px;\n  background: var(--brand-color);\n  border-top-left-radius:20px;\n  border-top-right-radius:20px;\n}\nsl-dialog::part(title) {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\ntext-align:center;\ncolor:var(--light-txt-color);\n}\nsl-dialog::part(body) {\n  font-size: 1rem;\n    font-weight:600;\n    font-family: var(--base-font-family);\ntext-align:center;\ncolor:var(--base-txt-color);\n}\nsl-dialog::part(footer) {\n  display:flex;\n  flex-direction:row;\n  justify-content:space-between;\n  margin-left:50px;\n  margin-right:50px;\n}\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-input, sl-range::part(form-control-label) {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-medium);  \n}\n\n\nlabel, sl-input, sl-range {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label), sl-range::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\n\n\n.info-label, .rating-display-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n@media all and (max-width: 1000px){ \n  .review-listing {\n  width:90vw;\n}\n\n.top .right {\n  gap:10px;\n}\n\nsl-button, #delete-btn {\n  width:100px;\n  padding:10px;\n}\n\n}\n\n\n</style>\n\n\n<sl-dialog id=\"edit-dialog\" label=\"Edit Review\" class=\"dialog-overview\">\n<sl-form class=\"page-form\" @sl-submit=", ">\n \n <sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" value=", " required></sl-input>\n <sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"Text\" value=", " required></sl-input>\n <label for=\"name\">Rating\n <sl-range min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" required></sl-range>  \n </label>\n\n             <sl-button type=\"primary\" class=\"submit-btn\" submit>Update Review</sl-button>\n           </sl-form>\n</sl-dialog>\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n  <span>Are you sure you want to permanently delete this review?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n\n\n<sl-dialog id=\"report-dialog\" label=\"Report Review\" class=\"dialog-overview\">\n<report-form title=", " target_id=", " target_type=", "></report-form>\n</sl-dialog>\n\n\n\n<div class=\"review-listing\">\n  <div class=\"top\">\n\n<div class=\"left\"> \n\n    ", "\n    <div class=\"bot\">\n      <div class=\"left\">\n ", "       \n      </div>\n", "\n    </div>\n\n  </div>\n\n<div class=\"right\">\n", "\n</div>  \n  </div>\n\n\n  <div class=\"bot\">\n<h3>", "</h3>\n<p>", "</p>\n</div>\n\n</div>\n"])), this.updateReviewSubmitHandler.bind(this), this.review.title, this.review.text, () => {
+    return (0, _litElement.html)(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["\n\n<style>\n\n\np {\n  font-family: var(--base-font-family);\n    font-weight: 300;\n}\n\n  h1,h2,h3 {\n    margin: 0 0 .5em;\n    color: var(--heading-txt-color);\n  }\n\n  h1 {\n    font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n  }\n\n  h2 {\n    font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n  }\n\n  h3 {\n    font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  } \n\n\n\n.rating-display {\n  display:flex;\n  flex-direction:column;\n  justify-content:center;\n  width:80px;\n  height:80px;\n  border:4px solid var(--brand-color);\n  border-radius:80px;\n  text-align:center; \n}\n\n.review-listing {\n  display:flex;\n  flex-direction: column;\n  width:500px;\n  margin:10px;\n  justify-content: space-evenly;\n  align-items:center;\n  box-shadow: var(--main-content-box-shadow);\n  border-radius: 10px;\n}\n\n.top {\n  display:flex;\n  flex-direction: row;\n  width:100%;\n  margin:20px;\n  justify-content: space-evenly;\n  align-items:center;\n  padding-bottom:20px;\n  border-bottom:var(--main-content-border);\n}\n\n\n.bot {\ndisplay:flex;\nflex-direction:column;\nwidth:100%;\n}\n\n.bot h3, .bot p {\n  padding-left:20px;\n  padding-right:20px;\n  text-align:left;\n}\n\n.top .left .bot {\n  display:flex;\n  flex-direction:row;\n  gap:10px;\n}\n\n.top .right {\n  display:flex;\n  flex-direction:column;\n  justify-content:left;\n  gap:20px;\n}\n\n\n#delete-btn {\n  /*Right-align element to parent */\n  margin-left: auto; \nmargin-right: 0;\n\nwidth:150px;\npadding:5px;\nheight: auto;\ntext-align:center;\n\n}\n\n#delete-btn::part(base) {\nbackground:red;\nborder: 2px solid black;\nborder-radius:10px;\ncolor:black;\nfont-weight:600;\n}\n\nsl-dialog::part(panel) {\n  border-radius:20px;\n  box-shadow:var(--dialog-box-shadow);\n}\nsl-dialog::part(overlay) {\n  height:100vh;\n}\nsl-dialog::part(header) {\n  padding:5px;\n  background: var(--brand-color);\n  border-top-left-radius:20px;\n  border-top-right-radius:20px;\n}\nsl-dialog::part(title) {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\ntext-align:center;\ncolor:var(--light-txt-color);\n}\nsl-dialog::part(body) {\n  font-size: 1rem;\n    font-weight:600;\n    font-family: var(--base-font-family);\ntext-align:center;\ncolor:var(--base-txt-color);\n}\nsl-dialog::part(footer) {\n  display:flex;\n  flex-direction:row;\n  justify-content:space-between;\n  margin-left:50px;\n  margin-right:50px;\n}\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-input, sl-range::part(form-control-label) {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-medium);  \n}\n\n\nlabel, sl-input, sl-range {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label), sl-range::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\n\n\n.info-label, .rating-display-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n@media all and (max-width: 1000px){ \n  .review-listing {\n  width:90vw;\n}\n\n.top .right {\n  gap:10px;\n}\n\nsl-button, #delete-btn {\n  width:100px;\n  padding:10px;\n}\n\n}\n\n\n</style>\n\n\n<sl-dialog id=\"edit-dialog\" label=\"Edit Review\" class=\"dialog-overview\">\n<sl-form class=\"page-form\" @sl-submit=", " enctype=\"multipart/form-data\">\n \n <sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" value=", " required></sl-input>\n <sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"Text\" value=", " required></sl-input>\n <label for=\"name\">Rating\n <sl-range min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" value=", " required></sl-range>  \n </label>\n\n             <sl-button type=\"primary\" class=\"submit-btn\" submit>Update Review</sl-button>\n           </sl-form>\n</sl-dialog>\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n  <span>Are you sure you want to permanently delete this review?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n\n\n<sl-dialog id=\"report-dialog\" label=\"Report Review\" class=\"dialog-overview\">\n<report-form title=", " target_id=", " target_type=", "></report-form>\n</sl-dialog>\n\n\n\n<div class=\"review-listing\">\n  <div class=\"top\">\n\n<div class=\"left\"> \n\n    ", "\n    <div class=\"bot\">\n      <div class=\"left\">\n ", "       \n      </div>\n", "\n    </div>\n\n  </div>\n\n<div class=\"right\">\n", "\n</div>  \n  </div>\n\n\n  <div class=\"bot\">\n<h3>", "</h3>\n<p>", "</p>\n</div>\n\n</div>\n"])), this.updateReviewSubmitHandler.bind(this), this.review.title, this.review.text, this.review.rating, () => {
       this.shadowRoot.getElementById('delete-dialog').hide();
       _ReviewAPI.default.deleteById(this.review._id);
     }, () => this.shadowRoot.getElementById('delete-dialog').hide(), document.title, this.review._id, _enum.default.reportTargetType.review, this.restaurant_name ? (0, _litElement.html)(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral(["<div class=\"target-details\"><h3>", "</h3></div> "])), this.restaurant_name) : (0, _litElement.html)(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral([""]))), voteDisplay, ratingDisplay, reviewActions, this.review.title, this.review.text);
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../services/AuthAPI":"services/AuthAPI.js","../../services/ReviewAPI":"services/ReviewAPI.js","../../Toast":"Toast.js","../../services/UserAPI":"services/UserAPI.js","../../utils/enum.utils":"utils/enum.utils.js"}],"components/list/restaurant.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../App":"App.js","../../services/AuthAPI":"services/AuthAPI.js","../../services/ReviewAPI":"services/ReviewAPI.js","../../Toast":"Toast.js","../../services/UserAPI":"services/UserAPI.js","../../utils/enum.utils":"utils/enum.utils.js"}],"components/list/restaurant.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../Router"));
+var _Router = require("../../Router");
 var _App = _interopRequireDefault(require("../../App"));
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
-var _templateObject;
+var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
+var _templateObject, _templateObject2, _templateObject3;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
                                                                                                                                                                                          * Restaurant Listing Component
@@ -11518,18 +11594,22 @@ customElements.define('restaurant-listing', class RestaurantListing extends _lit
    * @returns Render of restaurant listing
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n  margin:10px;\n  padding:0px;\n  text-align:center;\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n.restaurant-listing {\n  display:flex;\n  flex-direction: row;\n  width:700px;\n  height:250px;\n  margin:20px;\n  justify-content: space-between;\n  box-shadow: var(--main-content-box-shadow);\n  border-radius: 20px;\n}\n\n.left {\n  display:flex;\n  flex-direction: column;\n   align-items:center;\n   justify-content:center;\n}\n\n.mid {\n  border-left: 4px solid var(--brand-color);\n  border-right: 4px solid var(--brand-color);\n\n  overflow-y:scroll;\n}\n\n.mid p {  \npadding:20px;\n}\n\nsl-button {\n  padding:10px;\n}\n\nsl-button::part(base) {\n  font-size:1rem;\n  font-weight:600; \n}\n\nsl-avatar {\n  --size: 100px; \n  margin:10px;\n}\n\n\n\n@media all and (max-width: 768px){ \n\n\n  .restaurant-listing {\n    flex-direction:column;\n  width:80vw;\n  padding:10px;\n  height:200px;\n}\n\n.left {\n  flex-direction:row-reverse;\n  padding:10px;\n}\n\n.right {\n\n align-items:end;\n}\n\nsl-button {\n  width:100%;\n  height:100px;\n}\n\nsl-button::part(base) {\n  font-size:1rem;\n  font-weight:600;\n}\n\n.mid {\n  border:none;\n  margin:0;\n  padding:0;\n\n}\n\n  .mid p {\n    display:none;\n  }\n\n  .right {\n    align-items:start;\n  }\n\n  \nsl-avatar {\n  --size: 80px; \n  margin: 1em;\n}\n\n  }\n  \n\n</style>\n\n\n\n<div class=\"restaurant-listing\">\n\n\n\n  <div class=\"left\">\n     <h3>", "</h3>  \n  <sl-avatar image=", "></sl-avatar>\n  </div>\n  <div class=\"mid\">\n  <p>", "</p>\n</div>\n<div class=\"right\">\n<sl-button class=\"view-btn\" @click=", ">View Restaurant</sl-button>\n</div>\n</div>\n"])), this.restaurant.restaurantName, this.restaurant.avatar ? "".concat(_App.default.apiBase, "/images/").concat(this.restaurant.avatar) : '', this.restaurant.bio, event => {
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n  margin:10px;\n  padding:0px;\n  text-align:center;\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n.restaurant-listing {\n  display:flex;\n  flex-direction: row;\n  width:700px;\n  height:250px;\n  margin:20px;\n  justify-content: space-between;\n  box-shadow: var(--main-content-box-shadow);\n  border-radius: 20px;\n}\n\n.left {\n  display:flex;\n  flex-direction: column;\n   align-items:center;\n   justify-content:center;\n}\n\n.mid {\n  border-left: 4px solid var(--brand-color);\n  border-right: 4px solid var(--brand-color);\n\n  overflow-y:scroll;\n}\n\n.mid p {  \npadding:20px;\n}\n\nsl-button {\n  padding:10px;\n}\n\nsl-button::part(base) {\n  font-size:1rem;\n  font-weight:600; \n}\n\nsl-avatar {\n  --size: 100px; \n  margin:10px;\n}\n\n\n\n@media all and (max-width: 768px){ \n\n\n  .restaurant-listing {\n    flex-direction:column;\n  width:80vw;\n  padding:10px;\n  height:200px;\n}\n\n.left {\n  flex-direction:row-reverse;\n  padding:10px;\n}\n\n.right {\n\n align-items:end;\n}\n\nsl-button {\n  width:100%;\n  height:100px;\n}\n\nsl-button::part(base) {\n  font-size:1rem;\n  font-weight:600;\n}\n\n.mid {\n  border:none;\n  margin:0;\n  padding:0;\n\n}\n\n  .mid p {\n    display:none;\n  }\n\n  .right {\n    align-items:start;\n  }\n\n  \nsl-avatar {\n  --size: 80px; \n  margin: 1em;\n}\n\n  }\n  \n\n</style>\n\n\n\n<div class=\"restaurant-listing\">\n\n\n\n  <div class=\"left\">\n     <h3>", "</h3>  \n     ", "\n  </div>\n  <div class=\"mid\">\n  <p>", "</p>\n</div>\n<div class=\"right\">\n<sl-button class=\"view-btn\" @click=", ">View Restaurant</sl-button>\n</div>\n</div>\n"])), this.restaurant.restaurantName, _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n                   <sl-avatar shape=\"rounded\" image=", "></sl-avatar>\n                 "])), _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n                 <sl-avatar shape=\"rounded\"></sl-avatar>\n                 "]))), this.restaurant.bio, event => {
       _AuthAPI.default.currentRestaurant = this.restaurant;
-      (0, _Router.default)('/restaurant');
+      (0, _Router.gotoRoute)('/restaurant');
     });
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../App":"App.js","../../services/AuthAPI":"services/AuthAPI.js"}],"components/list/report.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../App":"App.js","../../services/AuthAPI":"services/AuthAPI.js","../../utils/enum.utils":"utils/enum.utils.js"}],"components/list/report.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../Router"));
+var _Router = require("../../Router");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
+var _App = _interopRequireDefault(require("../../App"));
+var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
+var _Toast = _interopRequireDefault(require("../../Toast"));
+var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
 var _templateObject;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -11564,18 +11644,19 @@ customElements.define('report-listing', class ReportListing extends _litElement.
     return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n  .report-listing {\n    display:flex;\n  flex-direction: row;\n  width:400px;\n  margin:20px;\n  max-width:80vw;\n  padding:10px;\n  justify-content: space-between;\n  box-shadow: var(--main-content-box-shadow);\n  border-radius: 20px;\n}\n\n.left, .mid, .right {\n  display:flex;\n  flex-direction: column;\n   align-items:center; \n}\n\n.right {\n justify-content:center;\n}\n\nsl-button {\n  width:100px;\n}\n\nsl-button::part(base) {\n  font-size:1rem;\n  font-weight:600; \n}\n\n</style>\n\n\n<div class=\"report-listing\">\n  <div class=\"left\">\n    <span class=\"bold-text\">Topic: ", "</span>\n  </div>\n  <div class=\"mid\">\n  <span class=\"bold-text\">", "</span>  \n</div>\n<div class=\"right\">\n    <sl-button class=\"view-btn\" @click=", ">View Report</sl-button>\n</div>\n</div>"])), this.report.topic, this.report.status, event => {
       _AuthAPI.default.currentReport = this.report;
       _AuthAPI.default.currentTarget = this.target;
-      (0, _Router.default)('/report');
+      (0, _Router.gotoRoute)('/report');
     });
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js"}],"components/profile/reviewer.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js","../../services/ReviewAPI":"services/ReviewAPI.js","../../Toast":"Toast.js","../../utils/enum.utils":"utils/enum.utils.js"}],"components/profile/reviewer.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../Router"));
+var _Router = require("../../Router");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _App = _interopRequireDefault(require("../../App"));
 var _UserAPI = _interopRequireDefault(require("../../services/UserAPI"));
+var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
 var _templateObject, _templateObject2, _templateObject3;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -11595,23 +11676,23 @@ customElements.define('reviewer-profile', class ReviewerProfile extends _litElem
    * @returns Render of reviewer profile component
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["   \n\n<style>\n\n\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n\n\n\n.profile {\n    display:flex;\n    flex-direction: column;\n    justify-content:center;\n    width: 700px;\n    align-items: center;\n    border: 4px solid var(--brand-color);\n    background:var(--body-bg);\n    margin:auto;\n    border-radius: 20px;\n    padding:30px; \n  }\n\n\n  .top {\n    display:flex;\n    flex-direction:row;\n    width:600px;\n    justify-content:space-between;\n  }\n\n.mid {\n  display:flex;\n  flex-direction:row;\n  align-items:top;\n  gap:30px;\n  margin-bottom:20px;\n}\n\n.main-info {\n  display:flex;\n  flex-direction:column;\n  box-shadow: var(--main-content-box-shadow);\nwidth: 300px;\nborder-radius:20px;\npadding:30px;\n}\n\n.bot {\n  display:flex;\n  flex-direction:column;\n  gap:50px;\n}\n\n.bio-display {\n display:flex;\n flex-direction:column; \n box-shadow: var(--main-content-box-shadow);\n width:600px;\n border-radius:20px;\n padding:30px;\n}\n\n.bio-display h3 {\n  text-align:left;\n  margin-bottom:0px;\n  margin-top:0px;\n}\n\np {\n  overflow-y: scroll;\n}\n\na {\n  text-decoration:none;\n  color:var(--base-txt-color);\n  font-weight:700;\n}\n\n\n.point-display {\n  display:flex;\n  flex-direction:row;\n  justify-content:center;\n  gap:15px;\n  width:150px;\n  height:auto;\n  background: var(--brand-color);\n  color:var(--light-txt-color);\n  margin-top:5px;\n  margin-bottom:5px;\n  padding:5px;\n  padding-left:10px;\n  border-radius:20px;\n}\n\n\n.delete-btn {\n  /*Right-align element to parent */\n  margin-left: auto; \nmargin-right: 0;\nwidth:150px;\npadding:5px;\nheight: auto;\ntext-align:center;\n}\n\n.delete-btn::part(base) {\nbackground:red;\nborder: 2px solid black;\nborder-radius:10px;\ncolor:black;\nfont-weight:600;\n}\n\n\n\nsl-dialog::part(panel) {\n  border-radius:20px;\n  box-shadow:var(--dialog-box-shadow);\n}\nsl-dialog::part(overlay) {\n  height:100vh;\n}\nsl-dialog::part(header) {\n  padding:5px;\n  background: var(--brand-color);\n  border-top-left-radius:20px;\n  border-top-right-radius:20px;\n}\nsl-dialog::part(title) {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\ntext-align:center;\ncolor:var(--light-txt-color);\n}\nsl-dialog::part(body) {\n  font-size: 1rem;\n    font-weight:600;\n    font-family: var(--base-font-family);\ntext-align:center;\ncolor:var(--base-txt-color);\n}\nsl-dialog::part(footer) {\n  display:flex;\n  flex-direction:row;\n  justify-content:space-between;\n  margin-left:50px;\n  margin-right:50px;\n}\n\n\n\n\n@media all and (max-width: 768px){ \n\n  .profile {\n    display:flex;\n    flex-direction: column;\n    justify-content:center;\n    width: 100vw;\n    align-items: center;\n    border:none;\n    border-radius:0px;\n    padding:20px;\n  }\n\n  .top {\n    width:90%;\n  }\n\n.mid {\n  display:flex;\n  flex-direction:column;\n  width:90%;\n  align-items:left;\n}\n\n.bot {\n  width:90%;\n  gap:100px;\n}\n\n.bio-display {\n width:90%;\n border-radius:20px;\n padding:20px;\n}\n\n\n}\n\n</style>\n\n\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n  <span>Are you sure you want to permanently delete your account?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n\n\n          <div class=\"profile\">\n      <div class=\"top\">\n        <h1>Your Profile</h1>\n        <sl-icon-button name=\"pencil\" label=\"Edit Profile\" style=\"font-size: 2rem;\" @click=", "></sl-icon-button>\n      </div>\n      \n      <div class=\"mid\">\n             ", "\n             <div class=\"main-info\">\n              <div><span class=\"bold-text\">Username </span><span>", "</span></div>\n              <div><span class=\"bold-text\">Name </span><span>", " ", "</span></div>\n              <div><span class=\"bold-text\">Email </span><span>", "</span></div>\n              <div class=\"point-display\"><span class=\"bold-text\">Demerits </span><span>", "</span></div>\n              <div class=\"point-display\"><span class=\"bold-text\">Total Upvotes </span><span>", "</span></div>\n              <div class=\"point-display\"><span class=\"bold-text\">Total Downvotes </span><span>", "</span></div>\n             </div>\n      </div>\n      <div class=\"bot\">\n        <div class=\"bio-display\"><h3>Bio</h3>\n        <p>", "</p></div>\n          <sl-button class=\"delete-btn\" @click=\"", "\">Delete Account</sl-button>      \n      </div>\n\n       \n    </div>\n\n            \n    "])), () => {
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["   \n\n<style>\n\n\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n\n\n\n.profile {\n    display:flex;\n    flex-direction: column;\n    justify-content:center;\n    width: 700px;\n    align-items: center;\n    border: 4px solid var(--brand-color);\n    background:var(--body-bg);\n    margin:auto;\n    border-radius: 20px;\n    padding:30px; \n  }\n\n\n  .top {\n    display:flex;\n    flex-direction:row;\n    width:600px;\n    justify-content:space-between;\n  }\n\n.mid {\n  display:flex;\n  flex-direction:row;\n  align-items:top;\n  gap:30px;\n  margin-bottom:20px;\n}\n\n.main-info {\n  display:flex;\n  flex-direction:column;\n  box-shadow: var(--main-content-box-shadow);\nwidth: 300px;\nborder-radius:20px;\npadding:30px;\n}\n\n.bot {\n  display:flex;\n  flex-direction:column;\n  gap:50px;\n}\n\n.bio-display {\n display:flex;\n flex-direction:column; \n box-shadow: var(--main-content-box-shadow);\n width:600px;\n border-radius:20px;\n padding:30px;\n}\n\n.bio-display h3 {\n  text-align:left;\n  margin-bottom:0px;\n  margin-top:0px;\n}\n\np {\n  overflow-y: scroll;\n}\n\na {\n  text-decoration:none;\n  color:var(--base-txt-color);\n  font-weight:700;\n}\n\n\n.point-display {\n  display:flex;\n  flex-direction:row;\n  justify-content:center;\n  gap:15px;\n  width:150px;\n  height:auto;\n  background: var(--brand-color);\n  color:var(--light-txt-color);\n  margin-top:5px;\n  margin-bottom:5px;\n  padding:5px;\n  padding-left:10px;\n  border-radius:20px;\n}\n\n\n.delete-btn {\n  /*Right-align element to parent */\n  margin-left: auto; \nmargin-right: 0;\nwidth:150px;\npadding:5px;\nheight: auto;\ntext-align:center;\n}\n\n.delete-btn::part(base) {\nbackground:red;\nborder: 2px solid black;\nborder-radius:10px;\ncolor:black;\nfont-weight:600;\n}\n\n\n\nsl-dialog::part(panel) {\n  border-radius:20px;\n  box-shadow:var(--dialog-box-shadow);\n}\nsl-dialog::part(overlay) {\n  height:100vh;\n}\nsl-dialog::part(header) {\n  padding:5px;\n  background: var(--brand-color);\n  border-top-left-radius:20px;\n  border-top-right-radius:20px;\n}\nsl-dialog::part(title) {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\ntext-align:center;\ncolor:var(--light-txt-color);\n}\nsl-dialog::part(body) {\n  font-size: 1rem;\n    font-weight:600;\n    font-family: var(--base-font-family);\ntext-align:center;\ncolor:var(--base-txt-color);\n}\nsl-dialog::part(footer) {\n  display:flex;\n  flex-direction:row;\n  justify-content:space-between;\n  margin-left:50px;\n  margin-right:50px;\n}\n\n\nsl-avatar {\n  --size: 200px; \n  margin-bottom: 1em;\n}\n\n\n@media all and (max-width: 768px){ \n\n  .profile {\n    display:flex;\n    flex-direction: column;\n    justify-content:center;\n    width: 100vw;\n    align-items: center;\n    border:none;\n    border-radius:0px;\n    padding:20px;\n  }\n\n  .top {\n    width:90%;\n  }\n\n.mid {\n  display:flex;\n  flex-direction:column;\n  width:90%;\n  align-items:left;\n}\n\n.bot {\n  width:90%;\n  gap:100px;\n}\n\n.bio-display {\n width:90%;\n border-radius:20px;\n padding:20px;\n}\n\n\n}\n\n</style>\n\n\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n  <span>Are you sure you want to permanently delete your account?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n\n\n          <div class=\"profile\">\n      <div class=\"top\">\n        <h1>Your Profile</h1>\n        <sl-icon-button name=\"pencil\" label=\"Edit Profile\" style=\"font-size: 2rem;\" @click=", "></sl-icon-button>\n      </div>\n      \n      <div class=\"mid\">\n      ", "\n             <div class=\"main-info\">\n              <div><span class=\"bold-text\">Username </span><span>", "</span></div>\n              <div><span class=\"bold-text\">Name </span><span>", " ", "</span></div>\n              <div><span class=\"bold-text\">Email </span><span>", "</span></div>\n              <div class=\"point-display\"><span class=\"bold-text\">Demerits </span><span>", "</span></div>\n             </div>\n      </div>\n      <div class=\"bot\">\n        <div class=\"bio-display\"><h3>Bio</h3>\n        <p>", "</p></div>\n          <sl-button class=\"delete-btn\" @click=\"", "\">Delete Account</sl-button>      \n      </div>\n\n       \n    </div>\n\n            \n    "])), () => {
       this.shadowRoot.getElementById('delete-dialog').hide();
       _UserAPI.default.deleteById(_AuthAPI.default.currentUser._id);
-    }, () => this.shadowRoot.getElementById('delete-dialog').hide(), () => (0, _Router.default)('/edit-profile'), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n               <sl-avatar shape=\"rounded\" style=\"--size: 200px; margin-bottom: 1em;\" image=", "></sl-avatar>\n             "])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_App.default.apiBase, "/images/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n             <sl-avatar shape=\"rounded\" style=\"--size: 200px; margin-bottom: 1em;\"></sl-avatar>\n             "]))), _AuthAPI.default.currentUser.username, _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.email, _AuthAPI.default.currentUser.demerits, _AuthAPI.default.currentUser.upvotes, _AuthAPI.default.currentUser.downvotes, _AuthAPI.default.currentUser.bio, () => this.shadowRoot.getElementById('delete-dialog').show());
+    }, () => this.shadowRoot.getElementById('delete-dialog').hide(), () => (0, _Router.gotoRoute)('/edit-profile'), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n                   <sl-avatar shape=\"rounded\" image=", "></sl-avatar>\n                 "])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n                 <sl-avatar shape=\"rounded\"></sl-avatar>\n                 "]))), _AuthAPI.default.currentUser.username, _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.email, _AuthAPI.default.currentUser.demerits, _AuthAPI.default.currentUser.bio, () => this.shadowRoot.getElementById('delete-dialog').show());
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js","../../services/UserAPI":"services/UserAPI.js"}],"components/profile/restaurant.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js","../../services/UserAPI":"services/UserAPI.js","../../utils/enum.utils":"utils/enum.utils.js"}],"components/profile/restaurant.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../Router"));
+var _Router = require("../../Router");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _App = _interopRequireDefault(require("../../App"));
 var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
 var _UserAPI = _interopRequireDefault(require("../../services/UserAPI"));
 var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
-var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8, _templateObject9, _templateObject10, _templateObject11, _templateObject12, _templateObject13, _templateObject14;
+var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8, _templateObject9, _templateObject10, _templateObject11, _templateObject12, _templateObject13, _templateObject14, _templateObject15, _templateObject16;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
                                                                                                                                                                                          * Restaurant profile component
@@ -11699,7 +11780,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
     if (this.is_visitor == "false") {
       demeritDisplay = (0, _litElement.html)(_templateObject9 || (_templateObject9 = _taggedTemplateLiteral(["\n           <div class=\"point-display\"><span class=\"bold-text\">Demerits </span><span>", "</span></div>\n        "])), _AuthAPI.default.currentUser.demerits);
       deleteAccountBtn = (0, _litElement.html)(_templateObject10 || (_templateObject10 = _taggedTemplateLiteral(["\n                  <sl-button id=\"delete-btn\" @click=\"", "\">Delete Account</sl-button>      \n        "])), () => this.shadowRoot.getElementById('delete-dialog').show());
-      editProfileBtn = (0, _litElement.html)(_templateObject11 || (_templateObject11 = _taggedTemplateLiteral(["\n        <sl-icon-button id=\"edit-btn\" name=\"pencil\" label=\"Edit Profile\" style=\"font-size: 2rem;\" @click=", "></sl-icon-button>\n"])), () => (0, _Router.default)('/edit-profile'));
+      editProfileBtn = (0, _litElement.html)(_templateObject11 || (_templateObject11 = _taggedTemplateLiteral(["\n        <sl-icon-button id=\"edit-btn\" name=\"pencil\" label=\"Edit Profile\" style=\"font-size: 2rem;\" @click=", "></sl-icon-button>\n"])), () => (0, _Router.gotoRoute)('/edit-profile'));
     }
     //Render UI if this is not your profile
     else if (this.is_visitor == "true" && _AuthAPI.default.currentUser._id != this.restaurant._id) {
@@ -11709,10 +11790,10 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
       }
     }
     let restaurantInfo = (0, _litElement.html)(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral([""])));
-    restaurantInfo = (0, _litElement.html)(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral(["\n          \n          <style>\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .info-label, .rating-display-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n  .rating-display-text {\nmargin: 0 auto;\n    }\n\n\n\n            #restaurant-info {\n            display: flex;\n            flex-direction: column;\n          align-items: center;\n          justify-content: center;\n          align-self: center;\n          width: 900px;\n          border: 4px solid var(--brand-color);\n             padding:20px;\n             gap:20px;\n          border-radius:20px;\n          }\n          \n          \n            .top {\n              display:flex;\n              flex-direction: row;\n            justify-content:space-between;\n              align-items: center;\n              padding-right:20px;\n            }\n\n            .mid {\n              display:flex;\n              flex-direction:row;\n              align-items:start;\n              gap:20px;\n              padding-left:20px;\n            }\n\n\n\n            .rating-container {\n                       display:flex;\n              flex-direction:column;\n              align-items:center;    \n              padding:10px;\n              box-shadow: var(--main-content-box-shadow); \n            }\n\n\n            .rating-container h3 {\n              margin-top:5px;\n              text-align:center;\n            }\n\n            .rating-display {\n              display:flex;\n  flex-direction:column;\n  justify-content:center;\n  width:100px;\n  height:100px;\n  border:4px solid var(--brand-color);\n  border-radius:80px;\n  text-align:center; \n            }\n\n\n\n            .point-display {\n  display:flex;\n  flex-direction:row;\n  justify-content:center;\n  gap:15px;\n  width:150px;\n  height:auto;\n  background: var(--brand-color);\n  color:var(--light-txt-color);\n  margin-top:5px;\n  margin-bottom:5px;\n  padding:5px;\n  padding-left:10px;\n  border-radius:20px;\n}\n          \n            .bot {\n          display:flex;\n          flex-direction:row;\n          justify-content:center;\n          gap:50px;\n            }\n          \n          \n            .bio-container {\n              box-shadow: var(--main-content-box-shadow);\n          width:60%;\n          padding:20px;\n            }\n          \n          \n            .profile-info {\n              box-shadow: var(--main-content-box-shadow);\n              padding:20px;\n            }\n\n            ul {\n              padding:0;\n            }\n\n            li {\n              list-style-type:none;\n              margin-top:5px;\n              margin-bottom:5px;\n            }\n\n\n            #edit-btn {\n              align-self:start;\n            }\n\n\n\n\n            #delete-btn {\n  /*Right-align element to parent */\n  margin-left: auto; \nmargin-right: 0;\n\nwidth:150px;\npadding:5px;\nheight: auto;\ntext-align:center;\nmargin-top:40px;\n\n}\n\n#delete-btn::part(base) {\nbackground:red;\nborder: 2px solid black;\nborder-radius:10px;\ncolor:black;\nfont-weight:600;\n}\n\n\nsl-dialog::part(panel) {\n  border-radius:20px;\n  box-shadow:var(--dialog-box-shadow);\n}\nsl-dialog::part(overlay) {\n  height:100vh;\n}\nsl-dialog::part(header) {\n  padding:5px;\n  background: var(--brand-color);\n  border-top-left-radius:20px;\n  border-top-right-radius:20px;\n}\nsl-dialog::part(title) {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\ntext-align:center;\ncolor:var(--light-txt-color);\n}\nsl-dialog::part(body) {\n  font-size: 1rem;\n    font-weight:600;\n    font-family: var(--base-font-family);\ntext-align:center;\ncolor:var(--base-txt-color);\n}\nsl-dialog::part(footer) {\n  display:flex;\n  flex-direction:row;\n  justify-content:space-between;\n  margin-left:50px;\n  margin-right:50px;\n}\n\nsl-avatar {\n  --size: 200px; \n  margin-bottom: 1em;\n}\n\n\n\n\n\n\n\n@media all and (max-width: 1000px){ \n\n  #restaurant-info {\n          width: 90vw;\n             border: none;\n          }\n        \n          .bot {\n            flex-direction:column-reverse;\n            align-items:center;\n          }\n\n          .bio-container, .profile-info {\n          width:80%;\n            }\n\n\n}\n\n\n          </style>\n\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\">\n  <span>Are you sure you want to permanently delete your account?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n<sl-dialog id=\"report-dialog\" label=\"Submit Report\">\n  <report-form title=", " target_id=", " target_type=", " ></report-form>\n</sl-dialog>\n          \n          \n          \n          <div id=\"restaurant-info\">\n\n            <div class=\"top\">   \n             <h1>", "</h1> \n              ", "\n              ", "\n    </div>\n\n    <div class=\"mid\">\n   <sl-avatar image=", "></sl-avatar>   \n                 <div class=\"rating-container\">\n                <div class=\"rating-display\">", "</div>\n                <span class=\"rating-display-text\">", "</span>\n              </div>\n    </div>         \n        \n\n            <div class=\"bot\">\n              <div class=\"bio-container\">\n                <h3>About Us</h3>\n                <p>", "</p>\n</div>\n                <div class=\"profile-info\">\n                 <h3>Business Information</h3>\n                <ul>\n                  <li><span class=\"info-label\">Cuisine </span>", "</li>\n                  <li><span class=\"info-label\">Address </span>", "</li>\n                  <li><span class=\"info-label\">Contact </span>", "</li>\n                  <li><span class=\"info-label\">Established </span>", "</li>\n                </ul>\n                ", "                 \n                </div>\n</div>\n ", "\n          </div>       \n      "])), () => {
+    restaurantInfo = (0, _litElement.html)(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral(["\n          \n          <style>\n\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .info-label, .rating-display-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n  .rating-display-text {\nmargin: 0 auto;\n    }\n\n\n\n            #restaurant-info {\n            display: flex;\n            flex-direction: column;\n          align-items: center;\n          justify-content: center;\n          align-self: center;\n          width: 900px;\n          border: 4px solid var(--brand-color);\n             padding:20px;\n             gap:20px;\n          border-radius:20px;\n          }\n          \n          \n            .top {\n              display:flex;\n              flex-direction: row;\n            justify-content:space-between;\n              align-items: center;\n              padding-right:20px;\n            }\n\n            .mid {\n              display:flex;\n              flex-direction:row;\n              align-items:start;\n              gap:20px;\n              padding-left:20px;\n            }\n\n\n\n            .rating-container {\n                       display:flex;\n              flex-direction:column;\n              align-items:center;    \n              padding:10px;\n              box-shadow: var(--main-content-box-shadow); \n            }\n\n\n            .rating-container h3 {\n              margin-top:5px;\n              text-align:center;\n            }\n\n            .rating-display {\n              display:flex;\n  flex-direction:column;\n  justify-content:center;\n  width:100px;\n  height:100px;\n  border:4px solid var(--brand-color);\n  border-radius:80px;\n  text-align:center; \n            }\n\n\n\n            .point-display {\n  display:flex;\n  flex-direction:row;\n  justify-content:center;\n  gap:15px;\n  width:150px;\n  height:auto;\n  background: var(--brand-color);\n  color:var(--light-txt-color);\n  margin-top:5px;\n  margin-bottom:5px;\n  padding:5px;\n  padding-left:10px;\n  border-radius:20px;\n}\n          \n            .bot {\n          display:flex;\n          flex-direction:row;\n          justify-content:center;\n          gap:50px;\n            }\n          \n          \n            .bio-container {\n              box-shadow: var(--main-content-box-shadow);\n          width:60%;\n          padding:20px;\n            }\n          \n          \n            .profile-info {\n              box-shadow: var(--main-content-box-shadow);\n              padding:20px;\n            }\n\n            ul {\n              padding:0;\n            }\n\n            li {\n              list-style-type:none;\n              margin-top:5px;\n              margin-bottom:5px;\n            }\n\n\n            #edit-btn {\n              align-self:start;\n            }\n\n\n\n\n            #delete-btn {\n  /*Right-align element to parent */\n  margin-left: auto; \nmargin-right: 0;\n\nwidth:150px;\npadding:5px;\nheight: auto;\ntext-align:center;\nmargin-top:40px;\n\n}\n\n#delete-btn::part(base) {\nbackground:red;\nborder: 2px solid black;\nborder-radius:10px;\ncolor:black;\nfont-weight:600;\n}\n\n\nsl-dialog::part(panel) {\n  border-radius:20px;\n  box-shadow:var(--dialog-box-shadow);\n}\nsl-dialog::part(overlay) {\n  height:100vh;\n}\nsl-dialog::part(header) {\n  padding:5px;\n  background: var(--brand-color);\n  border-top-left-radius:20px;\n  border-top-right-radius:20px;\n}\nsl-dialog::part(title) {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\ntext-align:center;\ncolor:var(--light-txt-color);\n}\nsl-dialog::part(body) {\n  font-size: 1rem;\n    font-weight:600;\n    font-family: var(--base-font-family);\ntext-align:center;\ncolor:var(--base-txt-color);\n}\nsl-dialog::part(footer) {\n  display:flex;\n  flex-direction:row;\n  justify-content:space-between;\n  margin-left:50px;\n  margin-right:50px;\n}\n\nsl-avatar {\n  --size: 200px; \n  margin-bottom: 1em;\n}\n\n\n\n\n\n\n\n@media all and (max-width: 1000px){ \n\n  #restaurant-info {\n          width: 90vw;\n             border: none;\n          }\n        \n          .bot {\n            flex-direction:column-reverse;\n            align-items:center;\n          }\n\n          .bio-container, .profile-info {\n          width:80%;\n            }\n\n\n}\n\n\n          </style>\n\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\">\n  <span>Are you sure you want to permanently delete your account?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n<sl-dialog id=\"report-dialog\" label=\"Submit Report\">\n  <report-form title=", " target_id=", " target_type=", " ></report-form>\n</sl-dialog>\n          \n          \n          \n          <div id=\"restaurant-info\">\n\n            <div class=\"top\">   \n             <h1>", "</h1> \n              ", "\n              ", "\n    </div>\n\n    <div class=\"mid\">\n    ", "\n                 <div class=\"rating-container\">\n                <div class=\"rating-display\">", "</div>\n                <span class=\"rating-display-text\">", "</span>\n              </div>\n    </div>         \n        \n\n            <div class=\"bot\">\n              <div class=\"bio-container\">\n                <h3>About Us</h3>\n                <p>", "</p>\n</div>\n                <div class=\"profile-info\">\n                 <h3>Business Information</h3>\n                <ul>\n                  <li><span class=\"info-label\">Cuisine </span>", "</li>\n                  <li><span class=\"info-label\">Address </span>", "</li>\n                  <li><span class=\"info-label\">Contact </span>", "</li>\n                  <li><span class=\"info-label\">Established </span>", "</li>\n                </ul>\n                ", "                 \n                </div>\n</div>\n ", "\n          </div>       \n      "])), () => {
       this.shadowRoot.getElementById('delete-dialog').hide();
       _UserAPI.default.deleteById(_AuthAPI.default.currentUser._id);
-    }, () => this.shadowRoot.getElementById('delete-dialog').hide(), document.title, this.restaurant._id, _enum.default.reportTargetType.restaurant, this.restaurant.restaurantName, reportAccountBtn, editProfileBtn, this.restaurant.avatar ? "".concat(_App.default.apiBase, "/images/").concat(this.restaurant.avatar) : '', this.ratingDisplayTemplate, this.numReviewsMsg, this.restaurant.bio, this.restaurant.cuisine, this.restaurant.location, this.restaurant.phoneNumber, this.restaurant.established, demeritDisplay, deleteAccountBtn);
+    }, () => this.shadowRoot.getElementById('delete-dialog').hide(), document.title, this.restaurant._id, _enum.default.reportTargetType.restaurant, this.restaurant.restaurantName, reportAccountBtn, editProfileBtn, _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject15 || (_templateObject15 = _taggedTemplateLiteral(["\n                   <sl-avatar shape=\"rounded\" image=", "></sl-avatar>\n                 "])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject16 || (_templateObject16 = _taggedTemplateLiteral(["\n                 <sl-avatar shape=\"rounded\"></sl-avatar>\n                 "]))), this.ratingDisplayTemplate, this.numReviewsMsg, this.restaurant.bio, this.restaurant.cuisine, this.restaurant.location, this.restaurant.phoneNumber, this.restaurant.established, demeritDisplay, deleteAccountBtn);
     return restaurantInfo;
   }
 });
@@ -11720,9 +11801,10 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
-var _Router = _interopRequireDefault(require("../../Router"));
+var _Router = require("../../Router");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _App = _interopRequireDefault(require("../../App"));
+var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
 var _templateObject, _templateObject2, _templateObject3;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -11742,10 +11824,10 @@ customElements.define('admin-profile', class AdminProfile extends _litElement.Li
    * @returns Render of admin profile component
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["   \n    \n    <style>\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n    \n    .profile {\n        display:flex;\n        flex-direction: column;\n        justify-content:center;\n        width: 700px;\n        align-items: center;\n        border: 4px solid var(--brand-color);\n        background:var(--body-bg);\n        margin:auto;\n        border-radius: 20px;\n        padding:30px;\n       \n      }\n    \n    \n      .bold-text {\n        font-weight: 700;\n      }\n    \n    \n      .top {\n        display:flex;\n        flex-direction:row;\n        width:600px;\n        justify-content:space-between;\n      }\n    \n    .mid {\n      display:flex;\n      flex-direction:row;\n      align-items:top;\n      gap:30px;\n      margin-bottom:20px;\n    }\n    \n    .main-info {\n      display:flex;\n      flex-direction:column;\n      box-shadow: var(--main-content-box-shadow);\n    width: 300px;\n    border-radius:20px;\n    padding:30px;\n    }\n    \n    .bot {\n      display:flex;\n      flex-direction:column;\n      gap:50px;\n    }\n    \n    .bio-display {\n     display:flex;\n     flex-direction:column; \n     box-shadow: var(--main-content-box-shadow);\n     width:600px;\n     border-radius:20px;\n     padding:30px;\n    }\n    \n    .bio-display h3 {\n      text-align:left;\n      margin-bottom:0px;\n    }\n    \n    p {\n      overflow-y: scroll;\n    }\n    \n    a {\n      text-decoration:none;\n      color:var(--base-txt-color);\n      font-weight:700;\n    }\n    \n    \n    .point-display {\n      display:flex;\n      flex-direction:row;\n      justify-content:center;\n      gap:15px;\n      width:150px;\n      height:auto;\n      background: var(--brand-color);\n      color:#FFFFFF;\n      margin-top:5px;\n      margin-bottom:5px;\n      padding:5px;\n      padding-left:10px;\n      border-radius:20px;\n    }\n    \n    \n    \n    #delete-btn {\n      /*Right-align element to parent */\n      margin-left: auto; \n    margin-right: 0;\n    \n    width:150px;\n    padding:5px;\n    height: auto;\n    text-align:center;\n    \n    }\n    \n    #delete-btn::part(base) {\n    background:red;\n    border: 2px solid black;\n    border-radius:10px;\n    color:black;\n    font-weight:600;\n    }\n\n\n\n    @media all and (max-width: 768px){ \n\n.profile {\n  display:flex;\n  flex-direction: column;\n  justify-content:center;\n  width: 100vw;\n  align-items: center;\n  border:none;\n  border-radius:0px;\n  padding:20px;\n}\n\n.top {\n  width:90%;\n}\n\n.mid {\ndisplay:flex;\nflex-direction:column;\nwidth:90%;\nalign-items:left;\n}\n\n.bot {\nwidth:90%;\ngap:100px;\n}\n\n.bio-display {\nwidth:90%;\nborder-radius:20px;\npadding:20px;\n}\n\n\n}\n\n\n  \n    \n    </style>\n    \n    \n              <div class=\"profile\">\n          <div class=\"top\">\n            <h1>Your Profile</h1>\n            <sl-icon-button name=\"pencil\" label=\"Edit Profile\" style=\"font-size: 2rem;\" @click=", "></sl-icon-button>\n          </div>\n          \n          <div class=\"mid\">\n                 ", "\n                 <div class=\"main-info\">\n                  <div><span class=\"bold-text\">Username </span><span>", "</span></div>\n                  <div><span class=\"bold-text\">Name </span><span>", " ", "</span></div>\n                  <div><span class=\"bold-text\">Email </span><span>", "</span></div>\n                 </div>\n          </div>\n          <div class=\"bot\">\n            <div class=\"bio-display\"><h3>Bio</h3>\n            <p>", "</p></div>\n  \n          </div>\n        </div>\n    \n                \n        "])), () => (0, _Router.default)('/edit-profile'), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n                   <sl-avatar shape=\"rounded\" style=\"--size: 200px; margin-bottom: 1em;\" image=", "></sl-avatar>\n                 "])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_App.default.apiBase, "/images/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n                 <sl-avatar shape=\"rounded\" style=\"--size: 200px; margin-bottom: 1em;\"></sl-avatar>\n                 "]))), _AuthAPI.default.currentUser.username, _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.email, _AuthAPI.default.currentUser.bio);
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["   \n    \n    <style>\n\nh1 {\n  font-size: var(--h1-font-size);\n    font-weight:var(--h1-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh2 {\n  font-size: var(--h2-font-size);\n    font-weight:var(--h2-font-weight);\n    font-family:var(--heading-font-family);\n    color:var(--heading-txt-color);\n}\nh3 {\n  font-size: var(--h3-font-size);\n    font-weight:var(--h3-font-weight);\n    font-family:var(--heading-font-family);\n  color:var(--heading-txt-color);\n}\n  .bold-text {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n  }\n\n\n    \n    .profile {\n        display:flex;\n        flex-direction: column;\n        justify-content:center;\n        width: 700px;\n        align-items: center;\n        border: 4px solid var(--brand-color);\n        background:var(--body-bg);\n        margin:auto;\n        border-radius: 20px;\n        padding:30px;\n       \n      }\n    \n    \n      .bold-text {\n        font-weight: 700;\n      }\n    \n    \n      .top {\n        display:flex;\n        flex-direction:row;\n        width:600px;\n        justify-content:space-between;\n      }\n    \n    .mid {\n      display:flex;\n      flex-direction:row;\n      align-items:top;\n      gap:30px;\n      margin-bottom:20px;\n    }\n    \n    .main-info {\n      display:flex;\n      flex-direction:column;\n      box-shadow: var(--main-content-box-shadow);\n    width: 300px;\n    border-radius:20px;\n    padding:30px;\n    }\n    \n    .bot {\n      display:flex;\n      flex-direction:column;\n      gap:50px;\n    }\n    \n    .bio-display {\n     display:flex;\n     flex-direction:column; \n     box-shadow: var(--main-content-box-shadow);\n     width:600px;\n     border-radius:20px;\n     padding:30px;\n    }\n    \n    .bio-display h3 {\n      text-align:left;\n      margin-bottom:0px;\n    }\n    \n    p {\n      overflow-y: scroll;\n    }\n    \n    a {\n      text-decoration:none;\n      color:var(--base-txt-color);\n      font-weight:700;\n    }\n    \n    \n    .point-display {\n      display:flex;\n      flex-direction:row;\n      justify-content:center;\n      gap:15px;\n      width:150px;\n      height:auto;\n      background: var(--brand-color);\n      color:#FFFFFF;\n      margin-top:5px;\n      margin-bottom:5px;\n      padding:5px;\n      padding-left:10px;\n      border-radius:20px;\n    }\n    \n    \n    \n    #delete-btn {\n      /*Right-align element to parent */\n      margin-left: auto; \n    margin-right: 0;\n    \n    width:150px;\n    padding:5px;\n    height: auto;\n    text-align:center;\n    \n    }\n    \n    #delete-btn::part(base) {\n    background:red;\n    border: 2px solid black;\n    border-radius:10px;\n    color:black;\n    font-weight:600;\n    }\n\n\n\n    sl-avatar {\n      --size: 200px; \n      margin-bottom: 1em;\n    }\n\n\n\n    @media all and (max-width: 768px){ \n\n.profile {\n  display:flex;\n  flex-direction: column;\n  justify-content:center;\n  width: 100vw;\n  align-items: center;\n  border:none;\n  border-radius:0px;\n  padding:20px;\n}\n\n.top {\n  width:90%;\n}\n\n.mid {\ndisplay:flex;\nflex-direction:column;\nwidth:90%;\nalign-items:left;\n}\n\n.bot {\nwidth:90%;\ngap:100px;\n}\n\n.bio-display {\nwidth:90%;\nborder-radius:20px;\npadding:20px;\n}\n\n\n}\n\n\n  \n    \n    </style>\n    \n    \n              <div class=\"profile\">\n          <div class=\"top\">\n            <h1>Your Profile</h1>\n            <sl-icon-button name=\"pencil\" label=\"Edit Profile\" style=\"font-size: 2rem;\" @click=", "></sl-icon-button>\n          </div>\n          \n          <div class=\"mid\">\n                 ", "\n                 <div class=\"main-info\">\n                  <div><span class=\"bold-text\">Username </span><span>", "</span></div>\n                  <div><span class=\"bold-text\">Name </span><span>", " ", "</span></div>\n                  <div><span class=\"bold-text\">Email </span><span>", "</span></div>\n                 </div>\n          </div>\n          <div class=\"bot\">\n            <div class=\"bio-display\"><h3>Bio</h3>\n            <p>", "</p></div>\n  \n          </div>\n        </div>\n    \n                \n        "])), () => (0, _Router.gotoRoute)('/edit-profile'), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n                   <sl-avatar shape=\"rounded\" image=", "></sl-avatar>\n                 "])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n                 <sl-avatar shape=\"rounded\"></sl-avatar>\n                 "]))), _AuthAPI.default.currentUser.username, _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.email, _AuthAPI.default.currentUser.bio);
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js","../../utils/enum.utils":"utils/enum.utils.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -11866,7 +11948,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54167" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65156" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

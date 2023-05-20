@@ -29,7 +29,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
   static get properties(){
     return {
       review: {
-        type: Object
+        type:Object
       },
       restaurant_name: {
         type:String
@@ -39,6 +39,9 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
       },
       downvotes: {
         type:Number
+      },
+      is_report: {
+        type:String
       }
     }
   }
@@ -70,8 +73,10 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
   async updateReviewSubmitHandler(e){
     e.preventDefault();
     const formData = e.detail.formData;
+
+    console.log(formData);
     try {
-      const response = await ReviewAPI.updateById(this.review._id, formData);     
+      const response = await ReviewAPI.updateById(this.review._id, formData, false);     
       console.log(response);
       Toast.show('review created');   
     this.shadowRoot.getElementById('edit-dialog').hide();   
@@ -124,12 +129,14 @@ return html`
  * @returns Template of review actions
  */
   buildReviewActions() {
+    //Build actions for author
         if (AuthAPI.currentUser._id == this.review.authorId) {
       return html`       
       <sl-button id="edit-btn" @click="${() => this.shadowRoot.getElementById('edit-dialog').show()}">Edit</sl-button>  
  <sl-button id="delete-btn" @click="${() => this.shadowRoot.getElementById('delete-dialog').show()}">Delete</sl-button>`;
     }
-    else {
+    //Build actions for non-authors and not viewed in report
+    else if (AuthAPI.currentUser._id != this.review.authorId && this.is_report != "true") {
       return html`<sl-button id="report-btn" @click="${() => this.shadowRoot.getElementById('report-dialog').show()}">Report</sl-button>`;
     }
   }
@@ -151,9 +158,9 @@ if (this.review.downvoters.includes(AuthAPI.currentUser._id)) {
 this.review.downvoters = this.review.downvoters.slice(AuthAPI.currentUser._id, -1);  
 this.downvotes--;
 }
-//Disable downvoting, enable upvoting
-this.shadowRoot.getElementById('upvote-btn').removeAttribute('disabled');
-this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled','');
+//Disable upvoting, enable downvoting
+this.shadowRoot.getElementById('downvote-btn').removeAttribute('disabled');
+this.shadowRoot.getElementById('upvote-btn').setAttribute('disabled','');
     }
     //Downvote the review, remove upvote if it exists
     else if (vote == "downvote") {
@@ -166,9 +173,9 @@ if (this.review.upvoters.includes(AuthAPI.currentUser._id)) {
 this.review.upvoters = this.review.upvoters.slice(AuthAPI.currentUser._id, -1);  
 this.upvotes--;
 }
-//Disable upvoting, enable downvoting
-this.shadowRoot.getElementById('downvote-btn').removeAttribute('disabled');
-this.shadowRoot.getElementById('upvote-btn').setAttribute('disabled','');
+//Disable downvoting, enable upvoting
+this.shadowRoot.getElementById('upvote-btn').removeAttribute('disabled');
+this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled','');
     }
     else 
       return;
@@ -185,8 +192,8 @@ await ReviewAPI.updateById(this.review._id, JSON.stringify(this.review), true);
    * @returns Template of vote display
    */
   buildVoteDisplay() {
-    //Disable voting for author
-    if (this.review.authorId == AuthAPI.currentUser._id) {
+    //Disable voting for author and as flagged content in report
+    if (this.review.authorId == AuthAPI.currentUser._id || this.is_report == "true") {
 return html`    
       <div class="vote-container"><sl-button id="upvote-btn" disabled>Upvote</sl-button><div>Upvotes: ${this.review.upvotes}</div></div>
   <div class="vote-container"><sl-button id="downvote-btn" disabled>Downvote</sl-button><div>Downvotes: ${this.review.downvotes}</div></div>`;
@@ -223,10 +230,11 @@ return html`
 
     //Review actions if the user authored the review
     const reviewActions = this.buildReviewActions();
-    //Review rating UI display
+        //Review rating UI display
     let ratingDisplay = this.buildRatingDisplay();
     //Upvote and downvote UI display
-    let voteDisplay = this.buildVoteDisplay();
+    let voteDisplay = this.buildVoteDisplay();      
+
 
 return html`
 
@@ -443,12 +451,12 @@ sl-button, #delete-btn {
 
 
 <sl-dialog id="edit-dialog" label="Edit Review" class="dialog-overview">
-<sl-form class="page-form" @sl-submit=${this.updateReviewSubmitHandler.bind(this)}>
+<sl-form class="page-form" @sl-submit=${this.updateReviewSubmitHandler.bind(this)} enctype="multipart/form-data">
  
  <sl-input label="Title" type="text" name="title" placeholder="Title" value=${this.review.title} required></sl-input>
  <sl-input label="Description" type="text" name="text" placeholder="Text" value=${this.review.text} required></sl-input>
  <label for="name">Rating
- <sl-range min="0.1" max="10" step="0.1" name="rating" required></sl-range>  
+ <sl-range min="0.1" max="10" step="0.1" name="rating" value=${this.review.rating} required></sl-range>  
  </label>
 
              <sl-button type="primary" class="submit-btn" submit>Update Review</sl-button>

@@ -282,8 +282,6 @@ sl-avatar {
               <div><span class="bold-text">Name </span><span>${AuthAPI.currentUser.firstName} ${AuthAPI.currentUser.lastName}</span></div>
               <div><span class="bold-text">Email </span><span>${AuthAPI.currentUser.email}</span></div>
               <div class="point-display"><span class="bold-text">Demerits </span><span>${AuthAPI.currentUser.demerits}</span></div>
-              <div class="point-display"><span class="bold-text">Total Upvotes </span><span>${AuthAPI.currentUser.upvotes}</span></div>
-              <div class="point-display"><span class="bold-text">Total Downvotes </span><span>${AuthAPI.currentUser.downvotes}</span></div>
              </div>
       </div>
       <div class="bot">

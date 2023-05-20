@@ -165,8 +165,8 @@ sl-avatar {
 
   <div class="left">
      <h3>${this.restaurant.restaurantName}</h3>  
-     ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html`
-                   <sl-avatar shape="rounded" image=${(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
+     ${AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar ? html`
+                   <sl-avatar shape="rounded" image=${(AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
                  `:html`
                  <sl-avatar shape="rounded"></sl-avatar>
                  `}

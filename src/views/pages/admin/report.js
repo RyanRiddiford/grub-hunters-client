@@ -13,6 +13,7 @@ import AuthAPI from '../../../services/AuthAPI';
 import UserAPI from '../../../services/UserAPI';
 import ReportAPI from '../../../services/ReportAPI';
 import enumUtils from '../../../utils/enum.utils';
+import Toast from '../../../Toast';
 
 
 //Renders report view
@@ -27,6 +28,51 @@ class ReportView {
     this.render();
   }
 
+
+
+/**
+ * Closes the ticket and optionally gives offender a demerit
+ * @param {*} action Denotes whether to give the target user a demerit
+ */
+  reportActionHandler(action) {
+    //Close ticket and give user a demerit
+    if (action == "demerit") {
+      const btn = document.getElementById('disciplinary-btn');
+      btn.setAttribute('loading', '');
+                //Close the report ticket
+                ReportAPI.closeTicket(AuthAPI.currentReport._id);
+                //If profile is flagged, get user id from report
+                if (AuthAPI.currentReport.targetType == "restaurant") {
+            UserAPI.giveDemerit(AuthAPI.currentReport.targetId).then(() => {
+              btn.removeAttribute('loading');
+              Toast.show('User has been given a demerit');
+            });
+                }
+                //If restaurant review is flagged, get user id from review
+                else if (AuthAPI.currentReport.targetType == "review") {
+                  UserAPI.giveDemerit(AuthAPI.currentTarget.authorId).then(() => {
+                    btn.removeAttribute('loading');
+                  Toast.show('User has been given a demerit');
+                  });
+   
+                }      
+    }
+    //Close ticket with no consequences
+    else if (action == "close") {
+      const btn = document.getElementById('close-ticket-btn');
+      btn.setAttribute('loading', '');
+ReportAPI.closeTicket(AuthAPI.currentReport._id).then(() => {
+  btn.removeAttribute('loading');
+  Toast.show('Closed report with no consequences');
+});
+    }
+  }
+
+
+
+
+
+
   /**
    * Renders the restaurant page
    */
@@ -35,8 +81,7 @@ class ReportView {
     let flaggedContent;
 
     if (AuthAPI.currentReport.targetType == enumUtils.reportTargetType.review) {
-      console.log(this.restaurantName);
-flaggedContent = html`<review-listing review=${JSON.stringify(AuthAPI.currentTarget)}></review-listing>`;
+flaggedContent = html`<review-listing is_report="true" review=${JSON.stringify(AuthAPI.currentTarget)}></review-listing>`;
     }
     else if (AuthAPI.currentReport.targetType == enumUtils.reportTargetType.restaurant) {
 flaggedContent = html`<restaurant-profile is_report="true" is_visitor="true" restaurant=${JSON.stringify(AuthAPI.currentTarget)}></restaurant-profile>`;
@@ -184,19 +229,8 @@ sl-dialog::part(panel) {
       html`
       <div class="bot">
        
-      <sl-button id="close-ticket-btn" @click=${()=> ReportAPI.closeTicket(AuthAPI.currentReport._id)} >Close Ticket</sl-button>
-      <sl-button id="disciplinary-btn" @click=${()=> {
-            //Close the report ticket
-    ReportAPI.closeTicket(AuthAPI.currentReport._id);
-    //If profile is flagged, get user id from report
-    if (AuthAPI.currentReport.targetType == "restaurant") {
-UserAPI.giveDemerit(AuthAPI.currentReport.targetId);
-    }
-    //If restaurant review is flagged, get user id from review
-    else if (AuthAPI.currentReport.targetType == "review") {
-      UserAPI.giveDemerit(AuthAPI.currentTarget.authorId);
-    }
-      }}>Disciplinary Action</sl-button>
+      <sl-button id="close-ticket-btn" @click=${()=> this.reportActionHandler('close')} >Close Ticket</sl-button>
+      <sl-button id="disciplinary-btn" @click=${()=> this.reportActionHandler('demerit')}>Disciplinary Action</sl-button>
       </div>      
       ` :
       html``
