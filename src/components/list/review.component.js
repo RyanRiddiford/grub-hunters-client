@@ -31,6 +31,12 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
       },
       restaurant_name: {
         type:String
+      },
+      upvotes: {
+        type:Number
+      },
+      downvotes: {
+        type:Number
       }
     }
   }
@@ -41,6 +47,9 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
     //Find restaurant name of review if it is undefined
     if (!this.restaurant_name)
     this.getRestaurantName();
+    //Set initial vote count displays for the listing
+    this.upvotes = this.review.upvotes;
+    this.downvotes = this.review.downvotes;
   }
 
   /**
@@ -133,10 +142,14 @@ return html`
     if (vote == "upvote") {
       this.review.upvotes++;
       this.review.upvoters.push(AuthAPI.currentUser._id);
+      this.upvotes++;
+      //Remove downvote if it exists
 if (this.review.downvoters.includes(AuthAPI.currentUser._id)) {
   this.review.downvotes--;
 this.review.downvoters = this.review.downvoters.slice(AuthAPI.currentUser._id, -1);  
+this.downvotes--;
 }
+//Disable downvoting, enable upvoting
 this.shadowRoot.getElementById('upvote-btn').removeAttribute('disabled');
 this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled','');
     }
@@ -144,16 +157,21 @@ this.shadowRoot.getElementById('downvote-btn').setAttribute('disabled','');
     else if (vote == "downvote") {
       this.review.downvotes++;  
       this.review.downvoters.push(AuthAPI.currentUser._id);    
+      this.downvotes++;
+      //Remove upvote if it exists
 if (this.review.upvoters.includes(AuthAPI.currentUser._id)) {
   this.review.upvotes--;
 this.review.upvoters = this.review.upvoters.slice(AuthAPI.currentUser._id, -1);  
+this.upvotes--;
 }
+//Disable upvoting, enable downvoting
 this.shadowRoot.getElementById('downvote-btn').removeAttribute('disabled');
 this.shadowRoot.getElementById('upvote-btn').setAttribute('disabled','');
     }
     else 
       return;
  
+      //Update the review with updated voting fields
 await ReviewAPI.updateById(this.review._id, JSON.stringify(this.review), true);
 
   }
@@ -205,7 +223,7 @@ return html`
     const reviewActions = this.buildReviewActions();
     //Review rating UI display
     let ratingDisplay = this.buildRatingDisplay();
-
+    //Upvote and downvote UI display
     let voteDisplay = this.buildVoteDisplay();
 
 return html`
