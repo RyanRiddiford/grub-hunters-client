@@ -26,6 +26,12 @@ class UserAPI {
 
     let headerOptions;
 
+
+    if (userData.get("avatar")) { 
+      let filename = userData.get("avatar").name;
+userData.append("filename", filename);
+}
+
     //If parameter values are missing, exit function
     if(!userId || !userData) 
                         return;

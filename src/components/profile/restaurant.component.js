@@ -419,7 +419,11 @@ sl-avatar {
     </div>
 
     <div class="mid">
-   <sl-avatar image=${this.restaurant.avatar ? `${App.apiBase}/images/${this.restaurant.avatar}` : ''}></sl-avatar>   
+    ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html`
+                   <sl-avatar shape="rounded" image=${(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
+                 `:html`
+                 <sl-avatar shape="rounded"></sl-avatar>
+                 `}
                  <div class="rating-container">
                 <div class="rating-display">${this.ratingDisplayTemplate}</div>
                 <span class="rating-display-text">${this.numReviewsMsg}</span>

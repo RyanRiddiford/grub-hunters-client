@@ -9,6 +9,12 @@
 //Collection of enums for global use
 class EnumUtils {
 
+
+    //S3 path to images
+    BUCKET_URI = "s3://grub-hunters-bucket/images/";
+
+
+
 //Enum of access levels
 accessLevels = {
     reviewer: 1,

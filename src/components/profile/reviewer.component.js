@@ -12,6 +12,7 @@ import {anchorRoute, gotoRoute} from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
 import App from '../../App';
 import UserAPI from '../../services/UserAPI';
+import enumUtils from '../../utils/enum.utils';
 
 
 //Define custom element
@@ -207,6 +208,10 @@ sl-dialog::part(footer) {
 }
 
 
+sl-avatar {
+  --size: 200px; 
+  margin-bottom: 1em;
+}
 
 
 @media all and (max-width: 768px){ 
@@ -267,11 +272,11 @@ sl-dialog::part(footer) {
       </div>
       
       <div class="mid">
-             ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html`
-               <sl-avatar shape="rounded" style="--size: 200px; margin-bottom: 1em;" image=${(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${App.apiBase}/images/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
-             `:html`
-             <sl-avatar shape="rounded" style="--size: 200px; margin-bottom: 1em;"></sl-avatar>
-             `}
+      ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html`
+                   <sl-avatar shape="rounded" image=${(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
+                 `:html`
+                 <sl-avatar shape="rounded"></sl-avatar>
+                 `}
              <div class="main-info">
               <div><span class="bold-text">Username </span><span>${AuthAPI.currentUser.username}</span></div>
               <div><span class="bold-text">Name </span><span>${AuthAPI.currentUser.firstName} ${AuthAPI.currentUser.lastName}</span></div>

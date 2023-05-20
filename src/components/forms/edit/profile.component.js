@@ -13,6 +13,7 @@ import AuthAPI from '../../../services/AuthAPI';
 import App from '../../../App';
 import Toast from '../../../Toast';
 import UserAPI from '../../../services/UserAPI';
+import enumUtils from '../../../utils/enum.utils';
 
 //Define custom element
 customElements.define('edit-profile-form', class EditProfileForm extends LitElement {
@@ -193,7 +194,7 @@ h1 {
 <h1>${document.title}</h1>
           <div class="avatar-input-container">
                                ${(AuthAPI.currentUser.avatar) ? html`
-<sl-avatar image="${App.apiBase}/images/${AuthAPI.currentUser.avatar}"></sl-avatar>
+<sl-avatar image="${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}"></sl-avatar>
     <label for="avatar">Avatar</label><br>   
 <input type="file" name="avatar" />
 `: html`

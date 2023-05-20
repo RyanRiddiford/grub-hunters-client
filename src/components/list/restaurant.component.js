@@ -11,6 +11,7 @@ import { LitElement, html, css } from '@polymer/lit-element';
 import {anchorRoute, gotoRoute} from '../../Router';
 import App from '../../App';
 import AuthAPI from '../../services/AuthAPI';
+import enumUtils from '../../utils/enum.utils';
 
 
 //Define custom element
@@ -164,7 +165,11 @@ sl-avatar {
 
   <div class="left">
      <h3>${this.restaurant.restaurantName}</h3>  
-  <sl-avatar image=${(this.restaurant.avatar) ? `${App.apiBase}/images/${this.restaurant.avatar}` : ''}></sl-avatar>
+     ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html`
+                   <sl-avatar shape="rounded" image=${(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
+                 `:html`
+                 <sl-avatar shape="rounded"></sl-avatar>
+                 `}
   </div>
   <div class="mid">
   <p>${this.restaurant.bio}</p>
