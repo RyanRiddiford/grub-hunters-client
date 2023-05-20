@@ -30,70 +30,7 @@ class SearchRestaurantsView {
   }
 
 
-   /**
-   * Send form data for searching data
-   * @param {*} e The event object
-   */
-      async searchSubmitHandler(e){
 
-        if (!this.currPage)
-        this.currPage = 0; 
-
-        e.preventDefault();
-
-        const formData = e.detail.formData;
-
-          this.keywords = formData.get("keywords");
-          let submitBtn = document.querySelector('#search-restaurants-submit-btn');
-          submitBtn.setAttribute('loading', '');
-          this.loadData();
-            submitBtn.removeAttribute('loading');
-        
-      }
-
-
-
-      /**
- * Load a page of data
- * @param {*} isNextPage 
- */
-async loadData(isNextPage) {
-  //If loading a subsequent page
-  if (isNextPage == true || isNextPage == false) {
-      //Increment for next page
-      if (isNextPage == true) {   
-        paginationUtils.incrementPage();
-          }
-          //Decrement for previous page
-          else if (isNextPage == false) {  
-             paginationUtils.decrementPage();
-          }
-  }
-    //Find number of pages
-    const numPages = await UserAPI.getNumPages(this.keywords, enumUtils.accessLevels.restaurant);
-  //Disable/enable pagination buttons
-  paginationUtils.updatePaginationButtons(numPages);
-      //Get page of data
-      const data = await UserAPI.getPage(this.currPage, enumUtils.accessLevels.restaurant, this.keywords);
-      //Render data listing array to container element
-this.renderListings(data);
-}
-
-
-/**
- * Render the data listings to container element
- * @param {*} data array of data to render listings with
- */
-async renderListings(data) {
-        //Build template array of restaurant listings
-          const listingTemplates = [];
-          for (const item of data) {
-        listingTemplates.push(html`<restaurant-listing restaurant=${JSON.stringify(item)}></restaurant-listing>`);
-          }
-
-        //Render review listing template array to restaurants container
-  render(listingTemplates, document.getElementById("restaurants-container"));
-}
 
 
       /**
@@ -107,31 +44,7 @@ async renderListings(data) {
 
     <div class="page-content">
 
-    <div class="search-container">
-      <h1>Search Restaurants</h1>
 
-
-
-     <sl-form class="form-search" @sl-submit=${this.searchSubmitHandler.bind(this)}>       
-        
-               <sl-input name="keywords" type="text" placeholder="Restaurant Name"></sl-input>
-            <sl-button class="submit-btn" id="search-resaurants-submit-btn" type="primary" submit>Search Restaurants</sl-button>
-           </sl-form>      
-    </div>
-
-
-        <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
-        <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
-      </div>
-           <div id="restaurants-container">
-           </div>
-
-
-           <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> {this.loadData(false)}} class="prev">Previous</sl-button>
-        <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
-      </div>
            
     
     </div>
