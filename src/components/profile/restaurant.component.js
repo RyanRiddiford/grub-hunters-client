@@ -7,8 +7,8 @@
 
 
 //Import dependencies
-import { LitElement, html, TemplateResult } from '@polymer/lit-element';
-import gotoRoute from '../../Router';
+import { LitElement, html, css, TemplateResult } from '@polymer/lit-element';
+import {anchorRoute, gotoRoute} from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
 import App from '../../App';
 import enumUtils from '../../utils/enum.utils';
