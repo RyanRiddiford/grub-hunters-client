@@ -8,8 +8,12 @@
 
 //Import dependencies
 import { LitElement, html, css } from '@polymer/lit-element';
-import gotoRoute from '../../Router';
+import {anchorRoute, gotoRoute} from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
+import App from '../../App';
+import ReviewAPI from '../../services/ReviewAPI';
+import Toast from '../../Toast';
+import enumUtils from '../../utils/enum.utils';
 
 
 //Define custom element

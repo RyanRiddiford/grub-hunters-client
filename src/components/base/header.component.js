@@ -7,9 +7,10 @@
 
 
 //Import dependencies
-import { LitElement, html } from '@polymer/lit-element';
-import anchorRoute from '../../Router';
+import { LitElement, html, css } from '@polymer/lit-element';
+import {anchorRoute, gotoRoute} from '../../Router';
 import Auth from '../../services/AuthAPI';
+import App from '../../App';
 import enumUtils from '../../utils/enum.utils';
 import mascot from '../../views/partials/mascot.partial';
 import gsap from 'gsap';

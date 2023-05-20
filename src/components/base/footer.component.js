@@ -7,7 +7,10 @@
 
 
 //Import dependencies
-import { LitElement, html } from '@polymer/lit-element';
+import { LitElement, html, css } from '@polymer/lit-element';
+import {anchorRoute, gotoRoute} from '../../Router';
+import Auth from '../../services/AuthAPI';
+import App from '../../App';
 
 
 //Define the footer element as a custom element
