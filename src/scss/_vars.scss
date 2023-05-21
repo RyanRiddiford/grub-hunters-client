@@ -1,123 +1,103 @@
 // Vars
 
 :root {
-    // base
-    --base-txt-color: #222;
-    --heading-txt-color: #333;
-    --txt-font-family: 'Times New Roman', Times, serif;
-    --heading-font-family: 'Verdana', sans-serif;
-    --body-bg: #FFFFFF;
+  // base
+  --base-txt-color: #222;
+  --heading-txt-color: #333;
+  --txt-font-family: "Times New Roman", Times, serif;
+  --heading-font-family: "Verdana", sans-serif;
+  --body-bg: #ffffff;
 
-    // colors  
-    $brand-color: #6F7A82;
-    $secondary-brand-color:#b27754;
-    $light-txt-color:#FFFFFF;
-    --brand-color: #{$brand-color};
-    --secondary-brand-color: #{$secondary-brand-color};
-    --link-color: --brand-color;
-    --light-link-color: #{$light-txt-color};
-    --light-txt-color: #{$light-txt-color};
+  // colors
+  $brand-color: #6f7a82;
+  $secondary-brand-color: #b27754;
+  $light-txt-color: #ffffff;
+  --brand-color: #{$brand-color};
+  --secondary-brand-color: #{$secondary-brand-color};
+  --link-color: --brand-color;
+  --light-link-color: #{$light-txt-color};
+  --light-txt-color: #{$light-txt-color};
 
-    //Nav Link Font
-    $nav-font-size:1.1rem;
-    $nav-font-weight:600;
-    --nav-font-size:#{$nav-font-size};
-    --nav-font-weight:#{$nav-font-weight};
+  //Nav Link Font
+  $nav-font-size: 1.1rem;
+  $nav-font-weight: 600;
+  --nav-font-size: #{$nav-font-size};
+  --nav-font-weight: #{$nav-font-weight};
 
-    //Signout Link Font
-    $signout-font-size:1rem;
-    $signout-font-weight:600;
-    --signout-font-size:#{$signout-font-size};
-    --signout-font-weight:#{$signout-font-weight};
+  //Signout Link Font
+  $signout-font-size: 1rem;
+  $signout-font-weight: 600;
+  --signout-font-size: #{$signout-font-size};
+  --signout-font-weight: #{$signout-font-weight};
 
+  //Body text
+  $body-font-size: 1rem;
+  $body-font-weight: 400;
+  --body-font-size: #{$body-font-size};
+  --body-font-weight: #{$body-font-weight};
 
-    //Body text
-    $body-font-size:1rem;
-    $body-font-weight:400;
-    --body-font-size:#{$body-font-size};
-    --body-font-weight:#{$body-font-weight};
+  //Labels
+  $label-font-size: 1.1rem;
+  $label-font-weight: 700;
+  --label-font-size: #{$label-font-size};
+  --label-font-weight: #{$label-font-weight};
 
+  //Text Input
+  $input-font-size: 1rem;
+  $input-font-weight: 400;
+  --input-font-size: #{$input-font-size};
+  --input-font-weight: #{$input-font-weight};
 
-    //Labels
-    $label-font-size:1.1rem;
-    $label-font-weight:700;
-    --label-font-size:#{$label-font-size};
-    --label-font-weight:#{$label-font-weight};
+  //Buttons
+  $button-font-size: 1.5rem;
+  $button-font-weight: 600;
+  --button-font-size: #{$button-font-size};
+  --button-font-weight: #{$button-font-weight};
 
+  //H1
+  $h1-font-size: 2.5rem;
+  $h1-font-weight: 800;
+  --h1-font-size: #{$h1-font-size};
+  --h1-font-weight: #{$h1-font-weight};
 
-    //Text Input
-    $input-font-size:1rem;
-    $input-font-weight:400;
-    --input-font-size:#{$input-font-size};
-    --input-font-weight:#{$input-font-weight};
+  //H2
+  $h2-font-size: 2rem;
+  $h2-font-weight: 700;
+  --h2-font-size: #{$h2-font-size};
+  --h2-font-weight: #{$h2-font-weight};
 
+  //H3
+  $h3-font-size: 1.7rem;
+  $h3-font-weight: 600;
+  --h3-font-size: #{$h3-font-size};
+  --h3-font-weight: #{$h3-font-weight};
 
-    //Buttons
-    $button-font-size:1.5rem;
-    $button-font-weight:600;
-    --button-font-size:#{$button-font-size};
-    --button-font-weight:#{$button-font-weight};
+  //Restaurant review rating colors
+  --no-rating: gray;
+  --high-rating: green;
+  --mid-rating: yellow;
+  --low-rating: red;
 
-    //H1
-    $h1-font-size:2.5rem;
-    $h1-font-weight:800;
-    --h1-font-size:#{$h1-font-size};
-    --h1-font-weight:#{$h1-font-weight};
-    
-    //H2
-    $h2-font-size:2rem;
-    $h2-font-weight:700;
-    --h2-font-size:#{$h2-font-size};
-    --h2-font-weight:#{$h2-font-weight};
+  //App header
+  --app-header-height: 60px;
+  --app-header-txt-color: #fff;
+  --app-header-title-font-size: 1.6em;
 
-    //H3
-    $h3-font-size:1.7rem;
-    $h3-font-weight:600;
-    --h3-font-size:#{$h3-font-size};
-    --h3-font-weight:#{$h3-font-weight};
+  //Shoelace tokens
+  --sl-color-primary-50: #6f7a82;
+  --sl-color-primary-100: #{lighten($brand-color, 40%)};
+  --sl-color-primary-200: #{lighten($brand-color, 30%)};
+  --sl-color-primary-300: #{lighten($brand-color, 20%)};
+  --sl-color-primary-400: #{lighten($brand-color, 10%)};
+  --sl-color-primary-500: #{$brand-color};
+  --sl-color-primary-600: #{darken($brand-color, 10%)};
+  --sl-color-primary-700: #{darken($brand-color, 20%)};
+  --sl-color-primary-800: #{darken($brand-color, 30%)};
+  --sl-color-primary-900: #{darken($brand-color, 40%)};
+  --sl-focus-ring-color-primary: #{rgba($brand-color, 0.1)};
 
-    //Restaurant review rating colors
-    --no-rating:gray;
-    --high-rating:green;
-    --mid-rating:yellow;
-    --low-rating:red;
-    
-    //App header
-    --app-header-height: 60px;
-    --app-header-txt-color: #fff;
-    --app-header-title-font-size: 1.6em;
-  
-    //Shoelace tokens
-    --sl-color-primary-50: #6F7A82;
-    --sl-color-primary-100: #{lighten($brand-color, 40%)};
-    --sl-color-primary-200: #{lighten($brand-color, 30%)};
-    --sl-color-primary-300: #{lighten($brand-color, 20%)};
-    --sl-color-primary-400: #{lighten($brand-color, 10%)};
-    --sl-color-primary-500: #{$brand-color};
-    --sl-color-primary-600: #{darken($brand-color, 10%)};
-    --sl-color-primary-700: #{darken($brand-color, 20%)};
-    --sl-color-primary-800: #{darken($brand-color, 30%)};
-    --sl-color-primary-900: #{darken($brand-color, 40%)};
-    --sl-focus-ring-color-primary: #{rgba($brand-color, 0.1)};
-
-
-
-
-
-    //Borders/Box shadows
-    --main-content-border: 4px solid #{$brand-color};
-    --main-content-box-shadow:0 0 8px #e3e3e3;
-    --dialog-box-shadow: 0 0 10px #252424;
-
-
-
-
-
-
-
-
-
-
-
-
-  }
+  //Borders/Box shadows
+  --main-content-border: 4px solid #{$brand-color};
+  --main-content-box-shadow: 0 0 8px #e3e3e3;
+  --dialog-box-shadow: 0 0 10px #252424;
+}

@@ -7235,17 +7235,16 @@ class AuthAPI {
       body: userData
     });
 
-    // if response not ok
+    //If response not ok
     if (!response.ok) {
-      // console log error
       const err = await response.json();
       if (err) console.log(err);
-      // show error      
+      //Show error      
       _Toast.default.show("Problem getting user: ".concat(response.status));
-      // run fail() functon if set
+      //Run fail() functon if set
       if (typeof fail == 'function') fail();
     }
-    /// sign up success - show toast and redirect to sign in page
+    //Sign up success - show toast and redirect to sign in page
     _Toast.default.show('Account created, please sign in');
   }
 
@@ -7270,17 +7269,16 @@ class AuthAPI {
       body: JSON.stringify(bodyData)
     });
 
-    // if response not ok
+    //If response not ok
     if (!response.ok) {
-      // console log error
       const err = await response.json();
       if (err) console.log(err);
-      // show error      
+      //Show error      
       _Toast.default.show("Problem signing in: ".concat(err.message), 'error');
-      // run fail() functon if set
+      //Run fail() functon if set
       if (typeof fail == 'function') fail();
     } else {
-      // sign in success
+      //Sign in success
       const data = await response.json();
 
       //Check for demerit handling
@@ -7356,7 +7354,6 @@ class AuthAPI {
 
     //If response not ok
     if (!response.ok) {
-      //Console log error
       const err = await response.json();
       if (err) console.log(err);
       //Delete local token
@@ -7511,9 +7508,7 @@ class UserAPI {
    * @returns The updated user
    */
   async updateById(userId, userData, isJson) {
-    console.log("updating the user");
     let headerOptions;
-
     //If parameter values are missing, exit function
     if (!userId || !userData) return;
     if (isJson) {
@@ -7526,7 +7521,6 @@ class UserAPI {
         "Authorization": "Bearer ".concat(localStorage.accessToken)
       };
       if (userData.get("avatar")) {
-        console.log("passed usedata.get");
         let filename = userData.get("avatar").name;
         userData.append("filename", filename);
       }
@@ -7556,10 +7550,10 @@ class UserAPI {
   }
 
   /**
-  * Update the user by id
-  * @param {*} userId The id of the user to update
-  * @returns The updated user
-  */
+   * Update the user by id
+   * @param {*} userId The id of the user to update
+   * @returns The updated user
+   */
   async giveDemerit(userId) {
     //If parameter values are missing, exit function
     if (!userId) return;
@@ -7788,7 +7782,6 @@ class ProfileView {
    * Unsets warning flag once the user has acknowledged the warning
    */
   async warningReceived() {
-    console.log("inside warning received handler");
     let warningDialog = document.getElementById("warning-dialog");
     //Set warning status to false on server
     try {
@@ -7805,8 +7798,8 @@ class ProfileView {
   }
 
   /**
-  * Renders the profile page
-  */
+   * Renders the profile page
+   */
   render() {
     let content;
 
@@ -7814,7 +7807,6 @@ class ProfileView {
     if (_AuthAPI.default.currentUser.accessLevel == _enum.default.accessLevels.reviewer) content = (0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<reviewer-profile></reviewer-profile>"])));
     //Render restaurant profile content
     else if (_AuthAPI.default.currentUser.accessLevel == _enum.default.accessLevels.restaurant) {
-      console.log("should be false");
       content = (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<restaurant-profile restaurant=", " is_visitor=\"false\"></restaurant-profile>"])), JSON.stringify(_AuthAPI.default.currentUser));
     }
     //Render administrator profile content
@@ -7953,9 +7945,9 @@ class SearchRestaurantsView {
   }
 
   /**
-  * Send form data for searching data
-  * @param {*} e The event object
-  */
+   * Send form data for searching data
+   * @param {*} e The event object
+   */
   async searchSubmitHandler(e) {
     if (!this.currPage) this.currPage = 0;
     e.preventDefault();
@@ -7968,9 +7960,9 @@ class SearchRestaurantsView {
   }
 
   /**
-  * Load a page of data
-  * @param {*} isNextPage 
-  */
+   * Load a page of data
+   * @param {*} isNextPage 
+   */
   async loadData(isNextPage) {
     //If loading a subsequent page
     if (isNextPage == true || isNextPage == false) {
@@ -8045,10 +8037,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //Report API request methods
 class ReportAPI {
   /**
-  * Create a new report
-  * @param {*} reportData New report data to send to server
-  * @returns The new report
-  */
+   * Create a new report
+   * @param {*} reportData New report data to send to server
+   * @returns The new report
+   */
   async create(reportData) {
     //If parameter values are missing, exit function
     if (!reportData) return;
@@ -8146,8 +8138,8 @@ class ReportAPI {
   }
 
   /**
-  * Get number of pages
-  */
+   * Get number of pages
+   */
   async getNumPages(report_status, target_type) {
     let endpoint = "".concat(_App.default.apiBase, "/report/num/page/qty/").concat(report_status, "/").concat(target_type);
 
@@ -8166,13 +8158,8 @@ class ReportAPI {
       //Throw new error  
       throw new Error('Problem getting number of review pages');
     }
-
     //Convert json and store as data
     const data = await response.json();
-
-    //TODO REMOVE THIS CONSOLE LOG
-    console.log(data);
-
     //Return data
     return data;
   }
@@ -8339,9 +8326,6 @@ class ReviewAPI {
    * @returns The updated review
    */
   async updateById(reviewId, reviewData, isVote) {
-    console.log("UPDATING REVIEW");
-    console.log(reviewId);
-    console.log(reviewData);
     let response;
 
     //If parameter values are missing, exit function
@@ -8357,7 +8341,6 @@ class ReviewAPI {
         body: reviewData
       });
     } else {
-      console.log("is not json");
       //Await PUT request on server
       response = await fetch("".concat(_App.default.apiBase, "/review/").concat(reviewId), {
         method: "PUT",
@@ -8671,7 +8654,6 @@ class SearchTicketsView {
       let target;
       if (item.targetType == _enum.default.reportTargetType.review) target = await _ReviewAPI.default.getById(item.targetId);else if (item.targetType == _enum.default.reportTargetType.restaurant) {
         target = await _UserAPI.default.getById(item.targetId);
-        console.log("this is a restaurant: " + target);
       }
       listingTemplates.push((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<report-listing target=", " report=", "></report-listing>"])), JSON.stringify(target), JSON.stringify(item)));
     }
@@ -8873,7 +8855,7 @@ class ReviewsView {
     const numPages = await _ReviewAPI.default.getNumPages(_AuthAPI.default.currentUser._id);
 
     //Disable/enable pagination buttons
-    _pagination.default.updatePaginationButtons();
+    _pagination.default.updatePaginationButtons(numPages);
     const data = await _ReviewAPI.default.getPage(this.currPage, _AuthAPI.default.currentUser._id, _AuthAPI.default.currentUser.accessLevel);
     //Render data listing array to container element
     this.renderListings(data);
@@ -8990,7 +8972,7 @@ class RestaurantView {
    * Renders the restaurant page
    */
   render() {
-    const template = (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n\n\n\n\n\n     <sl-dialog id=\"create-dialog\" label=\"Create Review\" class=\"dialog-overview\">\n<review-form title=", "></review-form>\n</sl-dialog>   \n\n\n      <app-header title=\"Restaurant\" user=\"", "\"></app-header>\n\n      <div class=\"page-content\">\n\n      <restaurant-profile is_visitor=\"true\" restaurant=", "></restaurant-profile>\n\n      <div id=\"reviews-section\">\n\n<div class=\"top\">\n  <h2>Reviews</h2>\n  ", "\n</div>\n\n<div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n<div id=\"reviews-container\"></div>\n\n<div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n      </div>\n\n      </div>\n\n\n      <app-footer title=", "></app-footer>\n    "])), document.title, JSON.stringify(_AuthAPI.default.currentUser), JSON.stringify(_AuthAPI.default.currentRestaurant), _AuthAPI.default.currentUser.accessLevel == "1" ? (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n        <sl-button class=\"create-review-btn\" @click=\"", "\">Create Review</sl-button>  \n        "])), () => document.getElementById('create-dialog').show()) : (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n        "]))), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
+    const template = (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n\n\n\n\n\n     <sl-dialog id=\"create-dialog\" label=\"Create Review\" class=\"dialog-overview\">\n<review-form title=", "></review-form>\n</sl-dialog>   \n\n\n      <app-header title=\"Restaurant\" user=\"", "\"></app-header>\n\n      <div class=\"page-content\">\n\n      <restaurant-profile is_visitor=\"true\" restaurant=", "></restaurant-profile>\n\n      <div id=\"reviews-section\">\n\n<div class=\"top\">\n  <h2>Reviews</h2>\n  ", "\n</div>\n\n<div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n<div id=\"reviews-container\"></div>\n\n<div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n      </div>\n\n      </div>\n\n\n      <app-footer title=", "></app-footer>\n    "])), document.title, JSON.stringify(_AuthAPI.default.currentUser), JSON.stringify(_AuthAPI.default.currentRestaurant), _AuthAPI.default.currentUser.accessLevel == "1" ? (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral([" < sl - button class = \"create-review-btn\"@\n\t\tclick = \"", "\" > Create Review < /sl-button>  \n\t\t"])), () => document.getElementById('create-dialog').show()) : (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n\t\t"]))), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
@@ -9040,7 +9022,6 @@ class IntrodoctionView {
       delete updatedUser.password;
       _AuthAPI.default.currentUser = updatedUser;
       _AuthAPI.default.currentUser = updatedUser;
-      console.log("removed intro flag from user");
     } catch (err) {
       console.log(err);
     }
@@ -9173,7 +9154,6 @@ class Router {
    * @param {*} pathname 
    */
   gotoRoute(pathname) {
-    console.log(pathname);
     window.history.pushState({}, pathname, window.location.origin + pathname);
     this.route(pathname);
   }
@@ -9217,8 +9197,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class App {
   constructor() {
     this.name = "Grub Hunters";
-    this.version = "1.0.0"; //'https://grub-hunters-api.herokuapp.com'
+    this.version = "1.0.0";
     this.apiBase = 'http://localhost:3000';
+    //this.apiBase = 'https://grub-hunters-api.herokuapp.com';
     this.rootEl = document.getElementById("root");
   }
   init() {
@@ -10981,27 +10962,9 @@ customElements.define('login-form', class LoginForm extends _litElement.LitEleme
    * @returns Render of login form
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input , sl-textarea {\n  margin-top: var(--sl-spacing-large);\n  font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\n.form-signin {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\n\n</style> \n\n\n\n\n\n\n<sl-form class=\"form-signin\" @sl-submit=", ">    \n<sl-input label=\"Email\" name=\"email\" type=\"email\" value=\"admin1@grubhunters.com.au\" placeholder=\"Email\" required></sl-input>         \n <sl-input label=\"Password\" name=\"password\" type=\"password\" value=\"admin123\" placeholder=\"Password\" required toggle-password></sl-input>\n\n <sl-button id=\"login-btn\" type=\"primary\" class=\"submit-btn\" submit>Login</sl-button>\n          </sl-form>"])), this.signInSubmitHandler);
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input , sl-textarea {\n  margin-top: var(--sl-spacing-large);\n  font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\n.form-signin {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\n\n</style> \n\n\n\n\n\n\n<sl-form class=\"form-signin\" @sl-submit=", ">    \n<sl-input label=\"Email\" name=\"email\" type=\"email\" placeholder=\"Email\" required></sl-input>         \n <sl-input label=\"Password\" name=\"password\" type=\"password\" placeholder=\"Password\" required toggle-password></sl-input>\n\n <sl-button id=\"login-btn\" type=\"primary\" class=\"submit-btn\" submit>Login</sl-button>\n          </sl-form>"])), this.signInSubmitHandler);
   }
 });
-
-/*
-
-
-// TODO DELETE
-//reviewer 
-<sl-input label="Email" name="email" type="email" value="nick@reviewer.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="reviewer123" placeholder="Password" required toggle-password></sl-input>
-
-//restaurant
- <sl-input label="Email" name="email" type="email" value="adam@restaurant.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="restaurant123" placeholder="Password" required toggle-password></sl-input>
-
-//admin
- <sl-input label="Email" name="email" type="email" value="admin1@grubhunters.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="admin123" placeholder="Password" required toggle-password></sl-input>
-
-*/
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../services/AuthAPI":"services/AuthAPI.js"}],"components/forms/auth/register.component.js":[function(require,module,exports) {
 "use strict";
 
@@ -11091,7 +11054,7 @@ customElements.define('register-form', class RegisterForm extends _litElement.Li
 
     //Restaurant fields
     this.restaurantFields = (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n\n      <div id=\"restaurant-fields\" class=\"hidden\">\n\n        <sl-input class=\"required\" label=\"Restaurant Name\" name=\"restaurantName\" type=\"text\" placeholder=\"Restaurant Name\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Phone Number\" name=\"phoneNumber\" type=\"tel\" placeholder=\"Phone Number\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Location\" name=\"location\" type=\"text\" placeholder=\"Location\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Date Established\" name=\"established\" type=\"text\" placeholder=\"Date Established\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Owner\" name=\"owner\" type=\"text\" placeholder=\"Owner\"></sl-input>\n\n\n        <sl-input class=\"required\" label=\"Cuisine\" name=\"cuisine\" type=\"text\" placeholder=\"Cuisine\"></sl-input>\n\n      </div>"])));
-    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n<style>\n\n.hidden {\n    visibility: hidden;\n    display:none;\n}\n\n.form-signup {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\nsl-input , sl-textarea {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-large);  \n}\n\n\nlabel, sl-input, sl-textarea {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label), sl-textarea::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control), sl-textarea::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:1.5rem;\n  font-weight:600; \n  \n}\n\nsl-switch {\n  --width:100px;\n  --height:50px;\n  --thumb-size:40px;\n  margin-bottom: var(--sl-spacing-large);\n}\n\n</style>\n\n\n\n\n\n<sl-form class=\"form-signup\" @sl-submit=", " enctype=\"multipart/form-data\">  \n\n\n<sl-switch checked @sl-change=\"", "\">", "</sl-switch><br>\n\n              <input id=\"access-level-input\" name=\"accessLevel\" type=\"hidden\" value=\"1\">\n\n                  <label>Avatar\n                     <input type=\"file\" name=\"avatar\" />\n                  </label>\n               \n                  \n\n       \n              <sl-input class=\"required\" label=\"Email\" name=\"email\" type=\"email\" value=\"nick@reviewer.com.au\" placeholder=\"Email\" required></sl-input>\n     \n\n   \n              <sl-input class=\"required\" label=\"Password\" name=\"password\" type=\"password\" value=\"reviewer123\" placeholder=\"Password\" required toggle-password></sl-input>\n     \n\n\n<sl-textarea class=\"required\" label=\"Bio\" rows=\"2\" resize=\"none\" name=\"bio\" type=\"text\" placeholder=\"Bio\" required></sl-textarea>\n\n\n\n\n  ", "\n  ", "\n\n\n  <sl-button id=\"register-btn\" type=\"primary\" class=\"submit-btn\" submit>Register</sl-button>\n\n          \n          </sl-form>"])), this.registerSubmitHandler, this.updateFormFields, this.currentForm, this.reviewerFields, this.restaurantFields);
+    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n<style>\n\n.hidden {\n    visibility: hidden;\n    display:none;\n}\n\n.form-signup {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\nsl-form {\n  align-items:center;\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\nsl-input , sl-textarea {\n  --label-width:6rem;\n--gap-width:2rem;\n  margin-top: var(--sl-spacing-large);  \n}\n\n\nlabel, sl-input, sl-textarea {\n    font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\n\n\nsl-input::part(form-control-label), sl-textarea::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control), sl-textarea::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:1.5rem;\n  font-weight:600; \n  \n}\n\nsl-switch {\n  --width:100px;\n  --height:50px;\n  --thumb-size:40px;\n  margin-bottom: var(--sl-spacing-large);\n}\n\n</style>\n\n\n\n\n\n<sl-form class=\"form-signup\" @sl-submit=", " enctype=\"multipart/form-data\">  \n\n\n<sl-switch checked @sl-change=\"", "\">", "</sl-switch><br>\n\n              <input id=\"access-level-input\" name=\"accessLevel\" type=\"hidden\" value=\"1\">\n\n                  <label>Avatar\n                     <input type=\"file\" name=\"avatar\" />\n                  </label>\n               \n                  \n\n       \n              <sl-input class=\"required\" label=\"Email\" name=\"email\" type=\"email\" placeholder=\"Email\" required></sl-input>\n     \n\n   \n              <sl-input class=\"required\" label=\"Password\" name=\"password\" type=\"password\" placeholder=\"Password\" required toggle-password></sl-input>\n     \n\n\n<sl-textarea class=\"required\" label=\"Bio\" rows=\"2\" resize=\"none\" name=\"bio\" type=\"text\" placeholder=\"Bio\" required></sl-textarea>\n\n\n\n\n  ", "\n  ", "\n\n\n  <sl-button id=\"register-btn\" type=\"primary\" class=\"submit-btn\" submit>Register</sl-button>\n\n          \n          </sl-form>"])), this.registerSubmitHandler, this.updateFormFields, this.currentForm, this.reviewerFields, this.restaurantFields);
   }
 });
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js"}],"components/forms/create/report.component.js":[function(require,module,exports) {
@@ -11143,8 +11106,7 @@ customElements.define('report-form', class ReportForm extends _litElement.LitEle
     submitBtn.setAttribute('loading', '');
     try {
       const response = await _ReportAPI.default.create(formData);
-      console.log(response);
-      _Toast.default.show('report created');
+      _Toast.default.show('Report created');
     } catch (err) {
       _Toast.default.show(err, 'error');
     }
@@ -11304,72 +11266,7 @@ customElements.define('edit-profile-form', class EditProfileForm extends _litEle
     return (0, _litElement.html)(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral([" \n\n<style>\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input {\n  margin-top: var(--sl-spacing-large);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n  \n}\n\n</style>\n\n\n<sl-input label=\"First Name\" type=\"text\" name=\"firstName\" value=\"", "\" placeholder=\"First Name\" required></sl-input>\n<sl-input label=\"Surname\" type=\"text\" name=\"lastName\" value=\"", "\" placeholder=\"Surname\" required></sl-input>\n\n<sl-input  label=\"Username\" type=\"text\" name=\"username\" value=\"", "\" placeholder=\"Username\" required></sl-input>  \n"])), _AuthAPI.default.currentUser.firstName, _AuthAPI.default.currentUser.lastName, _AuthAPI.default.currentUser.username);
   }
 });
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js","../../../Toast":"Toast.js","../../../services/UserAPI":"services/UserAPI.js","../../../utils/enum.utils":"utils/enum.utils.js"}],"components/forms/edit/review.component.js":[function(require,module,exports) {
-"use strict";
-
-var _litElement = require("@polymer/lit-element");
-var _Router = require("../../../Router");
-var _AuthAPI = _interopRequireDefault(require("../../../services/AuthAPI"));
-var _App = _interopRequireDefault(require("../../../App"));
-var _templateObject;
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
-                                                                                                                                                                                         * Edit profile form component
-                                                                                                                                                                                         * 
-                                                                                                                                                                                         * Author: Ryan Riddiford
-                                                                                                                                                                                         * Student ID: 20862086
-                                                                                                                                                                                         */ //Import dependencies
-//Define custom element
-customElements.define('edit-review-form', class EditReviewForm extends _litElement.LitElement {
-  constructor() {
-    super();
-  }
-
-  //Configure the element's custom properties
-  static get properties() {
-    return {
-      title: {
-        type: String
-      },
-      review: {
-        type: Object
-      }
-    };
-  }
-
-  /**
-   * Handler for edit review form
-   * @param {*} e 
-   * @param {*} reviewId 
-   */
-  async updateReviewSubmitHandler(e, reviewId) {
-    console.log("in update review submit handler");
-    e.preventDefault();
-    const formData = e.detail.formData;
-    console.log(formData);
-    console.log(reviewId);
-    const submitBtn = document.querySelector('.submit-btn');
-    submitBtn.setAttribute('loading', '');
-    try {
-      const updatedReview = await ReviewAPI.updateById(reviewId, formData, false);
-      console.log(updatedReview);
-      this.render();
-      Toast.show('review updated');
-    } catch (err) {
-      Toast.show(err, 'error');
-    }
-    submitBtn.removeAttribute('loading');
-  }
-
-  /**
-   * Renders the edit review form
-   * @returns Render of edit review form
-   */
-  render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n          <sl-form class=\"page-form\" @sl-submit=", ">\n            ", "\n            <sl-button type=\"primary\" class=\"submit-btn\" submit>Update Review</sl-button>\n          </sl-form>\n    "])), this.updateReviewSubmitHandler.bind(this, this.review._id), content);
-  }
-});
-},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js"}],"components/list/review.component.js":[function(require,module,exports) {
+},{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../App":"App.js","../../../Toast":"Toast.js","../../../services/UserAPI":"services/UserAPI.js","../../../utils/enum.utils":"utils/enum.utils.js"}],"components/list/review.component.js":[function(require,module,exports) {
 "use strict";
 
 var _litElement = require("@polymer/lit-element");
@@ -11438,11 +11335,9 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
   async updateReviewSubmitHandler(e) {
     e.preventDefault();
     const formData = e.detail.formData;
-    console.log(formData);
     try {
       const response = await _ReviewAPI.default.updateById(this.review._id, formData, false);
-      console.log(response);
-      _Toast.default.show('review created');
+      _Toast.default.show('Review created');
       this.shadowRoot.getElementById('edit-dialog').hide();
     } catch (err) {
       _Toast.default.show(err, 'error');
@@ -11893,7 +11788,6 @@ require("./components/forms/auth/register.component.js");
 require("./components/forms/create/report.component.js");
 require("./components/forms/create/review.component.js");
 require("./components/forms/edit/profile.component.js");
-require("./components/forms/edit/review.component.js");
 require("./components/list/review.component.js");
 require("./components/list/restaurant.component.js");
 require("./components/list/report.component.js");
@@ -11923,7 +11817,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 document.addEventListener('DOMContentLoaded', () => {
   _App.default.init();
 });
-},{"./App.js":"App.js","./components/base/header.component.js":"components/base/header.component.js","./components/base/footer.component.js":"components/base/footer.component.js","./components/forms/auth/login.component.js":"components/forms/auth/login.component.js","./components/forms/auth/register.component.js":"components/forms/auth/register.component.js","./components/forms/create/report.component.js":"components/forms/create/report.component.js","./components/forms/create/review.component.js":"components/forms/create/review.component.js","./components/forms/edit/profile.component.js":"components/forms/edit/profile.component.js","./components/forms/edit/review.component.js":"components/forms/edit/review.component.js","./components/list/review.component.js":"components/list/review.component.js","./components/list/restaurant.component.js":"components/list/restaurant.component.js","./components/list/report.component.js":"components/list/report.component.js","./components/profile/reviewer.component.js":"components/profile/reviewer.component.js","./components/profile/restaurant.component.js":"components/profile/restaurant.component.js","./components/profile/admin.component.js":"components/profile/admin.component.js","./scss/master.scss":"scss/master.scss"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./App.js":"App.js","./components/base/header.component.js":"components/base/header.component.js","./components/base/footer.component.js":"components/base/footer.component.js","./components/forms/auth/login.component.js":"components/forms/auth/login.component.js","./components/forms/auth/register.component.js":"components/forms/auth/register.component.js","./components/forms/create/report.component.js":"components/forms/create/report.component.js","./components/forms/create/review.component.js":"components/forms/create/review.component.js","./components/forms/edit/profile.component.js":"components/forms/edit/profile.component.js","./components/list/review.component.js":"components/list/review.component.js","./components/list/restaurant.component.js":"components/list/restaurant.component.js","./components/list/report.component.js":"components/list/report.component.js","./components/profile/reviewer.component.js":"components/profile/reviewer.component.js","./components/profile/restaurant.component.js":"components/profile/restaurant.component.js","./components/profile/admin.component.js":"components/profile/admin.component.js","./scss/master.scss":"scss/master.scss"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -11948,7 +11842,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65156" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52656" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

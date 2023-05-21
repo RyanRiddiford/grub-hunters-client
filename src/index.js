@@ -17,7 +17,6 @@ import './components/forms/auth/register.component.js';
 import './components/forms/create/report.component.js';
 import './components/forms/create/review.component.js';
 import './components/forms/edit/profile.component.js';
-import './components/forms/edit/review.component.js';
 //Dynamic data UI components
 import './components/list/review.component.js';
 import './components/list/restaurant.component.js';

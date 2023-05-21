@@ -2,87 +2,80 @@
 
 //Dialog
 sl-dialog::part(panel) {
-  border-radius:20px;
-  box-shadow:var(--dialog-box-shadow);
+  border-radius: 20px;
+  box-shadow: var(--dialog-box-shadow);
 }
 sl-dialog::part(overlay) {
-  height:100vh;
+  height: 100vh;
 }
 sl-dialog::part(header) {
-  padding:5px;
+  padding: 5px;
   background: var(--brand-color);
-  border-top-left-radius:20px;
-  border-top-right-radius:20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 sl-dialog::part(title) {
   font-size: var(--h2-font-size);
-    font-weight:var(--h2-font-weight);
-    font-family:var(--heading-font-family);
-text-align:center;
-color:var(--light-txt-color);
+  font-weight: var(--h2-font-weight);
+  font-family: var(--heading-font-family);
+  text-align: center;
+  color: var(--light-txt-color);
 }
 sl-dialog::part(body) {
   font-size: 1rem;
-    font-weight:600;
-    font-family: var(--base-font-family);
-text-align:center;
-color:var(--base-txt-color);
+  font-weight: 600;
+  font-family: var(--base-font-family);
+  text-align: center;
+  color: var(--base-txt-color);
 }
 sl-dialog::part(footer) {
-  display:flex;
-  flex-direction:row;
-  justify-content:space-between;
-  margin-left:50px;
-  margin-right:50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-left: 50px;
+  margin-right: 50px;
 }
-
-
 
 //Shoelace tab panel ---------------
 sl-tab-group {
-  --indicator-color:var(--brand-color);
+  --indicator-color: var(--brand-color);
 }
 sl-tab-group::part(base) {
-width:700px;
-border: 4px solid var(--brand-color);
-border-radius:20px;
+  width: 700px;
+  border: 4px solid var(--brand-color);
+  border-radius: 20px;
 }
 sl-tab-group::part(body) {
- padding:20px;
+  padding: 20px;
 }
 sl-tab {
-width:50%;
-text-align:center;
+  width: 50%;
+  text-align: center;
 }
 sl-tab:hover {
-cursor:pointer;
+  cursor: pointer;
 }
-
 
 //Shoelace button ---------------
 
 sl-button::part(base) {
-  font-size:var(--button-font-size);
-  font-weight:var(--button-font-weight);   
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
 }
-
 
 // RESPONSIVE - MOBILE -------------------
-@media all and (max-width: 768px){ 
-
-//Shoelace tab panel ---------------
-sl-tab-group {
-  --indicator-color:var(--brand-color);
-  width:100vw;
-}
-sl-tab-group::part(base) {
-width:100vw;
-border: none;
-}
-sl-tab {
-width:50vw;
-font-size:1.4rem;
-}
-
-
+@media all and (max-width: 768px) {
+  //Shoelace tab panel ---------------
+  sl-tab-group {
+    --indicator-color: var(--brand-color);
+    width: 100vw;
+  }
+  sl-tab-group::part(base) {
+    width: 100vw;
+    border: none;
+  }
+  sl-tab {
+    width: 50vw;
+    font-size: 1.4rem;
+  }
 }

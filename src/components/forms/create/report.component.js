@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../../Router';
 import Auth from '../../../services/AuthAPI';
 import App from '../../../App';
 import Toast from '../../../Toast';
@@ -19,89 +25,81 @@ import ReportAPI from '../../../services/ReportAPI';
 customElements.define('report-form', class ReportForm extends LitElement {
 
 
-  constructor(){
-    super()    
-  }
+	constructor() {
+		super();
+	}
 
-  //Configure the element's custom properties
-  static get properties(){
-    return {
-      title: {
-        type: String
-      },
-      target_id: {
-type:String
-      },
-      target_type: {
-        type:String
-      }
-    }
-  }
+	//Configure the element's custom properties
+	static get properties() {
+		return {
+			title: {
+				type: String
+			},
+			target_id: {
+				type: String
+			},
+			target_type: {
+				type: String
+			}
+		};
+	}
 
-  /**
-   * Handler for submitting report form
-   * @param {*} e 
-   */
-  async createReportSubmitHandler(e){
-    e.preventDefault();
-    const formData = e.detail.formData;
-    const submitBtn = this.shadowRoot.querySelector('#report-submit-btn');
-    submitBtn.setAttribute('loading', '');
-    try {
-      const response = await ReportAPI.create(formData); 
-      Toast.show('Report created')
-    }catch(err){      
-      Toast.show(err, 'error')
-    }
-    submitBtn.removeAttribute('loading');
-  }
+	/**
+	 * Handler for submitting report form
+	 * @param {*} e 
+	 */
+	async createReportSubmitHandler(e) {
+		e.preventDefault();
+		const formData = e.detail.formData;
+		const submitBtn = this.shadowRoot.querySelector('#report-submit-btn');
+		submitBtn.setAttribute('loading', '');
+		try {
+			const response = await ReportAPI.create(formData);
+			Toast.show('Report created');
+		} catch (err) {
+			Toast.show(err, 'error');
+		}
+		submitBtn.removeAttribute('loading');
+	}
 
 
-  /**
-   * Renders the register form html
-   * @returns Render of register form
-   */
-  render(){
-return html`
+	/**
+	 * Renders the register form html
+	 * @returns Render of register form
+	 */
+	render() {
+		return html `
 
 
 <style>
 
 sl-form {
-  align-items:center;
+     align-items:center;
 }
-
-sl-input::part(input) {
-  font-size:var(--input-font-size);
-  font-weight:var(--input-font-weight);
+ sl-input::part(input) {
+     font-size:var(--input-font-size);
+     font-weight:var(--input-font-weight);
 }
-
-sl-input {
-  --label-width:6rem;
---gap-width:2rem;
-  margin-top: var(--sl-spacing-medium);  
+ sl-input {
+     --label-width:6rem;
+     --gap-width:2rem;
+     margin-top: var(--sl-spacing-medium);
 }
-
-
-label, sl-input {
-    font-size:var(--label-font-size);
-  font-weight:var(--label-font-weight);
+ label, sl-input {
+     font-size:var(--label-font-size);
+     font-weight:var(--label-font-weight);
 }
-
-
-
-sl-input::part(form-control-label) {
-  text-align: right;
-  align-self: center;
-  margin-right:20px;
+ sl-input::part(form-control-label) {
+     text-align: right;
+     align-self: center;
+     margin-right:20px;
 }
-
-
-sl-input::part(form-control) {
-  display:grid;
-  grid: auto / var(--label-width) 1fr;
-  gap: 20px;
+ sl-input::part(form-control) {
+     display:grid;
+     grid: auto / var(--label-width) 1fr;
+     gap: 20px;
 }
+ 
 
 </style>
 
@@ -117,5 +115,5 @@ sl-input::part(form-control) {
 
       <sl-button id="report-submit-btn" type="primary" class="submit-btn" submit>Post Report</sl-button>
     </sl-form>`;
-  }
+	}
 });

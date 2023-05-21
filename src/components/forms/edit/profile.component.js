@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../../Router';
 import AuthAPI from '../../../services/AuthAPI';
 import App from '../../../App';
 import Toast from '../../../Toast';
@@ -19,56 +25,56 @@ import enumUtils from '../../../utils/enum.utils';
 customElements.define('edit-profile-form', class EditProfileForm extends LitElement {
 
 
-  constructor(){
-    super()    
-  }
+	constructor() {
+		super();
+	}
 
-  //Configure the element's custom properties
-  static get properties(){
-    return {
-      title: {
-        type: String
-      }
-    }
-  }
+	//Configure the element's custom properties
+	static get properties() {
+		return {
+			title: {
+				type: String
+			}
+		};
+	}
 
-  /**
-   * Handler for profile update form
-   * @param {*} e 
-   */
-  async updateProfileSubmitHandler(e) {
-    e.preventDefault();
-    const formData = e.detail.formData;
-    try {
-      const updatedUser = await UserAPI.updateById(AuthAPI.currentUser._id, formData);      
-      delete updatedUser.password;       
-      AuthAPI.currentUser = updatedUser;     
-      AuthAPI.currentUser = updatedUser;
-      this.render();
-      Toast.show('profile updated');
-      gotoRoute('/profile');
-    }catch(err){      
-      Toast.show(err, 'error');
-    }
-  }
+	/**
+	 * Handler for profile update form
+	 * @param {*} e 
+	 */
+	async updateProfileSubmitHandler(e) {
+		e.preventDefault();
+		const formData = e.detail.formData;
+		try {
+			const updatedUser = await UserAPI.updateById(AuthAPI.currentUser._id, formData);
+			delete updatedUser.password;
+			AuthAPI.currentUser = updatedUser;
+			AuthAPI.currentUser = updatedUser;
+			this.render();
+			Toast.show('profile updated');
+			gotoRoute('/profile');
+		} catch (err) {
+			Toast.show(err, 'error');
+		}
+	}
 
 
-  /**
-   * Renders the edit profile form
-   * @returns Render of edit profile form
-   */
-  render(){
+	/**
+	 * Renders the edit profile form
+	 * @returns Render of edit profile form
+	 */
+	render() {
 
-    let content;
+		let content;
 
-    if (AuthAPI.currentUser.type == "reviewer") 
-      content = this.reviewerTemplate();
- else if (AuthAPI.currentUser.type == "restaurant") 
-   content = this.restaurantTemplate();
- else if (AuthAPI.currentUser.type == "admin")
-   content = this.adminTemplate();
+		if (AuthAPI.currentUser.type == "reviewer")
+			content = this.reviewerTemplate();
+		else if (AuthAPI.currentUser.type == "restaurant")
+			content = this.restaurantTemplate();
+		else if (AuthAPI.currentUser.type == "admin")
+			content = this.adminTemplate();
 
-    return html`
+		return html `
 
 
 <style>
@@ -193,14 +199,11 @@ h1 {
           <sl-form class="form-edit-profile" @sl-submit=${this.updateProfileSubmitHandler.bind(this)} enctype="multipart/form-data">
 <h1>${document.title}</h1>
           <div class="avatar-input-container">
-                               ${(AuthAPI.currentUser.avatar) ? html`
-<sl-avatar image="${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}"></sl-avatar>
-    <label for="avatar">Avatar</label><br>   
-<input type="file" name="avatar" />
-`: html`
-    <label for="avatar">Avatar</label><br>   
-<input type="file" name="avatar" />
-`}   
+                               ${(AuthAPI.currentUser.avatar) ? html` <sl-avatar image="${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}"></sl-avatar>
+                               <label for="avatar">Avatar</label><br><input type="file"	name = "avatar"/>
+			`: html` <label
+		for="avatar">Avatar</label><br><input type="file" name="avatar"/>
+			`}   
           </div>
 
                   
@@ -210,16 +213,16 @@ h1 {
           ${content}
             <sl-button id="edit-profile-submit-btn" type="primary" class="submit-btn" submit>Update Profile</sl-button>
           </sl-form>
-    `; 
-  }
+    `;
+	}
 
 
-    /**
-   * Renders reviewer-specific form inputs
-   * @returns Render of reviewer-specific form inputs
-   */
-  reviewerTemplate() {
-    return html`   
+	/**
+	 * Renders reviewer-specific form inputs
+	 * @returns Render of reviewer-specific form inputs
+	 */
+	reviewerTemplate() {
+		return html `   
 
 
 <style>
@@ -254,16 +257,16 @@ sl-input::part(form-control) {
 <sl-input label="Surname" type="text" name="lastName" value="${AuthAPI.currentUser.lastName}" placeholder="Surname" required></sl-input>
 <sl-input label="Username" type="text" name="username" value="${AuthAPI.currentUser.username}" placeholder="Username" required></sl-input>
 `;
-  }
+	}
 
 
 
-  /**
-   * Renders restaurant-specific form inputs
-   * @returns Render of restaurant-specific form inputs
-   */
-  restaurantTemplate() {
-return html`   
+	/**
+	 * Renders restaurant-specific form inputs
+	 * @returns Render of restaurant-specific form inputs
+	 */
+	restaurantTemplate() {
+		return html `   
 
 <style>
 sl-input {
@@ -305,15 +308,15 @@ sl-input::part(form-control) {
 <sl-input label="Cuisine" type="text" name="cuisine" value="${AuthAPI.currentUser.cuisine}" placeholder="Cuisine" required></sl-input>
 
 `;
-  }
+	}
 
 
-    /**
-   * Renders admin-specific form inputs
-   * @returns Render of admin-specific form inputs
-   */
-  adminTemplate() {
-   return html` 
+	/**
+	 * Renders admin-specific form inputs
+	 * @returns Render of admin-specific form inputs
+	 */
+	adminTemplate() {
+		return html ` 
 
 <style>
 sl-input {
@@ -348,5 +351,5 @@ sl-input::part(form-control) {
 
 <sl-input  label="Username" type="text" name="username" value="${AuthAPI.currentUser.username}" placeholder="Username" required></sl-input>  
 `;
-  }
+	}
 });

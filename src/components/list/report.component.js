@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
 import App from '../../App';
 import ReviewAPI from '../../services/ReviewAPI';
@@ -19,69 +25,65 @@ import enumUtils from '../../utils/enum.utils';
 //Define custom element
 customElements.define('report-listing', class ReportListing extends LitElement {
 
-  constructor(){
-    super();  
-  }
+	constructor() {
+		super();
+	}
 
 
-  //Configure the element's custom properties
-  static get properties(){
-    return {
-      report: {
-        type: Object
-      },
-      target: {
-        type: Object
-      }
-    }
-  }
+	//Configure the element's custom properties
+	static get properties() {
+		return {
+			report: {
+				type: Object
+			},
+			target: {
+				type: Object
+			}
+		};
+	}
 
 
-  /**
-   * Renders report listing
-   * @returns Render of report listing
-   */
-  render(){
+	/**
+	 * Renders report listing
+	 * @returns Render of report listing
+	 */
+	render() {
 
-    return html`
+		return html `
 
 <style>
 
-  .bold-text {
-    font-size:var(--label-font-size);
-  font-weight:var(--label-font-weight);
-  }
-
-  .report-listing {
-    display:flex;
-  flex-direction: row;
-  width:400px;
-  margin:20px;
-  max-width:80vw;
-  padding:10px;
-  justify-content: space-between;
-  box-shadow: var(--main-content-box-shadow);
-  border-radius: 20px;
+.bold-text {
+     font-size:var(--label-font-size);
+     font-weight:var(--label-font-weight);
+}
+ .report-listing {
+     display:flex;
+     flex-direction: row;
+     width:400px;
+     margin:20px;
+     max-width:80vw;
+     padding:10px;
+     justify-content: space-between;
+     box-shadow: var(--main-content-box-shadow);
+     border-radius: 20px;
+}
+ .left, .mid, .right {
+     display:flex;
+     flex-direction: column;
+     align-items:center;
+}
+ .right {
+     justify-content:center;
+}
+ sl-button {
+     width:100px;
+}
+ sl-button::part(base) {
+     font-size:1rem;
+     font-weight:600;
 }
 
-.left, .mid, .right {
-  display:flex;
-  flex-direction: column;
-   align-items:center; 
-}
-
-.right {
- justify-content:center;
-}
-
-sl-button {
-  width:100px;
-}
-
-sl-button::part(base) {
-  font-size:1rem;
-  font-weight:600; 
-}
 
 </style>
 
@@ -102,7 +104,7 @@ sl-button::part(base) {
 </div>
 </div>`;
 
-  }
+	}
 
 
 });

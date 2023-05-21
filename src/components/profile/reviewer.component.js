@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
 import App from '../../App';
 import UserAPI from '../../services/UserAPI';
@@ -19,238 +25,203 @@ import enumUtils from '../../utils/enum.utils';
 customElements.define('reviewer-profile', class ReviewerProfile extends LitElement {
 
 
-  constructor(){
-    super();   
-  }
+	constructor() {
+		super();
+	}
 
 
-  /**
-   * 
-   * @returns Render of reviewer profile component
-   */
-  render() {  
+	/**
+	 * 
+	 * @returns Render of reviewer profile component
+	 */
+	render() {
 
 
-return html`   
+		return html `   
 
 <style>
 
-
-
-
 h1 {
-  font-size: var(--h1-font-size);
-    font-weight:var(--h1-font-weight);
-    font-family:var(--heading-font-family);
-    color:var(--heading-txt-color);
+     font-size: var(--h1-font-size);
+     font-weight:var(--h1-font-weight);
+     font-family:var(--heading-font-family);
+     color:var(--heading-txt-color);
 }
-h2 {
-  font-size: var(--h2-font-size);
-    font-weight:var(--h2-font-weight);
-    font-family:var(--heading-font-family);
-    color:var(--heading-txt-color);
+ h2 {
+     font-size: var(--h2-font-size);
+     font-weight:var(--h2-font-weight);
+     font-family:var(--heading-font-family);
+     color:var(--heading-txt-color);
 }
-h3 {
-  font-size: var(--h3-font-size);
-    font-weight:var(--h3-font-weight);
-    font-family:var(--heading-font-family);
-  color:var(--heading-txt-color);
+ h3 {
+     font-size: var(--h3-font-size);
+     font-weight:var(--h3-font-weight);
+     font-family:var(--heading-font-family);
+     color:var(--heading-txt-color);
 }
-  .bold-text {
-    font-size:var(--label-font-size);
-  font-weight:var(--label-font-weight);
-  }
-
-
-
-
-
-.profile {
-    display:flex;
-    flex-direction: column;
-    justify-content:center;
-    width: 700px;
-    align-items: center;
-    border: 4px solid var(--brand-color);
-    background:var(--body-bg);
-    margin:auto;
-    border-radius: 20px;
-    padding:30px; 
-  }
-
-
-  .top {
-    display:flex;
-    flex-direction:row;
-    width:600px;
-    justify-content:space-between;
-  }
-
-.mid {
-  display:flex;
-  flex-direction:row;
-  align-items:top;
-  gap:30px;
-  margin-bottom:20px;
+ .bold-text {
+     font-size:var(--label-font-size);
+     font-weight:var(--label-font-weight);
 }
-
-.main-info {
-  display:flex;
-  flex-direction:column;
-  box-shadow: var(--main-content-box-shadow);
-width: 300px;
-border-radius:20px;
-padding:30px;
+ .profile {
+     display:flex;
+     flex-direction: column;
+     justify-content:center;
+     width: 700px;
+     align-items: center;
+     border: 4px solid var(--brand-color);
+     background:var(--body-bg);
+     margin:auto;
+     border-radius: 20px;
+     padding:30px;
 }
-
-.bot {
-  display:flex;
-  flex-direction:column;
-  gap:50px;
+ .top {
+     display:flex;
+     flex-direction:row;
+     width:600px;
+     justify-content:space-between;
 }
-
-.bio-display {
- display:flex;
- flex-direction:column; 
- box-shadow: var(--main-content-box-shadow);
- width:600px;
- border-radius:20px;
- padding:30px;
+ .mid {
+     display:flex;
+     flex-direction:row;
+     align-items:top;
+     gap:30px;
+     margin-bottom:20px;
 }
-
-.bio-display h3 {
-  text-align:left;
-  margin-bottom:0px;
-  margin-top:0px;
+ .main-info {
+     display:flex;
+     flex-direction:column;
+     box-shadow: var(--main-content-box-shadow);
+     width: 300px;
+     border-radius:20px;
+     padding:30px;
 }
-
-p {
-  overflow-y: scroll;
+ .bot {
+     display:flex;
+     flex-direction:column;
+     gap:50px;
 }
-
-a {
-  text-decoration:none;
-  color:var(--base-txt-color);
-  font-weight:700;
+ .bio-display {
+     display:flex;
+     flex-direction:column;
+     box-shadow: var(--main-content-box-shadow);
+     width:600px;
+     border-radius:20px;
+     padding:30px;
 }
-
-
-.point-display {
-  display:flex;
-  flex-direction:row;
-  justify-content:center;
-  gap:15px;
-  width:150px;
-  height:auto;
-  background: var(--brand-color);
-  color:var(--light-txt-color);
-  margin-top:5px;
-  margin-bottom:5px;
-  padding:5px;
-  padding-left:10px;
-  border-radius:20px;
+ .bio-display h3 {
+     text-align:left;
+     margin-bottom:0px;
+     margin-top:0px;
 }
-
-
-.delete-btn {
-  /*Right-align element to parent */
-  margin-left: auto; 
-margin-right: 0;
-width:150px;
-padding:5px;
-height: auto;
-text-align:center;
+ p {
+     overflow-y: scroll;
 }
-
-.delete-btn::part(base) {
-background:red;
-border: 2px solid black;
-border-radius:10px;
-color:black;
-font-weight:600;
+ a {
+     text-decoration:none;
+     color:var(--base-txt-color);
+     font-weight:700;
 }
-
-
-
-sl-dialog::part(panel) {
-  border-radius:20px;
-  box-shadow:var(--dialog-box-shadow);
+ .point-display {
+     display:flex;
+     flex-direction:row;
+     justify-content:center;
+     gap:15px;
+     width:150px;
+     height:auto;
+     background: var(--brand-color);
+     color:var(--light-txt-color);
+     margin-top:5px;
+     margin-bottom:5px;
+     padding:5px;
+     padding-left:10px;
+     border-radius:20px;
 }
-sl-dialog::part(overlay) {
-  height:100vh;
+ .delete-btn {
+    /*Right-align element to parent */
+     margin-left: auto;
+     margin-right: 0;
+     width:150px;
+     padding:5px;
+     height: auto;
+     text-align:center;
 }
-sl-dialog::part(header) {
-  padding:5px;
-  background: var(--brand-color);
-  border-top-left-radius:20px;
-  border-top-right-radius:20px;
+ .delete-btn::part(base) {
+     background:red;
+     border: 2px solid black;
+     border-radius:10px;
+     color:black;
+     font-weight:600;
 }
-sl-dialog::part(title) {
-  font-size: var(--h2-font-size);
-    font-weight:var(--h2-font-weight);
-    font-family:var(--heading-font-family);
-text-align:center;
-color:var(--light-txt-color);
+ sl-dialog::part(panel) {
+     border-radius:20px;
+     box-shadow:var(--dialog-box-shadow);
 }
-sl-dialog::part(body) {
-  font-size: 1rem;
-    font-weight:600;
-    font-family: var(--base-font-family);
-text-align:center;
-color:var(--base-txt-color);
+ sl-dialog::part(overlay) {
+     height:100vh;
 }
-sl-dialog::part(footer) {
-  display:flex;
-  flex-direction:row;
-  justify-content:space-between;
-  margin-left:50px;
-  margin-right:50px;
+ sl-dialog::part(header) {
+     padding:5px;
+     background: var(--brand-color);
+     border-top-left-radius:20px;
+     border-top-right-radius:20px;
 }
-
-
-sl-avatar {
-  --size: 200px; 
-  margin-bottom: 1em;
+ sl-dialog::part(title) {
+     font-size: var(--h2-font-size);
+     font-weight:var(--h2-font-weight);
+     font-family:var(--heading-font-family);
+     text-align:center;
+     color:var(--light-txt-color);
 }
-
-
-@media all and (max-width: 768px){ 
-
-  .profile {
-    display:flex;
-    flex-direction: column;
-    justify-content:center;
-    width: 100vw;
-    align-items: center;
-    border:none;
-    border-radius:0px;
-    padding:20px;
-  }
-
-  .top {
-    width:90%;
-  }
-
-.mid {
-  display:flex;
-  flex-direction:column;
-  width:90%;
-  align-items:left;
+ sl-dialog::part(body) {
+     font-size: 1rem;
+     font-weight:600;
+     font-family: var(--base-font-family);
+     text-align:center;
+     color:var(--base-txt-color);
+}
+ sl-dialog::part(footer) {
+     display:flex;
+     flex-direction:row;
+     justify-content:space-between;
+     margin-left:50px;
+     margin-right:50px;
+}
+ sl-avatar {
+     --size: 200px;
+     margin-bottom: 1em;
+}
+ @media all and (max-width: 768px){
+     .profile {
+         display:flex;
+         flex-direction: column;
+         justify-content:center;
+         width: 100vw;
+         align-items: center;
+         border:none;
+         border-radius:0px;
+         padding:20px;
+    }
+     .top {
+         width:90%;
+    }
+     .mid {
+         display:flex;
+         flex-direction:column;
+         width:90%;
+         align-items:left;
+    }
+     .bot {
+         width:90%;
+         gap:100px;
+    }
+     .bio-display {
+         width:90%;
+         border-radius:20px;
+         padding:20px;
+    }
 }
 
-.bot {
-  width:90%;
-  gap:100px;
-}
-
-.bio-display {
- width:90%;
- border-radius:20px;
- padding:20px;
-}
-
-
-}
 
 </style>
 
@@ -272,11 +243,11 @@ sl-avatar {
       </div>
       
       <div class="mid">
-      ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html`
-                   <sl-avatar shape="rounded" image=${(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
-                 `:html`
-                 <sl-avatar shape="rounded"></sl-avatar>
-                 `}
+      ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html` <sl-avatar shape="rounded" image=${
+			(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''
+		} > </sl-avatar>
+		`:html` <sl-avatar shape="rounded" > </sl-avatar>
+		`}
              <div class="main-info">
               <div><span class="bold-text">Username </span><span>${AuthAPI.currentUser.username}</span></div>
               <div><span class="bold-text">Name </span><span>${AuthAPI.currentUser.firstName} ${AuthAPI.currentUser.lastName}</span></div>
@@ -296,7 +267,7 @@ sl-avatar {
             
     `;
 
-  }
+	}
 
 
 });

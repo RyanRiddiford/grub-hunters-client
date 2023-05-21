@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
 import App from '../../App';
 import AuthAPI from '../../services/AuthAPI';
 import enumUtils from '../../utils/enum.utils';
@@ -18,141 +24,117 @@ import enumUtils from '../../utils/enum.utils';
 customElements.define('restaurant-listing', class RestaurantListing extends LitElement {
 
 
-  constructor(){
-    super();   
-  }
+	constructor() {
+		super();
+	}
 
-  //Configure the element's custom properties
-  static get properties(){
-    return {
-      restaurant: {
-        type: Object
-      }
-    }
-  }
+	//Configure the element's custom properties
+	static get properties() {
+		return {
+			restaurant: {
+				type: Object
+			}
+		};
+	}
 
 
-  /**
-   * Renders a restaurant listing
-   * @returns Render of restaurant listing
-   */
-  render(){  
+	/**
+	 * Renders a restaurant listing
+	 * @returns Render of restaurant listing
+	 */
+	render() {
 
-return html`
+		return html `
 
 <style>
 
 h3 {
-  font-size: var(--h3-font-size);
-    font-weight:var(--h3-font-weight);
-    font-family:var(--heading-font-family);
-  color:var(--heading-txt-color);
-  margin:10px;
-  padding:0px;
-  text-align:center;
+     font-size: var(--h3-font-size);
+     font-weight:var(--h3-font-weight);
+     font-family:var(--heading-font-family);
+     color:var(--heading-txt-color);
+     margin:10px;
+     padding:0px;
+     text-align:center;
 }
-  .bold-text {
-    font-size:var(--label-font-size);
-  font-weight:var(--label-font-weight);
-  }
-
-.restaurant-listing {
-  display:flex;
-  flex-direction: row;
-  width:700px;
-  height:250px;
-  margin:20px;
-  justify-content: space-between;
-  box-shadow: var(--main-content-box-shadow);
-  border-radius: 20px;
+ .bold-text {
+     font-size:var(--label-font-size);
+     font-weight:var(--label-font-weight);
 }
-
-.left {
-  display:flex;
-  flex-direction: column;
-   align-items:center;
-   justify-content:center;
+ .restaurant-listing {
+     display:flex;
+     flex-direction: row;
+     width:700px;
+     height:250px;
+     margin:20px;
+     justify-content: space-between;
+     box-shadow: var(--main-content-box-shadow);
+     border-radius: 20px;
 }
-
-.mid {
-  border-left: 4px solid var(--brand-color);
-  border-right: 4px solid var(--brand-color);
-
-  overflow-y:scroll;
+ .left {
+     display:flex;
+     flex-direction: column;
+     align-items:center;
+     justify-content:center;
 }
-
-.mid p {  
-padding:20px;
+ .mid {
+     border-left: 4px solid var(--brand-color);
+     border-right: 4px solid var(--brand-color);
+     overflow-y:scroll;
 }
-
-sl-button {
-  padding:10px;
+ .mid p {
+     padding:20px;
 }
-
-sl-button::part(base) {
-  font-size:1rem;
-  font-weight:600; 
+ sl-button {
+     padding:10px;
 }
-
-sl-avatar {
-  --size: 100px; 
-  margin:10px;
+ sl-button::part(base) {
+     font-size:1rem;
+     font-weight:600;
 }
-
-
-
-@media all and (max-width: 768px){ 
-
-
-  .restaurant-listing {
-    flex-direction:column;
-  width:80vw;
-  padding:10px;
-  height:200px;
+ sl-avatar {
+     --size: 100px;
+     margin:10px;
 }
-
-.left {
-  flex-direction:row-reverse;
-  padding:10px;
-}
-
-.right {
-
- align-items:end;
-}
-
-sl-button {
-  width:100%;
-  height:100px;
-}
-
-sl-button::part(base) {
-  font-size:1rem;
-  font-weight:600;
+ @media all and (max-width: 768px){
+     .restaurant-listing {
+         flex-direction:column;
+         width:80vw;
+         padding:10px;
+         height:200px;
+    }
+     .left {
+         flex-direction:row-reverse;
+         padding:10px;
+    }
+     .right {
+         align-items:end;
+    }
+     sl-button {
+         width:100%;
+         height:100px;
+    }
+     sl-button::part(base) {
+         font-size:1rem;
+         font-weight:600;
+    }
+     .mid {
+         border:none;
+         margin:0;
+         padding:0;
+    }
+     .mid p {
+         display:none;
+    }
+     .right {
+         align-items:start;
+    }
+     sl-avatar {
+         --size: 80px;
+         margin: 1em;
+    }
 }
 
-.mid {
-  border:none;
-  margin:0;
-  padding:0;
-
-}
-
-  .mid p {
-    display:none;
-  }
-
-  .right {
-    align-items:start;
-  }
-
-  
-sl-avatar {
-  --size: 80px; 
-  margin: 1em;
-}
-
-  }
   
 
 </style>
@@ -165,11 +147,12 @@ sl-avatar {
 
   <div class="left">
      <h3>${this.restaurant.restaurantName}</h3>  
-     ${AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar ? html`
-                   <sl-avatar shape="rounded" image=${(AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''}></sl-avatar>
-                 `:html`
-                 <sl-avatar shape="rounded"></sl-avatar>
-                 `}
+     ${AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar ? html` <sl-avatar shape="rounded"
+		image=${
+			(AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''
+		} > </sl-avatar>
+		`:html` <sl-avatar shape="rounded"></sl-avatar>
+		`}
   </div>
   <div class="mid">
   <p>${this.restaurant.bio}</p>
@@ -183,7 +166,7 @@ sl-avatar {
 </div>
 `;
 
-  }
+	}
 
 
 });

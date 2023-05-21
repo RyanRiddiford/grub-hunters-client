@@ -7,8 +7,14 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
-import {anchorRoute, gotoRoute} from '../../../Router';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../../Router';
 import Auth from '../../../services/AuthAPI';
 import App from '../../../App';
 
@@ -17,85 +23,85 @@ import App from '../../../App';
 customElements.define('register-form', class RegisterForm extends LitElement {
 
 
-  constructor(){
-    super();
-    //Set reviewer register form as default
-    this.currentForm = "Reviewer";    
-  }
+	constructor() {
+		super();
+		//Set reviewer register form as default
+		this.currentForm = "Reviewer";
+	}
 
-    /**
-   * Send form data for signing in
-   * @param {*} e The event object
-   */
-    async registerSubmitHandler(e){
-        e.preventDefault();
-        const formData = e.detail.formData;
-        const submitBtn = this.shadowRoot.querySelector('#register-btn');
-        submitBtn.setAttribute('loading', '');  
-        Auth.signUp(formData,() => {}).then(() => {
-          submitBtn.removeAttribute('loading');
-        });    
-      }
-
-
-  /**
-   * Switch between fields for reviewer and restaurant accounts
-   * @param {*} e 
-   */
-  updateFormFields(e) {
-    //Switch between restaurant and reviewer form fields
-    if (e.target.getAttribute("checked") == "")
-    e.target.innerHTML = "Restaurant";
-    else if (e.target.getAttribute("checked") == null) 
-    e.target.innerHTML = "Reviewer";
-    //Assign form elements to variables
-    let revFields = this.shadowRoot.querySelector('#reviewer-fields');
-    let resFields = this.shadowRoot.querySelector('#restaurant-fields');
-    let accessLevelInput = this.shadowRoot.querySelector('#access-level-input');
-
-    //Toggle account-specific fields
-revFields.classList.toggle('hidden');
-resFields.classList.toggle('hidden');
-
-//If restaurant fields are enabled
-if (revFields.classList.contains('hidden')) {
-accessLevelInput.value = 2;
-  //Turn required on for restaurant fields
-  for (let field of resFields.querySelectorAll('.required')) {
-    field.setAttribute("required", "");   
-      }
-      //Turn required off for review fields
-      for (let field of revFields.querySelectorAll('.required')) {
-    field.removeAttribute("required");
-      }
-}
-//If review fields are enabled
-else if (resFields.classList.contains('hidden')) {
-  accessLevelInput.value = 1;
-  //Turn required off for restaurant fields
-  for (let field of resFields.querySelectorAll('.required')) {
-field.removeAttribute("required");
-  }
-  //Turn required on for review fields
-  for (let field of revFields.querySelectorAll('.required')) {
-field.setAttribute("required", "");
-  }
-  }
+	/**
+	 * Send form data for signing in
+	 * @param {*} e The event object
+	 */
+	async registerSubmitHandler(e) {
+		e.preventDefault();
+		const formData = e.detail.formData;
+		const submitBtn = this.shadowRoot.querySelector('#register-btn');
+		submitBtn.setAttribute('loading', '');
+		Auth.signUp(formData, () => {}).then(() => {
+			submitBtn.removeAttribute('loading');
+		});
+	}
 
 
+	/**
+	 * Switch between fields for reviewer and restaurant accounts
+	 * @param {*} e 
+	 */
+	updateFormFields(e) {
+		//Switch between restaurant and reviewer form fields
+		if (e.target.getAttribute("checked") == "")
+			e.target.innerHTML = "Restaurant";
+		else if (e.target.getAttribute("checked") == null)
+			e.target.innerHTML = "Reviewer";
+		//Assign form elements to variables
+		let revFields = this.shadowRoot.querySelector('#reviewer-fields');
+		let resFields = this.shadowRoot.querySelector('#restaurant-fields');
+		let accessLevelInput = this.shadowRoot.querySelector('#access-level-input');
+
+		//Toggle account-specific fields
+		revFields.classList.toggle('hidden');
+		resFields.classList.toggle('hidden');
+
+		//If restaurant fields are enabled
+		if (revFields.classList.contains('hidden')) {
+			accessLevelInput.value = 2;
+			//Turn required on for restaurant fields
+			for (let field of resFields.querySelectorAll('.required')) {
+				field.setAttribute("required", "");
+			}
+			//Turn required off for review fields
+			for (let field of revFields.querySelectorAll('.required')) {
+				field.removeAttribute("required");
+			}
+		}
+		//If review fields are enabled
+		else if (resFields.classList.contains('hidden')) {
+			accessLevelInput.value = 1;
+			//Turn required off for restaurant fields
+			for (let field of resFields.querySelectorAll('.required')) {
+				field.removeAttribute("required");
+			}
+			//Turn required on for review fields
+			for (let field of revFields.querySelectorAll('.required')) {
+				field.setAttribute("required", "");
+			}
+		}
 
 
-  }
 
 
-  /**
-   * Renders the register form html
-   * @returns Render of register form
-   */
-  render(){  
+	}
 
-  //Reviewer fields
-  this.reviewerFields = html`
+
+	/**
+	 * Renders the register form html
+	 * @returns Render of register form
+	 */
+	render() {
+
+		//Reviewer fields
+		this.reviewerFields = html `
   <div id="reviewer-fields">
 <sl-input class="required" label="First Name" name="firstName" type="text" placeholder="First Name" required></sl-input>
 <sl-input class="required" label="Surname" name="lastName" type="text" placeholder="Surname" required></sl-input>
@@ -103,8 +109,8 @@ field.setAttribute("required", "");
   </div>
   `;
 
-//Restaurant fields
-      this.restaurantFields = html`
+		//Restaurant fields
+		this.restaurantFields = html `
 
       <div id="restaurant-fields" class="hidden">
 
@@ -129,7 +135,7 @@ field.setAttribute("required", "");
 
 
 
-return html`
+		return html `
 
 <style>
 
@@ -255,6 +261,6 @@ sl-switch {
   <sl-button id="register-btn" type="primary" class="submit-btn" submit>Register</sl-button>
 
           
-          </sl-form>`
-  }
+          </sl-form>`;
+	}
 });

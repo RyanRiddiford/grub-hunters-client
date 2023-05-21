@@ -7,7 +7,10 @@
 
 
 //Import dependencies
-import { LitElement, html, css } from '@polymer/lit-element';
+import {
+	LitElement, html, css
+}
+from '@polymer/lit-element';
 import AuthAPI from '../../../services/AuthAPI';
 
 
@@ -15,33 +18,33 @@ import AuthAPI from '../../../services/AuthAPI';
 customElements.define('login-form', class LoginForm extends LitElement {
 
 
-  constructor(){
-    super()    
-  }
+	constructor() {
+		super();
+	}
 
-    /**
-   * Send form data for signing in
-   * @param {*} e The event object
-   */
-    signInSubmitHandler(e){
-        e.preventDefault();
-        const formData = e.detail.formData;
-        const submitBtn = this.shadowRoot.querySelector('#login-btn');
-        submitBtn.setAttribute('loading', '');
-        // sign in using AuthAPI    
-        AuthAPI.signIn(formData, () => {
-          submitBtn.removeAttribute('loading');
-        });
-      }
+	/**
+	 * Send form data for signing in
+	 * @param {*} e The event object
+	 */
+	signInSubmitHandler(e) {
+		e.preventDefault();
+		const formData = e.detail.formData;
+		const submitBtn = this.shadowRoot.querySelector('#login-btn');
+		submitBtn.setAttribute('loading', '');
+		// sign in using AuthAPI    
+		AuthAPI.signIn(formData, () => {
+			submitBtn.removeAttribute('loading');
+		});
+	}
 
 
-  /**
-   * Renders the login form html
-   * @returns Render of login form
-   */
-  render(){  
+	/**
+	 * Renders the login form html
+	 * @returns Render of login form
+	 */
+	render() {
 
-return html`
+		return html `
 
 
 <style>
@@ -108,5 +111,5 @@ sl-button::part(base) {
 
  <sl-button id="login-btn" type="primary" class="submit-btn" submit>Login</sl-button>
           </sl-form>`;
-  }
+	}
 });
