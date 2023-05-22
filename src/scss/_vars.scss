@@ -18,11 +18,14 @@
   --light-link-color: #{$light-txt-color};
   --light-txt-color: #{$light-txt-color};
 
-  //Nav Link Font
+  //Nav Links
   $nav-font-size: 1.1rem;
   $nav-font-weight: 600;
+  $nav-base-bg: #FFFFFF;
   --nav-font-size: #{$nav-font-size};
   --nav-font-weight: #{$nav-font-weight};
+  --nav-base-bg: #{$nav-base-bg};
+  --nav-active-bg: #{$secondary-brand-color};
 
   //Signout Link Font
   $signout-font-size: 1rem;

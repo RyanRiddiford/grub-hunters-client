@@ -47,7 +47,7 @@ customElements.define('app-header', class AppHeader extends LitElement {
 	 */
 	firstUpdated() {
 		super.firstUpdated();
-		//Setup navigation active link handling
+		//Setup initial active link styling
 		this.navActiveLinks();
 		//Setup header mascot animation
 		this.initMascotAnim(this.shadowRoot.querySelectorAll('.header-logo-container'));
@@ -150,11 +150,14 @@ customElements.define('app-header', class AppHeader extends LitElement {
 	navActiveLinks() {
 		const currentPath = window.location.pathname;
 		const navLinks = this.shadowRoot.querySelectorAll('.nav-links a');
-		navLinks.forEach(navLink => {
+		navLinks.forEach(navLink => {			
 			if (navLink.href.slice(-1) == '#') return;
-			if (navLink.pathname === currentPath) {
+			if (navLink.pathname === currentPath)
 				navLink.classList.add('active');
-			}
+			//Toggle active button for alternative profile paths
+			if (navLink.pathname === "/profile")
+			if (currentPath === '/home' || currentPath === '/')
+			navLink.classList.add('active');
 		});
 	}
 
@@ -164,25 +167,30 @@ customElements.define('app-header', class AppHeader extends LitElement {
 	 * @returns The top header component
 	 */
 	render() {
+
 		//Stores the available header links
 		let headerLinks;
 
-		if (this.user)
+		if (this.user) {
+
+
+
 		//Setup reviewer and restaurant level navigation
 			if (this.user.accessLevel == enumUtils.accessLevels.reviewer || this.user.accessLevel == enumUtils.accessLevels.restaurant) {
 				headerLinks = html `
-<a href="/search-restaurants" @click="${anchorRoute}">Search Restaurants</a> 
-<a href="/reviews" @click="${anchorRoute}">Your Reviews</a> 
-<a href="/profile" @click="${anchorRoute}">Your Profile</a> 
+<a href="/search-restaurants" @click="${() => {anchorRoute;}}">Search Restaurants</a> 
+<a href="/reviews" @click="${() => {anchorRoute;}}">Your Reviews</a> 
+<a href="/profile" @click="${() => {anchorRoute;}}">Your Profile</a> 
 `;
 			}
 			//Setup admin level navigation
 			else if (this.user.accessLevel == enumUtils.accessLevels.administrator) {
 			headerLinks = html `
-      <a href="/search-restaurants" @click="${anchorRoute}">Search Restaurants</a> 
-      <a href="/search-tickets" @click="${anchorRoute}">Search Tickets</a> 
-      <a href="/profile" @click="${anchorRoute}">Your Profile</a> 
+      <a href="/search-restaurants" @click="${() => {anchorRoute;}}">Search Restaurants</a> 
+      <a href="/search-tickets" @click="${() => {anchorRoute;}}">Search Tickets</a> 
+      <a href="/profile" @click="${() => {anchorRoute;}}">Your Profile</a> 
       `;
+		}			
 		}
 
 
@@ -245,8 +253,7 @@ h1 {
      display:flex;
      flex-direction:column;
      width:140px;
-     height: 50px;
-     background: #FFFFFF;
+     height: 50px;    
      margin-left: 15px;
      margin-right: 15px;
      padding:5px;
@@ -257,6 +264,11 @@ h1 {
      font-size: var(--nav-font-size);
      color:var(--base-txt-color);
 }
+
+.nav-links a:not(.active) {
+	background:var(--nav-base-bg);
+}
+
  .nav-links a, .header-logo {
      text-decoration:none;
 }
@@ -269,9 +281,10 @@ h1 {
      top:10px;
      right:20px;
 }
- .active {
-     background:var(--secondary-brand-color);
+.active {
+     background:var(--nav-active-bg);
 }
+
 /* RESPONSIVE - MOBILE -------------------*/
  @media all and (max-width: 768px) {
      .header-logo h1 {
@@ -302,25 +315,36 @@ h1 {
 
     </style>
 
-    <header class="app-header">
+<header class="app-header">
     ${localStorage.getItem('accessToken') ? 
-    html`
+    html` 
 
-		<a class="header-logo" href="/" @click="${() => anchorRoute }">
-			<div class="header-logo-container">${mascot}<h1>Grub Hunters</h1></div></a>
-      <nav class="app-top-nav">
-			<div class="nav-links">${headerLinks}
-    </div></nav>
-    <a class="signout-link" href = "#"@click = "${() => Auth.signOut()}">Sign Out</a>` :
-    html`
-		<style>
-			header {
-				margin: 0;
-				justify-content: center;
-			} 
-      </style>
+    <a class="header-logo" href="/" 
+    @click="${() => anchorRoute }">
+    <div class="header-logo-container">
+    ${mascot}
+   <h1>Grub Hunters</h1>
+  </div>
+</a>
 
-		<div class="header-logo-container">${mascot}<h1>Grub Hunters</h1></div>`
+        <nav class="app-top-nav">  
+          <div class="nav-links">
+     ${headerLinks}       
+          </div>    
+    </nav>
+    <a class="signout-link" href="#" @click="${() => Auth.signOut()}">Sign Out</a>
+    ` :
+    html`
+    
+    <style>
+  header {
+    margin:0;   
+    justify-content:center;        
+  }
+    </style>
+
+    
+    <div class="header-logo-container">${mascot}<h1>Grub Hunters</h1></div>`
   }  
 </header>
     `;

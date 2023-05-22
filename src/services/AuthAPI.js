@@ -65,14 +65,13 @@ class AuthAPI {
 	 * @param {*} fail 
 	 */
 	async signIn(userData, fail = false) {
-
+		
 		let email = userData.get("email");
 		let password = userData.get("password");
 		let bodyData = {
 			email: email,
 			password: password
 		};
-
 		const response = await fetch(`${App.apiBase}/auth/signin`, {
 			method: 'POST',
 			headers: {
@@ -80,7 +79,6 @@ class AuthAPI {
 			},
 			body: JSON.stringify(bodyData)
 		});
-
 		//If response not ok
 		if (!response.ok) {
 			const err = await response.json();
@@ -92,7 +90,6 @@ class AuthAPI {
 		} else {
 			//Sign in success
 			const data = await response.json();
-
 			//Check for demerit handling
 			if (data.code) {
 				//Warn the user with popup on login
@@ -139,7 +136,7 @@ class AuthAPI {
 				Router.init();
 				//Direct to the intro page on first time login
 				if (this.currentUser.showIntro == true)
-					gotoRoute('/intro');
+					gotoRoute('/intro');				
 				//Direct to the home/profile page on login
 				else
 					gotoRoute('/');
