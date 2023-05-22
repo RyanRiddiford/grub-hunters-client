@@ -29,7 +29,8 @@
   ],
   "staticFiles": {
     "staticPath": [
-      "./static"
+      "./static",
+      "./_redirects"
     ]
   }
 }
