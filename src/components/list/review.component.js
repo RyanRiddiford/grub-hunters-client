@@ -138,13 +138,20 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	buildReviewActions() {
 		//Build actions for author
 		if (AuthAPI.currentUser._id == this.review.authorId) {
-			return html`       
-      <sl-button id="edit-btn" @click="${() => this.shadowRoot.getElementById('edit-dialog').show()}">Edit</sl-button>  
- <sl-button id="delete-btn" @click="${() => this.shadowRoot.getElementById('delete-dialog').show()}">Delete</sl-button>`;
+			return html`     
+			<div class="action-container">
+				<sl-button id="edit-btn" @click="${() => this.shadowRoot.getElementById('edit-dialog').show()}">Edit</sl-button>  
+ 				<sl-button id="delete-btn" @click="${() => this.shadowRoot.getElementById('delete-dialog').show()}">Delete</sl-button>
+			</div>  
+      `;
 		}
 		//Build actions for non-authors and not viewed in report
 		else if (AuthAPI.currentUser._id != this.review.authorId && this.is_report != "true") {
-			return html`<sl-button id="report-btn" @click="${() => this.shadowRoot.getElementById('report-dialog').show()}">Report</sl-button>`;
+			return html`
+				<div class="action-container">
+				<sl-button id="report-btn" @click="${() => this.shadowRoot.getElementById('report-dialog').show()}">Report</sl-button>
+				</div>
+		`;
 		}
 	}
 
@@ -290,53 +297,60 @@ p {
      border-radius:80px;
      text-align:center;
 }
- .review-listing {
+
+.review-listing {
+	display:flex;
+	flex-direction:row;
+	align-items:center;
+	gap:20px;
+}
+ .review-listing .left {
      display:flex;
      flex-direction: column;
-     width:500px;
-     margin:10px;
      justify-content: space-evenly;
-     align-items:center;
      box-shadow: var(--main-content-box-shadow);
-     border-radius: 10px;
+	 border-bottom-right-radius:10px;
+	 border-bottom-left-radius:10px;
+
 }
- .top {
+ .top-container {
      display:flex;
      flex-direction: row;
-     width:100%;
-     margin:20px;
-     justify-content: space-evenly;
+	 min-height:100px;
+     justify-content: space-between;
      align-items:center;
-     padding-bottom:20px;
-     border-bottom:var(--main-content-border);
+	 background:var(--secondary-brand-color);
+	 border-top-right-radius:10px;
+	 border-top-left-radius:10px;
+	 margin-bottom:20px;
+	 padding-left:20px;
+	 padding-right:20px;
 }
- .bot {
+
+.bot-container {
+	display:flex;
+	flex-direction:row;
+	gap:10px;
+}
+ .review-heading-container {
      display:flex;
      flex-direction:column;
-     width:100%;
+	 align-items:center;
+	 width:200px;
+	 gap:20px;
+	 padding:10px;
+	 margin:20px;
+	 margin-right:0;
+	 box-shadow: var(--main-content-box-shadow);
 }
- .bot h3, .bot p {
-     padding-left:20px;
-     padding-right:20px;  
-}
-.bot h3 {
-	text-align:center;
-}
- .top .left .bot {
-     display:flex;
-     flex-direction:row;
-     gap:10px;
-}
- .top .right {
-     display:flex;
-     flex-direction:column;
-     justify-content:left;
-     gap:20px;
+.review-text-container {
+	padding:20px;
+	box-shadow: var(--main-content-box-shadow);
+	min-width:250px;
+	margin:20px;
+	margin-left:0;
 }
  #delete-btn {
-    /*Right-align element to parent */
-     margin-left: auto;
-     margin-right: 0;
      width:150px;
      padding:5px;
      height: auto;
@@ -347,7 +361,13 @@ p {
      border: 2px solid black;
      border-radius:10px;
      color:black;
-     font-weight:600;
+}
+#delete-btn::part(base):hover {
+	opacity:0.8;
+}
+sl-button {
+font-weight:var(--button-font-weight);
+font-size:var(--button-font-size);
 }
  sl-dialog::part(panel) {
      border-radius:20px;
@@ -460,32 +480,29 @@ p {
 
 
 <div class="review-listing">
-  <div class="top">
-
-<div class="left"> 
-
-    ${this.restaurant_name ? html` <div class="target-details"><h3>${this.restaurant_name}</h3></div> ` : html``}
-    <div class="bot">
-      <div class="left">
- ${voteDisplay}       
-      </div>
-${ratingDisplay}
-    </div>
-
-  </div>
+ 
+<div class="left">
+<div class="top-container">
+${this.restaurant_name ? html` <div class="target-details"><h3>${this.restaurant_name}</h3></div> ` : html``}
+${reviewActions}
+</div>
+<div class="bot-container">
+	<div class="review-heading-container">
+<h3>${this.review.title}</h3>	
+${ratingDisplay}	
+	</div>
+	<div class="review-text-container">
+<p>${this.review.text}</p>
+	</div>
+</div>
+</div>
 
 <div class="right">
-${reviewActions}
-</div>  
-  </div>
-
-
-  <div class="bot">
-<h3>${this.review.title}</h3>
-<p>${this.review.text}</p>
+ ${voteDisplay}  
 </div>
 
 </div>
+
 `;
 
 	}

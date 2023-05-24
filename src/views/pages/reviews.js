@@ -28,7 +28,6 @@ class ReviewsView {
 		document.title = 'Your Reviews';
 	    //Reset page for new filter
 		paginationUtils.setCurrentPage(0);
-		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');	
 		this.render();	
 		this.loadData();
 	}
@@ -100,8 +99,8 @@ class ReviewsView {
   <h1>Your Reviews</h1>
 
   <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
-        <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
+        <sl-button class="prev-page-btn prev hidden" @click=${()=> this.loadData(false)}>Previous</sl-button>
+        <sl-button class="next-page-btn next hidden" @click=${()=> this.loadData(true)}>Next</sl-button>
       </div>
 
 
@@ -110,8 +109,8 @@ class ReviewsView {
 
 
       <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
-        <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
+	    <sl-button class="prev-page-btn prev hidden" @click=${()=> this.loadData(false)}>Previous</sl-button>
+        <sl-button class="next-page-btn next hidden" @click=${()=> this.loadData(true)}>Next</sl-button>
       </div>
 
         </div>

@@ -306,6 +306,9 @@ h1 {
      color:black;
      font-weight:600;
 }
+#delete-btn::part(base):hover {
+	opacity:0.8;
+}
  sl-dialog::part(panel) {
      border-radius:20px;
      box-shadow:var(--dialog-box-shadow);

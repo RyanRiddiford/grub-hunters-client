@@ -208,8 +208,8 @@ count++;
            </sl-form>      
     </div>
     <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
-        <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
+        <sl-button class="prev-page-btn prev hidden" @click=${()=> this.loadData(false)}>Previous</sl-button>
+        <sl-button class="next-page-btn next hidden" @click=${()=> this.loadData(true)}>Next</sl-button>
       </div>
 
 
@@ -217,8 +217,8 @@ count++;
            </div>
 
            <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
-        <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
+          <sl-button class="prev-page-btn prev hidden" @click=${()=> this.loadData(false)}>Previous</sl-button>
+          <sl-button class="next-page-btn next hidden" @click=${()=> this.loadData(true)}>Next</sl-button>
       </div>
           
            
