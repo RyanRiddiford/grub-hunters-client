@@ -8,7 +8,7 @@
 
 //Import dependencies
 import {
-	LitElement, html, css
+	LitElement, html
 }
 from '@polymer/lit-element';
 import AuthAPI from '../../../services/AuthAPI';

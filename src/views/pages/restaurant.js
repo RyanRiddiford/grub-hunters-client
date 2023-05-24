@@ -98,10 +98,6 @@ class RestaurantView {
 
 		const template = html `
 
-
-
-
-
 <sl-dialog id="create-dialog" label="Create Review" class="dialog-overview">
 <review-form title=${document.title}></review-form>
 </sl-dialog>   

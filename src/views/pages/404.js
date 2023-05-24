@@ -33,7 +33,7 @@ class ErrorView {
 		const template = html `   
     <app-header title=${document.title} user=${JSON.stringify(AuthAPI.currentUser)}></app-header> 
       <div class="page-content">
-        <h1>Opps!</h1>
+        <h1>Oops!</h1>
         <p>Sorry, we couldn't find that.</p>
       </div>
       <app-footer title=${document.title}></app-footer>

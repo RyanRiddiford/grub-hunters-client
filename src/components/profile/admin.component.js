@@ -8,15 +8,11 @@
 
 //Import dependencies
 import {
-	LitElement, html, css
+	LitElement, html
 }
 from '@polymer/lit-element';
-import {
-	anchorRoute, gotoRoute
-}
-from '../../Router';
+import gotoRoute from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
-import App from '../../App';
 import enumUtils from '../../utils/enum.utils';
 
 
@@ -35,7 +31,7 @@ customElements.define('admin-profile', class AdminProfile extends LitElement {
 	 */
 	render() {
 
-		return html `   
+		return html`   
     
     <style>
 

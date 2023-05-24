@@ -10,8 +10,8 @@
 class EnumUtils {
 
 
-    //S3 path to images
-    BUCKET_URI = "https://grub-hunters-bucket.s3.us-west-2.amazonaws.com";
+//S3 path to images
+BUCKET_URI = "https://grub-hunters-bucket.s3.us-west-2.amazonaws.com";
 
 
 

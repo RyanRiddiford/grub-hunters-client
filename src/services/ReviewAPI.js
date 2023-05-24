@@ -9,8 +9,6 @@
 import App from '../App';
 import AuthAPI from './AuthAPI';
 import Toast from '../Toast';
-import enumUtils from '../utils/enum.utils';
-
 
 
 //Review API request methods
@@ -202,7 +200,6 @@ if (err) {
 //Throw new error
 throw new Error('Failed to delete review');
 }
-
 
 Toast.show('Review deleted');
     

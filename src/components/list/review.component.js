@@ -8,14 +8,9 @@
 
 //Import dependencies
 import {
-	LitElement, html, css
+	LitElement, html
 }
 from '@polymer/lit-element';
-import {
-	anchorRoute, gotoRoute
-}
-from '../../Router';
-import App from '../../App';
 import AuthAPI from '../../services/AuthAPI';
 import ReviewAPI from '../../services/ReviewAPI';
 import Toast from '../../Toast';

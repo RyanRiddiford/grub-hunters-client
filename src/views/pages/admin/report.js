@@ -28,9 +28,6 @@ class ReportView {
   }
 
 
-  
-
-
 
 /**
  * Closes the ticket and optionally gives offender a demerit
@@ -156,9 +153,6 @@ const template = html`
             #show-flagged-content-btn {
               width:200px;
             }
-
-
-
 
 
 

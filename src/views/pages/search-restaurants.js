@@ -14,7 +14,6 @@ from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import enumUtils from '../../utils/enum.utils';
-import Toast from '../../Toast';
 import paginationUtils from '../../utils/pagination.utils';
 
 

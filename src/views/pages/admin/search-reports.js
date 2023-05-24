@@ -114,7 +114,6 @@ paginationUtils.incrementPage();
 
       //Get page of data
       const data = await ReportAPI.getPage(paginationUtils.getCurrentPage(), this.status, this.targetType);    
-      
       //Alert user to no matching results found
 		  if (data.length == 0)
 		  Toast.show("No results found");
@@ -130,7 +129,9 @@ paginationUtils.incrementPage();
  * @param {*} data array of data to render listings with
  */
 async renderListings(data) {
+  //Empty current listing renders
   const listingTemplates = [];
+  render(null,document.getElementById('reports-container'));
   AuthAPI.targets = [];
   let count = 0;
   for (const item of data) {
@@ -161,7 +162,6 @@ count++;
   render() {
 
     const template = html`
-
 
 
 <style>

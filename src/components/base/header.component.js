@@ -8,15 +8,11 @@
 
 //Import dependencies
 import {
-	LitElement, html, css
+	LitElement, html
 }
 from '@polymer/lit-element';
-import {
-	anchorRoute, gotoRoute
-}
-from '../../Router';
+import anchorRoute from '../../Router';
 import Auth from '../../services/AuthAPI';
-import App from '../../App';
 import enumUtils from '../../utils/enum.utils';
 import mascot from '../../views/partials/mascot.partial';
 import gsap from 'gsap';
@@ -261,12 +257,10 @@ h1 {
      font-weight: var(--nav-font-weight);
      font-size: var(--nav-font-size);    
 }
-
 .nav-links a:not(.active) {
 	background:var(--nav-base-bg);
 	color:var(--base-txt-color);
 }
-
  .nav-links a, .header-logo {
      text-decoration:none;
 }

@@ -8,8 +8,6 @@
 //Utility function for pagination controls
 class PaginationUtils {
 
-
-
   constructor() {
     this.currPage = 0;
   }
