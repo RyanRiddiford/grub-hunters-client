@@ -42,16 +42,16 @@ class ReportView {
       const btn = document.getElementById('disciplinary-btn');
       btn.setAttribute('loading', '');
                 //Close the report ticket
-                ReportAPI.closeTicket(this.currentReport._id);
+                ReportAPI.closeTicket(AuthAPI.currentReport._id);
                 //If profile is flagged, get user id from report
-                if (this.currentReport.targetType == "restaurant") {
-            UserAPI.giveDemerit(this.currentReport.targetId).then(() => {
+                if (AuthAPI.currentReport.targetType == "restaurant") {
+            UserAPI.giveDemerit(AuthAPI.currentReport.targetId).then(() => {
               btn.removeAttribute('loading');
               Toast.show('User has been given a demerit');
             });
                 }
                 //If restaurant review is flagged, get user id from review
-                else if (this.currentReport.targetType == "review") {
+                else if (AuthAPI.currentReport.targetType == "review") {
                   UserAPI.giveDemerit(AuthAPI.currentTarget.authorId).then(() => {
                     btn.removeAttribute('loading');
                   Toast.show('User has been given a demerit');

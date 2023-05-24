@@ -220,7 +220,7 @@ async getPage(page, restaurantId, accessLevel) {
 
 
              //Fetch json array
-       const response = await fetch(`${App.apiBase}/review/${restaurantId}/${page}/${accessLevel}`, {
+       const response = await fetch(`${App.apiBase}/review/pagination/${restaurantId}/${page}/${accessLevel}`, {
         headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
       });     
   

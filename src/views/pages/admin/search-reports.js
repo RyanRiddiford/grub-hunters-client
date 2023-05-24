@@ -15,7 +15,7 @@ import enumUtils from '../../../utils/enum.utils';
 import ReportAPI from '../../../services/ReportAPI';
 import ReviewAPI from '../../../services/ReviewAPI';
 import paginationUtils from '../../../utils/pagination.utils';
-
+import Toast from '../../../Toast';
 
 
 //Search reports view
@@ -73,8 +73,8 @@ class SearchTicketsView {
    * @param {*} e The event object
    */
       async searchSubmitHandler(e) {
-        if (!this.currPage)
-        this.currPage = 0; 
+		    //Reset page for new filter
+		    paginationUtils.setCurrentPage(0);
         e.preventDefault();
         let submitBtn = document.querySelector('.submit-btn');
         submitBtn.setAttribute('loading', '');
@@ -112,9 +112,14 @@ paginationUtils.incrementPage();
   paginationUtils.updatePaginationButtons(numPages);
 
       //Get page of data
-      const data = await ReportAPI.getPage(this.currPage, this.status, this.targetType);           
+      const data = await ReportAPI.getPage(paginationUtils.getCurrentPage(), this.status, this.targetType);    
+      
+      //Alert user to no matching results found
+		  if (data.length == 0)
+		  Toast.show("No results found");
+      
       //Render data listing array to container element
-this.renderListings(AuthAPI.reportPage);
+      await this.renderListings(AuthAPI.reportPage);
 
 }
 
@@ -125,6 +130,7 @@ this.renderListings(AuthAPI.reportPage);
  */
 async renderListings(data) {
   const listingTemplates = [];
+  AuthAPI.targets = [];
   let count = 0;
   for (const item of data) {
     let target;

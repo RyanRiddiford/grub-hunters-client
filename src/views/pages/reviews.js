@@ -26,6 +26,8 @@ class ReviewsView {
 	 */
 	init() {
 		document.title = 'Your Reviews';
+	    //Reset page for new filter
+		paginationUtils.setCurrentPage(0);
 		this.render();
 		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
 		this.loadData();
@@ -53,9 +55,18 @@ class ReviewsView {
 
 		//Disable/enable pagination buttons
 		paginationUtils.updatePaginationButtons(numPages);
-		const data = await ReviewAPI.getPage(this.currPage, AuthAPI.currentUser._id, AuthAPI.currentUser.accessLevel);
+		const data = await ReviewAPI.getPage(paginationUtils.getCurrentPage(), AuthAPI.currentUser._id, AuthAPI.currentUser.accessLevel);
+		//Lett the user know no reviews exist
+		if (data.length ==  0) {
+						//Render review listing template array to reviews container
+				render(html`<h3 style="margin-top:100px">No Reviews Found</h3>`, document.getElementById("reviews-container"));	
+		}
 		//Render data listing array to container element
-		this.renderListings(data);
+		else {	
+		this.renderListings(data);		
+		}
+
+
 	}
 
 	/**

@@ -188,9 +188,8 @@ class UserAPI {
 	 * @returns Array of users that are a part of one of the access levels specified
 	 */
 	async getPage(page, accessLevel, keywords = "") {
-
 		//Fetch json array
-		const response = await fetch(`${App.apiBase}/user/${page}/${accessLevel}/${keywords}`, {
+		const response = await fetch(`${App.apiBase}/user/paginated/${page}/${accessLevel}/${keywords}`, {
 			headers: {
 				"Authorization": `Bearer ${localStorage.accessToken}`
 			},
@@ -207,7 +206,6 @@ class UserAPI {
 
 		//Convert json and store as data
 		const data = await response.json();
-
 		AuthAPI.restaurantPage = data;
 
 		//Return data
@@ -227,9 +225,6 @@ class UserAPI {
 				"Authorization": `Bearer ${localStorage.accessToken}`
 			},
 		});
-
-
-
 
 		//If response is not ok
 		if (!response.ok) {

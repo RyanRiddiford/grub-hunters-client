@@ -14,6 +14,7 @@ from 'lit-html';
 import AuthAPI from '../../services/AuthAPI';
 import UserAPI from '../../services/UserAPI';
 import enumUtils from '../../utils/enum.utils';
+import Toast from '../../Toast';
 import paginationUtils from '../../utils/pagination.utils';
 
 
@@ -27,7 +28,7 @@ class SearchRestaurantsView {
 	 * Initialise the view
 	 */
 	init() {
-		document.title = 'Search Restaurants';
+		document.title = 'Search Restaurants';	
 		this.render();
 		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
 	}
@@ -39,8 +40,8 @@ class SearchRestaurantsView {
 	 */
 	async searchSubmitHandler(e) {
 
-		if (!this.currPage)
-			this.currPage = 0;
+		//Reset page for new filter
+		paginationUtils.setCurrentPage(0);
 
 		e.preventDefault();
 		const formData = e.detail.formData;
@@ -77,10 +78,12 @@ class SearchRestaurantsView {
 		const numPages = await UserAPI.getNumPages(this.keywords, enumUtils.accessLevels.restaurant);
 		//Disable/enable pagination buttons
 		paginationUtils.updatePaginationButtons(numPages);
+
 		//Get page of data
-		const data = await UserAPI.getPage(this.currPage, enumUtils.accessLevels.restaurant, this.keywords);
+		const data = await UserAPI.getPage(paginationUtils.getCurrentPage(), enumUtils.accessLevels.restaurant, this.keywords);	
+
 		//Render data listing array to container element
-		this.renderListings(AuthAPI.restaurantPage);
+		await this.renderListings(data);
 	}
 
 

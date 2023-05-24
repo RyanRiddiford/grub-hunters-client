@@ -36,7 +36,7 @@ class ProfileView {
 		//Admin cannot get warnings
 		if (AuthAPI.currentUser.accessLevel != enumUtils.accessLevels.administrator)
 		//If warning has yet to be shown
-			if (AuthAPI.currentUser.warningStatus) {
+			if (AuthAPI.currentUser.warningStatus == true) {
 			let warningDialog = document.getElementById("warning-dialog");
 			warningDialog.show();
 		}
@@ -87,7 +87,7 @@ class ProfileView {
 
 <sl-dialog @sl-after-hide=${() => {this.warningReceived();}} id="warning-dialog" label="Confirmation" class="dialog-overview">
    <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>
-<sl-button id="warning-btn" slot="footer" submit>Ok</sl-button>
+<sl-button @click=${() => document.getElementById('warning-dialog').hide()} id="warning-btn" slot="footer" submit>Ok</sl-button>
 </sl-dialog>
 
            <app-header title=${document.title} user="${JSON.stringify(AuthAPI.currentUser)}"></app-header>

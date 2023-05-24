@@ -173,8 +173,6 @@ customElements.define('app-header', class AppHeader extends LitElement {
 
 		if (this.user) {
 
-
-
 		//Setup reviewer and restaurant level navigation
 			if (this.user.accessLevel == enumUtils.accessLevels.reviewer || this.user.accessLevel == enumUtils.accessLevels.restaurant) {
 				headerLinks = html `
@@ -261,12 +259,12 @@ h1 {
      text-align: center;
      justify-content: center;
      font-weight: var(--nav-font-weight);
-     font-size: var(--nav-font-size);
-     color:var(--base-txt-color);
+     font-size: var(--nav-font-size);    
 }
 
 .nav-links a:not(.active) {
 	background:var(--nav-base-bg);
+	color:var(--base-txt-color);
 }
 
  .nav-links a, .header-logo {
@@ -283,6 +281,7 @@ h1 {
 }
 .active {
      background:var(--nav-active-bg);
+	 color:var(--light-txt-color);
 }
 
 /* RESPONSIVE - MOBILE -------------------*/

@@ -60,11 +60,15 @@ class AuthAPI {
 			if (err) console.log(err);
 			//Show error      
 			Toast.show(`Problem getting user: ${response.status}`);
+			Toast.show(err.message);
 			//Run fail() functon if set
 			if (typeof fail == 'function') fail();
 		}
+		else {
 		//Sign up success - show toast and redirect to sign in page
-		Toast.show('Account created, please sign in');
+		Toast.show('Account created, please sign in');	
+		}
+
 	}
 
 

@@ -33,6 +33,8 @@
   --high-rating: green;
   --mid-rating: yellow;
   --low-rating: red;
+  --active-status-color: #46a854;
+  --closed-status-color: #a84846;
   --app-header-height: 60px;
   --app-header-txt-color: #fff;
   --app-header-title-font-size: 1.6em;

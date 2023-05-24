@@ -238,7 +238,7 @@ class ReportAPI {
 	async getPage(page, reportStatus, targetType) {
 
 		//Fetch json array
-		const response = await fetch(`${App.apiBase}/report/${page}/${reportStatus}/${targetType}`, {
+		const response = await fetch(`${App.apiBase}/report/pagination/${page}/${reportStatus}/${targetType}`, {
 			headers: {
 				"Authorization": `Bearer ${localStorage.accessToken}`
 			},

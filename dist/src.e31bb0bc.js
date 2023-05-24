@@ -7250,11 +7250,13 @@ class AuthAPI {
       if (err) console.log(err);
       //Show error      
       _Toast.default.show("Problem getting user: ".concat(response.status));
+      _Toast.default.show(err.message);
       //Run fail() functon if set
       if (typeof fail == 'function') fail();
+    } else {
+      //Sign up success - show toast and redirect to sign in page
+      _Toast.default.show('Account created, please sign in');
     }
-    //Sign up success - show toast and redirect to sign in page
-    _Toast.default.show('Account created, please sign in');
   }
 
   /**
@@ -7666,7 +7668,7 @@ class UserAPI {
   async getPage(page, accessLevel) {
     let keywords = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
     //Fetch json array
-    const response = await fetch("".concat(_App.default.apiBase, "/user/").concat(page, "/").concat(accessLevel, "/").concat(keywords), {
+    const response = await fetch("".concat(_App.default.apiBase, "/user/paginated/").concat(page, "/").concat(accessLevel, "/").concat(keywords), {
       headers: {
         "Authorization": "Bearer ".concat(localStorage.accessToken)
       }
@@ -7784,7 +7786,7 @@ class ProfileView {
     //Admin cannot get warnings
     if (_AuthAPI.default.currentUser.accessLevel != _enum.default.accessLevels.administrator)
       //If warning has yet to be shown
-      if (_AuthAPI.default.currentUser.warningStatus) {
+      if (_AuthAPI.default.currentUser.warningStatus == true) {
         let warningDialog = document.getElementById("warning-dialog");
         warningDialog.show();
       }
@@ -7823,9 +7825,9 @@ class ProfileView {
     }
     //Render administrator profile content
     else if (_AuthAPI.default.currentUser.accessLevel == _enum.default.accessLevels.administrator) content = (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["<admin-profile></admin-profile>"])));
-    const template = (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n\n<sl-dialog @sl-after-hide=", " id=\"warning-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n   <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>\n<sl-button id=\"warning-btn\" slot=\"footer\" submit>Ok</sl-button>\n</sl-dialog>\n\n           <app-header title=", " user=\"", "\"></app-header>\n\n           <div class=\"page-content\">\n             ", "\n           </div>\n           \n           <app-footer title=", "></app-footer>\n         "])), () => {
+    const template = (0, _litHtml.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n\n<sl-dialog @sl-after-hide=", " id=\"warning-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n   <span>Your account has received a demerit point. A second demerit point will lead to a 1 week suspension. A third demerit point will lead to a permanent account ban!</span>\n<sl-button @click=", " id=\"warning-btn\" slot=\"footer\" submit>Ok</sl-button>\n</sl-dialog>\n\n           <app-header title=", " user=\"", "\"></app-header>\n\n           <div class=\"page-content\">\n             ", "\n           </div>\n           \n           <app-footer title=", "></app-footer>\n         "])), () => {
       this.warningReceived();
-    }, document.title, JSON.stringify(_AuthAPI.default.currentUser), content, document.title);
+    }, () => document.getElementById('warning-dialog').hide(), document.title, JSON.stringify(_AuthAPI.default.currentUser), content, document.title);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
@@ -7849,6 +7851,10 @@ exports.default = void 0;
 
 //Utility function for pagination controls
 class PaginationUtils {
+  constructor() {
+    this.currPage = 0;
+  }
+
   /**
    * Increment current page by 1
    */
@@ -7864,12 +7870,25 @@ class PaginationUtils {
   }
 
   /**
+   * Getter for current page to paginate
+   * @returns The current page to paginate
+   */
+  getCurrentPage() {
+    return this.currPage;
+  }
+
+  /**
+   * Setter for current page to paginate
+   * @param {*} currPage The current page's new value
+   */
+  setCurrentPage(currPage) {
+    this.currPage = currPage;
+  }
+
+  /**
    * Disables/enables pagination buttons depending on if content exists
    */
   async updatePaginationButtons(numPages) {
-    //Initialise the current page index
-    if (!this.currPage) this.currPage = 0;
-
     //Class selectors for previous and next buttons
     const prevBtnSelector = '.prev-page-btn';
     const nextBtnSelector = '.next-page-btn';
@@ -7936,6 +7955,7 @@ var _litHtml = require("lit-html");
 var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _UserAPI = _interopRequireDefault(require("../../services/UserAPI"));
 var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
+var _Toast = _interopRequireDefault(require("../../Toast"));
 var _pagination = _interopRequireDefault(require("../../utils/pagination.utils"));
 var _templateObject, _templateObject2;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -7961,7 +7981,8 @@ class SearchRestaurantsView {
    * @param {*} e The event object
    */
   async searchSubmitHandler(e) {
-    if (!this.currPage) this.currPage = 0;
+    //Reset page for new filter
+    _pagination.default.setCurrentPage(0);
     e.preventDefault();
     const formData = e.detail.formData;
     this.keywords = formData.get("keywords");
@@ -7992,10 +8013,12 @@ class SearchRestaurantsView {
     const numPages = await _UserAPI.default.getNumPages(this.keywords, _enum.default.accessLevels.restaurant);
     //Disable/enable pagination buttons
     _pagination.default.updatePaginationButtons(numPages);
+
     //Get page of data
-    const data = await _UserAPI.default.getPage(this.currPage, _enum.default.accessLevels.restaurant, this.keywords);
+    const data = await _UserAPI.default.getPage(_pagination.default.getCurrentPage(), _enum.default.accessLevels.restaurant, this.keywords);
+
     //Render data listing array to container element
-    this.renderListings(_AuthAPI.default.restaurantPage);
+    await this.renderListings(data);
   }
 
   /**
@@ -8027,7 +8050,7 @@ class SearchRestaurantsView {
 //Export the view
 var _default = new SearchRestaurantsView();
 exports.default = _default;
-},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../services/AuthAPI":"services/AuthAPI.js","../../services/UserAPI":"services/UserAPI.js","../../utils/enum.utils":"utils/enum.utils.js","../../utils/pagination.utils":"utils/pagination.utils.js"}],"services/ReportAPI.js":[function(require,module,exports) {
+},{"../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../services/AuthAPI":"services/AuthAPI.js","../../services/UserAPI":"services/UserAPI.js","../../utils/enum.utils":"utils/enum.utils.js","../../Toast":"Toast.js","../../utils/pagination.utils":"utils/pagination.utils.js"}],"services/ReportAPI.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8243,7 +8266,7 @@ class ReportAPI {
    */
   async getPage(page, reportStatus, targetType) {
     //Fetch json array
-    const response = await fetch("".concat(_App.default.apiBase, "/report/").concat(page, "/").concat(reportStatus, "/").concat(targetType), {
+    const response = await fetch("".concat(_App.default.apiBase, "/report/pagination/").concat(page, "/").concat(reportStatus, "/").concat(targetType), {
       headers: {
         "Authorization": "Bearer ".concat(localStorage.accessToken)
       }
@@ -8482,7 +8505,7 @@ class ReviewAPI {
    */
   async getPage(page, restaurantId, accessLevel) {
     //Fetch json array
-    const response = await fetch("".concat(_App.default.apiBase, "/review/").concat(restaurantId, "/").concat(page, "/").concat(accessLevel), {
+    const response = await fetch("".concat(_App.default.apiBase, "/review/pagination/").concat(restaurantId, "/").concat(page, "/").concat(accessLevel), {
       headers: {
         "Authorization": "Bearer ".concat(localStorage.accessToken)
       }
@@ -8551,6 +8574,7 @@ var _enum = _interopRequireDefault(require("../../../utils/enum.utils"));
 var _ReportAPI = _interopRequireDefault(require("../../../services/ReportAPI"));
 var _ReviewAPI = _interopRequireDefault(require("../../../services/ReviewAPI"));
 var _pagination = _interopRequireDefault(require("../../../utils/pagination.utils"));
+var _Toast = _interopRequireDefault(require("../../../Toast"));
 var _templateObject, _templateObject2;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
@@ -8606,7 +8630,8 @@ class SearchTicketsView {
   * @param {*} e The event object
   */
   async searchSubmitHandler(e) {
-    if (!this.currPage) this.currPage = 0;
+    //Reset page for new filter
+    _pagination.default.setCurrentPage(0);
     e.preventDefault();
     let submitBtn = document.querySelector('.submit-btn');
     submitBtn.setAttribute('loading', '');
@@ -8639,9 +8664,13 @@ class SearchTicketsView {
     _pagination.default.updatePaginationButtons(numPages);
 
     //Get page of data
-    const data = await _ReportAPI.default.getPage(this.currPage, this.status, this.targetType);
+    const data = await _ReportAPI.default.getPage(_pagination.default.getCurrentPage(), this.status, this.targetType);
+
+    //Alert user to no matching results found
+    if (data.length == 0) _Toast.default.show("No results found");
+
     //Render data listing array to container element
-    this.renderListings(_AuthAPI.default.reportPage);
+    await this.renderListings(_AuthAPI.default.reportPage);
   }
 
   /**
@@ -8650,6 +8679,7 @@ class SearchTicketsView {
    */
   async renderListings(data) {
     const listingTemplates = [];
+    _AuthAPI.default.targets = [];
     let count = 0;
     for (const item of data) {
       let target;
@@ -8678,7 +8708,7 @@ class SearchTicketsView {
 //Export the view
 var _default = new SearchTicketsView();
 exports.default = _default;
-},{"../../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../services/UserAPI":"services/UserAPI.js","../../../utils/enum.utils":"utils/enum.utils.js","../../../services/ReportAPI":"services/ReportAPI.js","../../../services/ReviewAPI":"services/ReviewAPI.js","../../../utils/pagination.utils":"utils/pagination.utils.js"}],"views/pages/admin/report.js":[function(require,module,exports) {
+},{"../../../App":"App.js","lit-html":"../node_modules/lit-html/lit-html.js","../../../services/AuthAPI":"services/AuthAPI.js","../../../services/UserAPI":"services/UserAPI.js","../../../utils/enum.utils":"utils/enum.utils.js","../../../services/ReportAPI":"services/ReportAPI.js","../../../services/ReviewAPI":"services/ReviewAPI.js","../../../utils/pagination.utils":"utils/pagination.utils.js","../../../Toast":"Toast.js"}],"views/pages/admin/report.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8720,16 +8750,16 @@ class ReportView {
       const btn = document.getElementById('disciplinary-btn');
       btn.setAttribute('loading', '');
       //Close the report ticket
-      _ReportAPI.default.closeTicket(this.currentReport._id);
+      _ReportAPI.default.closeTicket(_AuthAPI.default.currentReport._id);
       //If profile is flagged, get user id from report
-      if (this.currentReport.targetType == "restaurant") {
-        _UserAPI.default.giveDemerit(this.currentReport.targetId).then(() => {
+      if (_AuthAPI.default.currentReport.targetType == "restaurant") {
+        _UserAPI.default.giveDemerit(_AuthAPI.default.currentReport.targetId).then(() => {
           btn.removeAttribute('loading');
           _Toast.default.show('User has been given a demerit');
         });
       }
       //If restaurant review is flagged, get user id from review
-      else if (this.currentReport.targetType == "review") {
+      else if (_AuthAPI.default.currentReport.targetType == "review") {
         _UserAPI.default.giveDemerit(_AuthAPI.default.currentTarget.authorId).then(() => {
           btn.removeAttribute('loading');
           _Toast.default.show('User has been given a demerit');
@@ -8822,7 +8852,7 @@ var _AuthAPI = _interopRequireDefault(require("../../services/AuthAPI"));
 var _UserAPI = _interopRequireDefault(require("../../services/UserAPI"));
 var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
 var _pagination = _interopRequireDefault(require("../../utils/pagination.utils"));
-var _templateObject, _templateObject2;
+var _templateObject, _templateObject2, _templateObject3;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
                                                                                                                                                                                          * Reviews view
@@ -8837,6 +8867,8 @@ class ReviewsView {
    */
   init() {
     document.title = 'Your Reviews';
+    //Reset page for new filter
+    _pagination.default.setCurrentPage(0);
     this.render();
     _pagination.default.disableButton('.prev-page-btn, .next-page-btn');
     this.loadData();
@@ -8864,9 +8896,16 @@ class ReviewsView {
 
     //Disable/enable pagination buttons
     _pagination.default.updatePaginationButtons(numPages);
-    const data = await _ReviewAPI.default.getPage(this.currPage, _AuthAPI.default.currentUser._id, _AuthAPI.default.currentUser.accessLevel);
+    const data = await _ReviewAPI.default.getPage(_pagination.default.getCurrentPage(), _AuthAPI.default.currentUser._id, _AuthAPI.default.currentUser.accessLevel);
+    //Lett the user know no reviews exist
+    if (data.length == 0) {
+      //Render review listing template array to reviews container
+      (0, _litHtml.render)((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<h3 style=\"margin-top:100px\">No Reviews Found</h3>"]))), document.getElementById("reviews-container"));
+    }
     //Render data listing array to container element
-    this.renderListings(data);
+    else {
+      this.renderListings(data);
+    }
   }
 
   /**
@@ -8878,7 +8917,7 @@ class ReviewsView {
     const listingTemplates = [];
     for (const item of data) {
       const restaurant = await _UserAPI.default.getRestaurantName(item.restaurantId);
-      listingTemplates.push((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing is_report=\"false\" restaurant_name=", " review=", "></review-listing>"])), restaurant.restaurantName, JSON.stringify(item)));
+      listingTemplates.push((0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<review-listing is_report=\"false\" restaurant_name=", " review=", "></review-listing>"])), restaurant.restaurantName, JSON.stringify(item)));
     }
 
     //Render review listing template array to reviews container
@@ -8889,7 +8928,7 @@ class ReviewsView {
    * Render review page
    */
   render() {
-    const template = (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n       \n       \n        <app-header title=\"Reviews\" user=", "></app-header>\n        <div class=\"page-content main-container\">\n      \n  <h1>Your Reviews</h1>\n\n  <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n\n      <div id=\"reviews-container\">\n      </div>\n\n\n      <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n        </div>\n<app-footer title=", "></app-footer>\n\n\n        \n        "])), JSON.stringify(_AuthAPI.default.currentUser), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
+    const template = (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n       \n       \n        <app-header title=\"Reviews\" user=", "></app-header>\n        <div class=\"page-content main-container\">\n      \n  <h1>Your Reviews</h1>\n\n  <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n\n      <div id=\"reviews-container\">\n      </div>\n\n\n      <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n        </div>\n<app-footer title=", "></app-footer>\n\n\n        \n        "])), JSON.stringify(_AuthAPI.default.currentUser), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
@@ -9045,21 +9084,21 @@ class IntrodoctionView {
    * Template containing guide for new reviewers
    */
   reviewerTemplate() {
-    return (0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n    <h1>Reviewer Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>\n      Welcome ", ". \n      At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!\n      Don't forget to leave helpful reviews on restaurants you visit. \n      Your voice can improve and support restaurants, and assist other reviewers in finding good grub!\n    </p>      \n    </div>\n\n    <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>Delete your account</li>\n      <li>View restaurants and reviews</li>\n      <li>Create, edit, and delete restaurant reviews</li>\n      <li>Vote on other user reviews</li>\n    </ul>\n    </div>\n\n    <div class=\"demerits-container\">\n    <h2>About Demerits</h2>  \n    <p>\n      Breaches in the user guidelines can result in the accumulation of demerit points.\n      Having 1 demerit point will result in a one-time warning message.\n      Having 2 demerit points will result in a 7-day account suspension.\n      Having 3 demerit points will result in an indefinite account ban\n    </p>      \n    </div>\n    "])), _AuthAPI.default.currentUser.username);
+    return (0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n    <h1>Reviewer Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>Welcome ", ".</p> \n     <p>At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!</p> \n     <p>Don't forget to leave helpful reviews on restaurants you visit. </p>\n     <p>Your voice can improve and support restaurants, and assist other reviewers in finding good grub!</p>     \n    </div>\n\n    <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>Delete your account</li>\n      <li>View restaurants and reviews</li>\n      <li>Create, edit, and delete restaurant reviews</li>\n      <li>Vote on other user reviews</li>\n    </ul>\n    </div>\n\n    <div class=\"demerits-container\">\n    <h2>About Demerits</h2>  \n    <ul>\n      <li>Breaches in the user guidelines can result in the accumulation of demerit points.</li>\n      <li>Having 1 demerit point will result in a one-time warning message.</li>\n      <li>Having 2 demerit points will result in a 7-day account suspension.</li>\n      <li>Having 3 demerit points will result in an indefinite account ban</li>\n    </ul>       \n    </div>\n    "])), _AuthAPI.default.currentUser.username);
   }
 
   /**
    * Template containing guide for new restaurants
    */
   restaurantTemplate() {
-    return (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    \n    <h1>Restaurant Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>\n      Welcome ", ". \n      At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!\n    </p>\n  </div>\n    <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>Delete your account</li>\n      <li>View restaurants and reviews</li>\n      <li>Create, edit, and delete restaurant reviews</li>\n    </ul> \n  </div>\n    <div class=\"demerits-container\">\n    <h2>About Demerits</h2>  \n    <p>\n      Breaches in the user guidelines can result in the accumulation of demerit points.\n      Having 1 demerit point will result in a one-time warning message.\n      Having 2 demerit points will result in a 7-day account suspension.\n      Having 3 demerit points will result in an indefinite account ban\n    </p>      \n    </div>\n    "])), _AuthAPI.default.currentUser.username);
+    return (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    \n    <h1>Restaurant Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>Welcome ", ".</p> \n      <p>At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!</p>\n   \n  </div>\n    <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>Delete your account</li>\n      <li>View restaurants and reviews</li>\n      <li>Create, edit, and delete restaurant reviews</li>\n    </ul> \n  </div>\n    <div class=\"demerits-container\">\n    <h2>About Demerits</h2>  \n    <ul>\n      <li>Breaches in the user guidelines can result in the accumulation of demerit points.</li>\n      <li>Having 1 demerit point will result in a one-time warning message.</li>\n      <li>Having 2 demerit points will result in a 7-day account suspension.</li>\n      <li>Having 3 demerit points will result in an indefinite account ban</li>\n    </ul>     \n    </div>\n    "])), _AuthAPI.default.currentUser.resaurantName);
   }
 
   /**
    * Template containing guide for new admins
    */
   adminTemplate() {
-    return (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n    \n    <h1>Administrator Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>\n      Welcome ", ". \n      At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!\n      As an administrator, your main role is to assess report tickets and determine a course of action on them.\n      Restaurant public profiles and restaurant reviews are the two targets a report can be about.\n    </p>\n  </div>\n  <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>View restaurants and reviews</li>\n      <li>Assess report tickets</li>\n    </ul> \n  </div>\n    "])), _AuthAPI.default.currentUser.username);
+    return (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n    \n    <h1>Administrator Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>Welcome ", ".</p>\n    <p>At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!</p>\n    <p>As an administrator, your main role is to assess report tickets and determine the correct course of action.</p>\n  </div>\n  <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>View restaurants and reviews</li>\n      <li>Assess report tickets</li>\n    </ul> \n  </div>\n    "])), _AuthAPI.default.currentUser.username);
   }
 
   /**
@@ -10908,7 +10947,7 @@ customElements.define('app-header', class AppHeader extends _litElement.LitEleme
     }
 
     //Return the header component
-    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n    <style>\n\n\nh1 {\n     font-size: var(--h1-font-size);\n     font-weight:var(--h1-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--light-txt-color);\n     margin:0;\n}\n header {\n     overflow: hidden;\n     position:fixed;\n     top:0;\n     z-index: 1;\n     width:100%;\n     height: 150px;\n     background: var(--brand-color);\n     display:flex;\n     flex-direction:row;\n     justify-content: space-between;\n     align-items: center;\n     margin-bottom: 50px;\n     padding:10px;\n}\n .header-logo {\n     color:var(--heading-txt-color);\n     text-align: center;\n     text-decoration: none;\n}\n .header-logo-container {\n     display:flex;\n     flex-direction:column;\n     align-items:center;\n}\n p, span, a {\n     font-family:var(--txt-font-family);\n}\n nav {\n     display: flex;\n     flex-direction: row;\n     align-items:center;\n     justify-content:space-between;\n     padding-right:20px;\n     width:500px;\n}\n .nav-links {\n     display: flex;\n     flex-direction: row;\n     width:500px;\n     gap:5px;\n}\n .nav-links a {\n     display:flex;\n     flex-direction:column;\n     width:140px;\n     height: 50px;    \n     margin-left: 15px;\n     margin-right: 15px;\n     padding:5px;\n     border-radius: 20px;\n     text-align: center;\n     justify-content: center;\n     font-weight: var(--nav-font-weight);\n     font-size: var(--nav-font-size);\n     color:var(--base-txt-color);\n}\n\n.nav-links a:not(.active) {\n\tbackground:var(--nav-base-bg);\n}\n\n .nav-links a, .header-logo {\n     text-decoration:none;\n}\n .signout-link {\n     font-size:var(--signout-font-size);\n     font-weight:var(--signout-font-weight);\n     color:var(--light-txt-color);\n     align-self:start;\n     position:fixed;\n     top:10px;\n     right:20px;\n}\n.active {\n     background:var(--nav-active-bg);\n}\n\n/* RESPONSIVE - MOBILE -------------------*/\n @media all and (max-width: 768px) {\n     .header-logo h1 {\n         display:none;\n    }\n     .header-logo {\n         float: none;\n         display: block;\n    }\n     nav {\n         width:100vw;\n         justify-content:center;\n    }\n     .nav-links {\n         width:100%;\n    }\n     header {\n         display:flex;\n         flex-direction:column;\n         gap:5px;\n         padding:5px;\n    }\n     .signout-link {\n         margin-left:15px;\n    }\n}\n\n\n    </style>\n\n<header class=\"app-header\">\n    ", "  \n</header>\n    "])), localStorage.getItem('accessToken') ? (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral([" \n\n    <a class=\"header-logo\" href=\"/\" \n    @click=\"", "\">\n    <div class=\"header-logo-container\">\n    ", "\n   <h1>Grub Hunters</h1>\n  </div>\n</a>\n\n        <nav class=\"app-top-nav\">  \n          <div class=\"nav-links\">\n     ", "       \n          </div>    \n    </nav>\n    <a class=\"signout-link\" href=\"#\" @click=\"", "\">Sign Out</a>\n    "])), () => _Router.anchorRoute, _mascot.default, headerLinks, () => _AuthAPI.default.signOut()) : (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n    \n    <style>\n  header {\n    margin:0;   \n    justify-content:center;        \n  }\n    </style>\n\n    \n    <div class=\"header-logo-container\">", "<h1>Grub Hunters</h1></div>"])), _mascot.default));
+    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n    <style>\n\n\nh1 {\n     font-size: var(--h1-font-size);\n     font-weight:var(--h1-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--light-txt-color);\n     margin:0;\n}\n header {\n     overflow: hidden;\n     position:fixed;\n     top:0;\n     z-index: 1;\n     width:100%;\n     height: 150px;\n     background: var(--brand-color);\n     display:flex;\n     flex-direction:row;\n     justify-content: space-between;\n     align-items: center;\n     margin-bottom: 50px;\n     padding:10px;\n}\n .header-logo {\n     color:var(--heading-txt-color);\n     text-align: center;\n     text-decoration: none;\n}\n .header-logo-container {\n     display:flex;\n     flex-direction:column;\n     align-items:center;\n}\n p, span, a {\n     font-family:var(--txt-font-family);\n}\n nav {\n     display: flex;\n     flex-direction: row;\n     align-items:center;\n     justify-content:space-between;\n     padding-right:20px;\n     width:500px;\n}\n .nav-links {\n     display: flex;\n     flex-direction: row;\n     width:500px;\n     gap:5px;\n}\n .nav-links a {\n     display:flex;\n     flex-direction:column;\n     width:140px;\n     height: 50px;    \n     margin-left: 15px;\n     margin-right: 15px;\n     padding:5px;\n     border-radius: 20px;\n     text-align: center;\n     justify-content: center;\n     font-weight: var(--nav-font-weight);\n     font-size: var(--nav-font-size);    \n}\n\n.nav-links a:not(.active) {\n\tbackground:var(--nav-base-bg);\n\tcolor:var(--base-txt-color);\n}\n\n .nav-links a, .header-logo {\n     text-decoration:none;\n}\n .signout-link {\n     font-size:var(--signout-font-size);\n     font-weight:var(--signout-font-weight);\n     color:var(--light-txt-color);\n     align-self:start;\n     position:fixed;\n     top:10px;\n     right:20px;\n}\n.active {\n     background:var(--nav-active-bg);\n\t color:var(--light-txt-color);\n}\n\n/* RESPONSIVE - MOBILE -------------------*/\n @media all and (max-width: 768px) {\n     .header-logo h1 {\n         display:none;\n    }\n     .header-logo {\n         float: none;\n         display: block;\n    }\n     nav {\n         width:100vw;\n         justify-content:center;\n    }\n     .nav-links {\n         width:100%;\n    }\n     header {\n         display:flex;\n         flex-direction:column;\n         gap:5px;\n         padding:5px;\n    }\n     .signout-link {\n         margin-left:15px;\n    }\n}\n\n\n    </style>\n\n<header class=\"app-header\">\n    ", "  \n</header>\n    "])), localStorage.getItem('accessToken') ? (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral([" \n\n    <a class=\"header-logo\" href=\"/\" \n    @click=\"", "\">\n    <div class=\"header-logo-container\">\n    ", "\n   <h1>Grub Hunters</h1>\n  </div>\n</a>\n\n        <nav class=\"app-top-nav\">  \n          <div class=\"nav-links\">\n     ", "       \n          </div>    \n    </nav>\n    <a class=\"signout-link\" href=\"#\" @click=\"", "\">Sign Out</a>\n    "])), () => _Router.anchorRoute, _mascot.default, headerLinks, () => _AuthAPI.default.signOut()) : (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n    \n    <style>\n  header {\n    margin:0;   \n    justify-content:center;        \n  }\n    </style>\n\n    \n    <div class=\"header-logo-container\">", "<h1>Grub Hunters</h1></div>"])), _mascot.default));
   }
 });
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../services/AuthAPI":"services/AuthAPI.js","../../App":"App.js","../../utils/enum.utils":"utils/enum.utils.js","../../views/partials/mascot.partial":"views/partials/mascot.partial.js","gsap":"../node_modules/gsap/index.js"}],"components/base/footer.component.js":[function(require,module,exports) {
@@ -10989,27 +11028,9 @@ customElements.define('login-form', class LoginForm extends _litElement.LitEleme
    * @returns Render of login form
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input , sl-textarea {\n  margin-top: var(--sl-spacing-large);\n  font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\n.form-signin {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\n\n</style> \n\n\n\n\n\n\n<sl-form class=\"form-signin\" @sl-submit=", ">    \n<sl-input label=\"Email\" name=\"email\" type=\"email\" value=\"admin1@grubhunters.com.au\" placeholder=\"Email\" required></sl-input>         \n <sl-input label=\"Password\" name=\"password\" type=\"password\" value=\"admin123\" placeholder=\"Password\" required toggle-password></sl-input>\n\n <sl-button id=\"login-btn\" type=\"primary\" class=\"submit-btn\" submit>Login</sl-button>\n          </sl-form>"])), this.signInSubmitHandler);
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input , sl-textarea {\n  margin-top: var(--sl-spacing-large);\n  font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\n.form-signin {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\n\n</style> \n\n\n\n<sl-form class=\"form-signin\" @sl-submit=", ">    \n<sl-input label=\"Email\" name=\"email\" type=\"email\" value=\"nick@reviewer.com.au\" placeholder=\"Email\" required></sl-input>         \n <sl-input label=\"Password\" name=\"password\" type=\"password\" value=\"reviewer123\" placeholder=\"Password\" required toggle-password></sl-input>\n\n <sl-button id=\"login-btn\" type=\"primary\" class=\"submit-btn\" submit>Login</sl-button>\n          </sl-form>"])), this.signInSubmitHandler);
   }
 });
-
-/*
-
-
-// TODO DELETE
-//reviewer 
-<sl-input label="Email" name="email" type="email" value="nick@reviewer.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="reviewer123" placeholder="Password" required toggle-password></sl-input>
-
-//restaurant
- <sl-input label="Email" name="email" type="email" value="adam@restaurant.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="restaurant123" placeholder="Password" required toggle-password></sl-input>
-
-//admin
- <sl-input label="Email" name="email" type="email" value="admin1@grubhunters.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="admin123" placeholder="Password" required toggle-password></sl-input>
-
-*/
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../services/AuthAPI":"services/AuthAPI.js"}],"components/forms/auth/register.component.js":[function(require,module,exports) {
 "use strict";
 
@@ -11385,7 +11406,7 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
     const formData = e.detail.formData;
     try {
       const response = await _ReviewAPI.default.updateById(this.review._id, formData, false);
-      _Toast.default.show('Review created');
+      _Toast.default.show('Review updated');
       this.shadowRoot.getElementById('edit-dialog').hide();
     } catch (err) {
       _Toast.default.show(err, 'error');
@@ -11466,8 +11487,8 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
    * @returns Template of vote display
    */
   buildVoteDisplay() {
-    //Disable voting for author and as flagged content in report
-    if (this.review.authorId == _AuthAPI.default.currentUser._id || this.is_report == "true") {
+    //Disable voting for author, restaurant owner, and as flagged content in report
+    if (this.review.authorId == _AuthAPI.default.currentUser._id || this.is_report == "true" || this.review.restaurantId == _AuthAPI.default.currentUser._id) {
       return (0, _litElement.html)(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["    \n      <div class=\"vote-container\"><sl-button id=\"upvote-btn\" disabled>Upvote</sl-button><div>Upvotes: ", "</div></div>\n  <div class=\"vote-container\"><sl-button id=\"downvote-btn\" disabled>Downvote</sl-button><div>Downvotes: ", "</div></div>"])), this.review.upvotes, this.review.downvotes);
     }
     //Enable voting for non-authors 
@@ -11500,7 +11521,7 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
     let ratingDisplay = this.buildRatingDisplay();
     //Upvote and downvote UI display
     let voteDisplay = this.buildVoteDisplay();
-    return (0, _litElement.html)(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["\n\n<style>\n\n\np {\n     font-family: var(--base-font-family);\n     font-weight: 300;\n}\n h1,h2,h3 {\n     margin: 0 0 .5em;\n     color: var(--heading-txt-color);\n}\n h1 {\n     font-size: var(--h1-font-size);\n     font-weight:var(--h1-font-weight);\n     font-family:var(--heading-font-family);\n}\n h2 {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n}\n h3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n}\n .rating-display {\n     display:flex;\n     flex-direction:column;\n     justify-content:center;\n     width:80px;\n     height:80px;\n     border:4px solid var(--brand-color);\n     border-radius:80px;\n     text-align:center;\n}\n .review-listing {\n     display:flex;\n     flex-direction: column;\n     width:500px;\n     margin:10px;\n     justify-content: space-evenly;\n     align-items:center;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 10px;\n}\n .top {\n     display:flex;\n     flex-direction: row;\n     width:100%;\n     margin:20px;\n     justify-content: space-evenly;\n     align-items:center;\n     padding-bottom:20px;\n     border-bottom:var(--main-content-border);\n}\n .bot {\n     display:flex;\n     flex-direction:column;\n     width:100%;\n}\n .bot h3, .bot p {\n     padding-left:20px;\n     padding-right:20px;\n     text-align:left;\n}\n .top .left .bot {\n     display:flex;\n     flex-direction:row;\n     gap:10px;\n}\n .top .right {\n     display:flex;\n     flex-direction:column;\n     justify-content:left;\n     gap:20px;\n}\n #delete-btn {\n    /*Right-align element to parent */\n     margin-left: auto;\n     margin-right: 0;\n     width:150px;\n     padding:5px;\n     height: auto;\n     text-align:center;\n}\n #delete-btn::part(base) {\n     background:red;\n     border: 2px solid black;\n     border-radius:10px;\n     color:black;\n     font-weight:600;\n}\n sl-dialog::part(panel) {\n     border-radius:20px;\n     box-shadow:var(--dialog-box-shadow);\n}\n sl-dialog::part(overlay) {\n     height:100vh;\n}\n sl-dialog::part(header) {\n     padding:5px;\n     background: var(--brand-color);\n     border-top-left-radius:20px;\n     border-top-right-radius:20px;\n}\n sl-dialog::part(title) {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n     text-align:center;\n     color:var(--light-txt-color);\n}\n sl-dialog::part(body) {\n     font-size: 1rem;\n     font-weight:600;\n     font-family: var(--base-font-family);\n     text-align:center;\n     color:var(--base-txt-color);\n}\n sl-dialog::part(footer) {\n     display:flex;\n     flex-direction:row;\n     justify-content:space-between;\n     margin-left:50px;\n     margin-right:50px;\n}\n sl-form {\n     align-items:center;\n}\n sl-input::part(input) {\n     font-size:var(--input-font-size);\n     font-weight:var(--input-font-weight);\n}\n sl-input, sl-range::part(form-control-label) {\n     --label-width:6rem;\n     --gap-width:2rem;\n     margin-top: var(--sl-spacing-medium);\n}\n label, sl-input, sl-range {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n sl-input::part(form-control-label), sl-range::part(form-control-label) {\n     text-align: right;\n     align-self: center;\n     margin-right:20px;\n}\n sl-input::part(form-control) {\n     display:grid;\n     grid: auto / var(--label-width) 1fr;\n     gap: 20px;\n}\n .info-label, .rating-display-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n @media all and (max-width: 1000px){\n     .review-listing {\n         width:90vw;\n    }\n     .top .right {\n         gap:10px;\n    }\n     sl-button, #delete-btn {\n         width:100px;\n         padding:10px;\n    }\n}\n\n\n\n</style>\n\n\n<sl-dialog id=\"edit-dialog\" label=\"Edit Review\" class=\"dialog-overview\">\n<sl-form class=\"page-form\" @sl-submit=", " enctype=\"multipart/form-data\">\n \n <sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" value=", " required></sl-input>\n <sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"Text\" value=", " required></sl-input>\n <label for=\"name\">Rating\n <sl-range min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" value=", " required></sl-range>  \n </label>\n\n             <sl-button type=\"primary\" class=\"submit-btn\" submit>Update Review</sl-button>\n           </sl-form>\n</sl-dialog>\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n  <span>Are you sure you want to permanently delete this review?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n\n\n<sl-dialog id=\"report-dialog\" label=\"Report Review\" class=\"dialog-overview\">\n<report-form title=", " target_id=", " target_type=", "></report-form>\n</sl-dialog>\n\n\n\n<div class=\"review-listing\">\n  <div class=\"top\">\n\n<div class=\"left\"> \n\n    ", "\n    <div class=\"bot\">\n      <div class=\"left\">\n ", "       \n      </div>\n", "\n    </div>\n\n  </div>\n\n<div class=\"right\">\n", "\n</div>  \n  </div>\n\n\n  <div class=\"bot\">\n<h3>", "</h3>\n<p>", "</p>\n</div>\n\n</div>\n"])), this.updateReviewSubmitHandler.bind(this), this.review.title, this.review.text, this.review.rating, () => {
+    return (0, _litElement.html)(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["\n\n<style>\n\n\np {\n     font-family: var(--base-font-family);\n     font-weight: 300;\n}\n h1,h2,h3 {\n     margin: 0 0 .5em;\n     color: var(--heading-txt-color);\n}\n h1 {\n     font-size: var(--h1-font-size);\n     font-weight:var(--h1-font-weight);\n     font-family:var(--heading-font-family);\n}\n h2 {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n}\n h3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n}\n .rating-display {\n     display:flex;\n     flex-direction:column;\n     justify-content:center;\n     width:80px;\n     height:80px;\n     border:4px solid var(--brand-color);\n     border-radius:80px;\n     text-align:center;\n}\n .review-listing {\n     display:flex;\n     flex-direction: column;\n     width:500px;\n     margin:10px;\n     justify-content: space-evenly;\n     align-items:center;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 10px;\n}\n .top {\n     display:flex;\n     flex-direction: row;\n     width:100%;\n     margin:20px;\n     justify-content: space-evenly;\n     align-items:center;\n     padding-bottom:20px;\n     border-bottom:var(--main-content-border);\n}\n .bot {\n     display:flex;\n     flex-direction:column;\n     width:100%;\n}\n .bot h3, .bot p {\n     padding-left:20px;\n     padding-right:20px;  \n}\n.bot h3 {\n\ttext-align:center;\n}\n .top .left .bot {\n     display:flex;\n     flex-direction:row;\n     gap:10px;\n}\n .top .right {\n     display:flex;\n     flex-direction:column;\n     justify-content:left;\n     gap:20px;\n}\n #delete-btn {\n    /*Right-align element to parent */\n     margin-left: auto;\n     margin-right: 0;\n     width:150px;\n     padding:5px;\n     height: auto;\n     text-align:center;\n}\n #delete-btn::part(base) {\n     background:red;\n     border: 2px solid black;\n     border-radius:10px;\n     color:black;\n     font-weight:600;\n}\n sl-dialog::part(panel) {\n     border-radius:20px;\n     box-shadow:var(--dialog-box-shadow);\n}\n sl-dialog::part(overlay) {\n     height:100vh;\n}\n sl-dialog::part(header) {\n     padding:5px;\n     background: var(--brand-color);\n     border-top-left-radius:20px;\n     border-top-right-radius:20px;\n}\n sl-dialog::part(title) {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n     text-align:center;\n     color:var(--light-txt-color);\n}\n sl-dialog::part(body) {\n     font-size: 1rem;\n     font-weight:600;\n     font-family: var(--base-font-family);\n     text-align:center;\n     color:var(--base-txt-color);\n}\n sl-dialog::part(footer) {\n     display:flex;\n     flex-direction:row;\n     justify-content:space-between;\n     margin-left:50px;\n     margin-right:50px;\n}\n sl-form {\n     align-items:center;\n}\n sl-input::part(input) {\n     font-size:var(--input-font-size);\n     font-weight:var(--input-font-weight);\n}\n sl-input, sl-range::part(form-control-label) {\n     --label-width:6rem;\n     --gap-width:2rem;\n     margin-top: var(--sl-spacing-medium);\n}\n label, sl-input, sl-range {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n sl-input::part(form-control-label), sl-range::part(form-control-label) {\n     text-align: right;\n     align-self: center;\n     margin-right:20px;\n}\n sl-input::part(form-control) {\n     display:grid;\n     grid: auto / var(--label-width) 1fr;\n     gap: 20px;\n}\n .info-label, .rating-display-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n @media all and (max-width: 1000px){\n     .review-listing {\n         width:90vw;\n    }\n     .top .right {\n         gap:10px;\n    }\n     sl-button, #delete-btn {\n         width:100px;\n         padding:10px;\n    }\n}\n\n\n\n</style>\n\n\n<sl-dialog id=\"edit-dialog\" label=\"Edit Review\" class=\"dialog-overview\">\n<sl-form class=\"page-form\" @sl-submit=", " enctype=\"multipart/form-data\">\n \n <sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" value=", " required></sl-input>\n <sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"Text\" value=", " required></sl-input>\n <label for=\"name\">Rating\n <sl-range min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" value=", " required></sl-range>  \n </label>\n\n             <sl-button type=\"primary\" class=\"submit-btn\" submit>Update Review</sl-button>\n           </sl-form>\n</sl-dialog>\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\" class=\"dialog-overview\">\n  <span>Are you sure you want to permanently delete this review?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n\n\n<sl-dialog id=\"report-dialog\" label=\"Report Review\" class=\"dialog-overview\">\n<report-form title=", " target_id=", " target_type=", "></report-form>\n</sl-dialog>\n\n\n\n<div class=\"review-listing\">\n  <div class=\"top\">\n\n<div class=\"left\"> \n\n    ", "\n    <div class=\"bot\">\n      <div class=\"left\">\n ", "       \n      </div>\n", "\n    </div>\n\n  </div>\n\n<div class=\"right\">\n", "\n</div>  \n  </div>\n\n\n  <div class=\"bot\">\n<h3>", "</h3>\n<p>", "</p>\n</div>\n\n</div>\n"])), this.updateReviewSubmitHandler.bind(this), this.review.title, this.review.text, this.review.rating, () => {
       this.shadowRoot.getElementById('delete-dialog').hide();
       _ReviewAPI.default.deleteById(this.review._id);
     }, () => this.shadowRoot.getElementById('delete-dialog').hide(), document.title, this.review._id, _enum.default.reportTargetType.review, this.restaurant_name ? (0, _litElement.html)(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral([" <div class=\"target-details\"><h3>", "</h3></div> "])), this.restaurant_name) : (0, _litElement.html)(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral([""]))), voteDisplay, ratingDisplay, reviewActions, this.review.title, this.review.text);
@@ -11542,13 +11563,38 @@ customElements.define('restaurant-listing', class RestaurantListing extends _lit
    * @returns Render of restaurant listing
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\nh3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n     margin:10px;\n     padding:0px;\n     text-align:center;\n}\n .bold-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .restaurant-listing {\n     display:flex;\n     flex-direction: row;\n     width:700px;\n     height:250px;\n     margin:20px;\n     justify-content: space-between;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 20px;\n}\n .left {\n     display:flex;\n     flex-direction: column;\n     align-items:center;\n     justify-content:center;\n}\n .mid {\n     border-left: 4px solid var(--brand-color);\n     border-right: 4px solid var(--brand-color);\n     overflow-y:scroll;\n}\n .mid p {\n     padding:20px;\n}\n sl-button {\n     padding:10px;\n}\n sl-button::part(base) {\n     font-size:1rem;\n     font-weight:600;\n}\n sl-avatar {\n     --size: 100px;\n     margin:10px;\n}\n @media all and (max-width: 768px){\n     .restaurant-listing {\n         flex-direction:column;\n         width:80vw;\n         padding:10px;\n         height:200px;\n    }\n     .left {\n         flex-direction:row-reverse;\n         padding:10px;\n    }\n     .right {\n         align-items:end;\n    }\n     sl-button {\n         width:100%;\n         height:100px;\n    }\n     sl-button::part(base) {\n         font-size:1rem;\n         font-weight:600;\n    }\n     .mid {\n         border:none;\n         margin:0;\n         padding:0;\n    }\n     .mid p {\n         display:none;\n    }\n     .right {\n         align-items:start;\n    }\n     sl-avatar {\n         --size: 80px;\n         margin: 1em;\n    }\n}\n\n  \n\n</style>\n\n\n\n<div class=\"restaurant-listing\">\n\n\n\n  <div class=\"left\">\n     <h3>", "</h3>  \n     ", "\n  </div>\n  <div class=\"mid\">\n  <p>", "</p>\n</div>\n<div class=\"right\">\n<sl-button class=\"view-btn\" @click=", ">View Restaurant</sl-button>\n</div>\n</div>\n"])), this.restaurant.restaurantName, _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"\n\t\timage=", " > </sl-avatar>\n\t\t"])), _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"></sl-avatar>\n\t\t"]))), this.restaurant.bio, event => {
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\nh3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--light-txt-color);\n     margin:10px;\n     padding:0px;\n     text-align:left;\n}\n .bold-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .info-header {\n    font-size:1.3rem;\n    color:var(--light-txt-color);\n    background:var(--secondary-brand-color);\n    text-align:center;\n    border-top-left-radius:10px;\n    border-top-right-radius:10px;\n }\n .restaurant-listing {\n     display:flex;\n     flex-direction: column;\n     width:500px;\n     margin:20px;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 20px;\n}\n\n.restaurant-listing .top {\n    display:flex;\n    flex-direction:row;\n    align-items:center;\n    justify-content:space-between;\n    padding-left:20px;\n    padding-right:20px;\n\n    background:var(--secondary-brand-color);\n    border-top-left-radius:20px;\n    border-top-right-radius:20px;\n}\n\n\n.restaurant-listing .bot {\n    display:flex;\n    flex-direction:row;\nalign-items:center;\ngap:50px;\npadding:20px;\n}\n\n\n .restaurant-listing .bot .left {\n     display:flex;\n     flex-direction: column;\n     align-items:center;\n     justify-content:center;\n     box-shadow:var(--main-content-box-shadow);\n}\n.restaurant-listing .bot .mid {\n     display:flex;\n     flex-direction:column;\n     box-shadow:var(--main-content-box-shadow);\n     border-radius:10px;\n}\n.restaurant-listing .bot .mid .info-container {\n    padding:20px;\n}\n sl-button {\n     padding:10px;\n}\n sl-button::part(base) {\n     font-size:1rem;\n     font-weight:600;\n}\n sl-avatar {\n     --size: 100px;\n     margin:10px;\n}\n @media all and (max-width: 768px){\n     .restaurant-listing {\n         flex-direction:column;\n         width:80vw;\n         padding:10px;\n         height:200px;\n    }\n     .left {\n         flex-direction:row-reverse;\n         padding:10px;\n    }\n    .restaurant-listing .bot .right {\n         align-items:end;\n    }\n     sl-button {\n         width:100%;\n         height:100px;\n    }\n     sl-button::part(base) {\n         font-size:1rem;\n         font-weight:600;\n    }\n     .mid {\n         border:none;\n         margin:0;\n         padding:0;\n    }\n     .mid p {\n         display:none;\n    }\n     .right {\n         align-items:start;\n    }\n     sl-avatar {\n         --size: 80px;\n         margin: 1em;\n    }\n}\n\n  \n\n</style>\n\n\n\n<div class=\"restaurant-listing\">\n\n<div class=\"top\">\n  <h3>", "</h3> \n  <sl-button class=\"view-btn\" @click=", ">View Restaurant</sl-button>\n</div>\n\n\n<div class=\"bot\">\n\n  <div class=\"left\"> \n     ", "\n  </div>\n\n  <div class=\"mid\">\n    <div class=\"bold-text info-header\">Information</div>\n  <div class=\"info-container\">\n    <div><span class=\"bold-text\">Location </span>", "</div>\n  <div><span class=\"bold-text\">Cuisine </span>", "</div>\n  </div>\n</div>\n\n\n\n</div>\n\n</div>\n\n"])), this.restaurant.restaurantName, event => {
       _AuthAPI.default.currentRestaurant = this.restaurant;
       localStorage.setItem("currentRestaurant", JSON.stringify(_AuthAPI.default.currentRestaurant));
       (0, _Router.gotoRoute)('/restaurant');
-    });
+    }, _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"\n\t\timage=", " > </sl-avatar>\n\t\t"])), _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"></sl-avatar>\n\t\t"]))), this.restaurant.cuisine, this.restaurant.cuisine);
   }
 });
+{/* <div class="restaurant-listing">
+ 
+ 
+ 
+  <div class="left">
+     <h3>${this.restaurant.restaurantName}</h3>  
+     ${AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar ? html` <sl-avatar shape="rounded"
+ 	image=${
+ 		(AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''
+ 	} > </sl-avatar>
+ 	`:html` <sl-avatar shape="rounded"></sl-avatar>
+ 	`}
+  </div>
+  <div class="mid">
+  <div><span class="bold-text">Location</span>${this.restaurant.cuisine}</div>
+  <div><span class="bold-text">Cuisine</span>${this.restaurant.cuisine}</div>
+ </div>
+ <div class="right">
+ <sl-button class="view-btn" @click=${(event) => {
+   AuthAPI.currentRestaurant = this.restaurant;
+   localStorage.setItem("currentRestaurant", JSON.stringify(AuthAPI.currentRestaurant));
+ gotoRoute('/restaurant');
+    }}>View Restaurant</sl-button>
+ </div>
+ </div> */}
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../Router":"Router.js","../../App":"App.js","../../services/AuthAPI":"services/AuthAPI.js","../../utils/enum.utils":"utils/enum.utils.js"}],"components/list/report.component.js":[function(require,module,exports) {
 "use strict";
 
@@ -11559,7 +11605,7 @@ var _App = _interopRequireDefault(require("../../App"));
 var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
 var _Toast = _interopRequireDefault(require("../../Toast"));
 var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
-var _templateObject;
+var _templateObject, _templateObject2, _templateObject3;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
                                                                                                                                                                                          * Review listing component
@@ -11588,7 +11634,6 @@ customElements.define('report-listing', class ReportListing extends _litElement.
     };
   }
   firstUpdated() {
-    console.log("first updated");
     this.render();
   }
 
@@ -11597,7 +11642,14 @@ customElements.define('report-listing', class ReportListing extends _litElement.
    * @returns Render of report listing
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\n.bold-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .report-listing {\n     display:flex;\n     flex-direction: row;\n     width:400px;\n     margin:20px;\n     max-width:80vw;\n     padding:10px;\n     justify-content: space-between;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 20px;\n}\n .left, .mid, .right {\n     display:flex;\n     flex-direction: column;\n     align-items:center;\n}\n .right {\n     justify-content:center;\n}\n sl-button {\n     width:100px;\n}\n sl-button::part(base) {\n     font-size:1rem;\n     font-weight:600;\n}\n\n\n</style>\n\n\n<div class=\"report-listing\">\n  <div class=\"left\">\n    <span class=\"bold-text\">Topic: ", "</span>\n  </div>\n  <div class=\"mid\">\n  <span class=\"bold-text\">", "</span>  \n</div>\n<div class=\"right\">\n    <sl-button class=\"view-btn\" @click=", ">View Report</sl-button>\n</div>\n</div>"])), _AuthAPI.default.reportPage[this.index].topic, _AuthAPI.default.reportPage[this.index].status, event => {
+    //HTML template for the report listing's status
+    let statusDisplay;
+    if (_AuthAPI.default.reportPage[this.index].status == "active") {
+      statusDisplay = (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n        .mid {\n          background: var(--active-status-color);\n        }\n</style>\n<div class=\"mid\"><span class=\"bold-text\">", "</span></div>\n \n"])), _AuthAPI.default.reportPage[this.index].status);
+    } else if (_AuthAPI.default.reportPage[this.index].status == "closed") {
+      statusDisplay = (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      \n      <style>\n        .mid {\n          background: var(--closed-status-color);\n        }\n      </style>\n\n      <div class=\"mid\">\n<span class=\"bold-text\">", "</span>\n      </div>"])), _AuthAPI.default.reportPage[this.index].status);
+    }
+    return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n\n<style>\n\n.bold-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .report-listing {\n     display:flex;\n     flex-direction: row;\n     width:500px;\n     margin:20px;\n     max-width:80vw;\n     padding:10px;\n     justify-content: space-between;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 20px;\n}\n .left, .mid, .right {\n     display:flex;\n     flex-direction: column;\n     align-items:center;\n     justify-content:center;\n}\n .left, .mid {\n     padding:10px;\n     box-shadow:var(--main-content-box-shadow);\n     border-radius:10px;\n }\n .left {\n  width:250px;\n }\n .right {\n     justify-content:center;\n}\n sl-button {\n     width:100px;\n}\n sl-button::part(base) {\n     font-size:1rem;\n     font-weight:600;\n}\n\n</style>\n\n\n<div class=\"report-listing\">\n  <div class=\"left\">\n    <span class=\"bold-text\">Topic: ", "</span>\n  </div>\n    ", "\n<div class=\"right\">\n    <sl-button class=\"view-btn\" @click=", ">View Report</sl-button>\n</div>\n</div>"])), _AuthAPI.default.reportPage[this.index].topic, statusDisplay, event => {
       _AuthAPI.default.currentReport = _AuthAPI.default.reportPage[this.index];
       _AuthAPI.default.currentTarget = _AuthAPI.default.targets[this.index];
       localStorage.setItem("currentReport", JSON.stringify(_AuthAPI.default.reportPage[this.index]));
@@ -11723,7 +11775,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
     //Render low rating display
     else if (this.avgRating < 5 && this.avgRating > 0) return (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n<style>\n  .rating-display {\n    background:var(--low-rating);\n  }\n\n</style><span class=\"rating-display-text\">", "/10</span>"])), this.avgRating);
     //Render mid rating display
-    else if (this.avgRating >= 5 && this.avgRating < 6.9) return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n<style>\n  .rating-display {\n    background:var(--mid-rating);\n  }\n</style><span class=\"rating-display-text\">", "/10</span>"])), this.avgRating);
+    else if (this.avgRating >= 5 && this.avgRating <= 6.9) return (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n<style>\n  .rating-display {\n    background:var(--mid-rating);\n  }\n</style><span class=\"rating-display-text\">", "/10</span>"])), this.avgRating);
     //Render high rating display
     else if (this.avgRating >= 7) return (0, _litElement.html)(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n<style>\n  .rating-display {\n    background:var(--high-rating);\n  }\n</style><span class=\"rating-display-text\">", "/10</span>"])), this.avgRating);
   }
@@ -11909,7 +11961,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56612" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55664" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

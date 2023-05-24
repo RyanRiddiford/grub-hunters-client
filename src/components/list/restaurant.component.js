@@ -52,38 +52,70 @@ h3 {
      font-size: var(--h3-font-size);
      font-weight:var(--h3-font-weight);
      font-family:var(--heading-font-family);
-     color:var(--heading-txt-color);
+     color:var(--light-txt-color);
      margin:10px;
      padding:0px;
-     text-align:center;
+     text-align:left;
 }
  .bold-text {
      font-size:var(--label-font-size);
      font-weight:var(--label-font-weight);
 }
+ .info-header {
+    font-size:1.3rem;
+    color:var(--light-txt-color);
+    background:var(--secondary-brand-color);
+    text-align:center;
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+ }
  .restaurant-listing {
      display:flex;
-     flex-direction: row;
-     width:700px;
-     height:250px;
+     flex-direction: column;
+     width:500px;
      margin:20px;
-     justify-content: space-between;
      box-shadow: var(--main-content-box-shadow);
      border-radius: 20px;
 }
- .left {
+
+.restaurant-listing .top {
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    padding-left:20px;
+    padding-right:20px;
+
+    background:var(--secondary-brand-color);
+    border-top-left-radius:20px;
+    border-top-right-radius:20px;
+}
+
+
+.restaurant-listing .bot {
+    display:flex;
+    flex-direction:row;
+align-items:center;
+gap:50px;
+padding:20px;
+}
+
+
+ .restaurant-listing .bot .left {
      display:flex;
      flex-direction: column;
      align-items:center;
      justify-content:center;
+     box-shadow:var(--main-content-box-shadow);
 }
- .mid {
-     border-left: 4px solid var(--brand-color);
-     border-right: 4px solid var(--brand-color);
-     overflow-y:scroll;
+.restaurant-listing .bot .mid {
+     display:flex;
+     flex-direction:column;
+     box-shadow:var(--main-content-box-shadow);
+     border-radius:10px;
 }
- .mid p {
-     padding:20px;
+.restaurant-listing .bot .mid .info-container {
+    padding:20px;
 }
  sl-button {
      padding:10px;
@@ -107,7 +139,7 @@ h3 {
          flex-direction:row-reverse;
          padding:10px;
     }
-     .right {
+    .restaurant-listing .bot .right {
          align-items:end;
     }
      sl-button {
@@ -143,6 +175,52 @@ h3 {
 
 <div class="restaurant-listing">
 
+<div class="top">
+  <h3>${this.restaurant.restaurantName}</h3> 
+  <sl-button class="view-btn" @click=${(event) => {
+   AuthAPI.currentRestaurant = this.restaurant;
+   localStorage.setItem("currentRestaurant", JSON.stringify(AuthAPI.currentRestaurant));
+ gotoRoute('/restaurant');
+    }}>View Restaurant</sl-button>
+</div>
+
+
+<div class="bot">
+
+  <div class="left"> 
+     ${AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar ? html` <sl-avatar shape="rounded"
+		image=${
+			(AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''
+		} > </sl-avatar>
+		`:html` <sl-avatar shape="rounded"></sl-avatar>
+		`}
+  </div>
+
+  <div class="mid">
+    <div class="bold-text info-header">Information</div>
+  <div class="info-container">
+    <div><span class="bold-text">Location </span>${this.restaurant.cuisine}</div>
+  <div><span class="bold-text">Cuisine </span>${this.restaurant.cuisine}</div>
+  </div>
+</div>
+
+
+
+</div>
+
+</div>
+
+`;
+
+	}
+
+
+});
+
+
+
+{/* <div class="restaurant-listing">
+
 
 
   <div class="left">
@@ -155,7 +233,8 @@ h3 {
 		`}
   </div>
   <div class="mid">
-  <p>${this.restaurant.bio}</p>
+  <div><span class="bold-text">Location</span>${this.restaurant.cuisine}</div>
+  <div><span class="bold-text">Cuisine</span>${this.restaurant.cuisine}</div>
 </div>
 <div class="right">
 <sl-button class="view-btn" @click=${(event) => {
@@ -164,10 +243,4 @@ h3 {
  gotoRoute('/restaurant');
     }}>View Restaurant</sl-button>
 </div>
-</div>
-`;
-
-	}
-
-
-});
+</div> */}

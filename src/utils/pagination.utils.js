@@ -8,6 +8,12 @@
 //Utility function for pagination controls
 class PaginationUtils {
 
+
+
+  constructor() {
+    this.currPage = 0;
+  }
+
   /**
    * Increment current page by 1
    */
@@ -21,15 +27,27 @@ class PaginationUtils {
   decrementPage() {
   this.currPage--;
   }
+
+  /**
+   * Getter for current page to paginate
+   * @returns The current page to paginate
+   */
+  getCurrentPage() {
+    return this.currPage;
+  }
+
+  /**
+   * Setter for current page to paginate
+   * @param {*} currPage The current page's new value
+   */
+  setCurrentPage(currPage) {
+    this.currPage = currPage;
+  }
     
     /**
      * Disables/enables pagination buttons depending on if content exists
      */
     async updatePaginationButtons(numPages) {
-  
-      //Initialise the current page index
-      if (!this.currPage)
-      this.currPage = 0;
     
     //Class selectors for previous and next buttons
       const prevBtnSelector = '.prev-page-btn';

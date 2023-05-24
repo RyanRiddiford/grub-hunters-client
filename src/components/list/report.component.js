@@ -48,7 +48,6 @@ customElements.define('report-listing', class ReportListing extends LitElement {
 
 
 	firstUpdated() {
-    console.log("first updated");
 		this.render();
 	}
 
@@ -63,6 +62,37 @@ customElements.define('report-listing', class ReportListing extends LitElement {
 	 */
 	render() {
 
+    //HTML template for the report listing's status
+    let statusDisplay;
+
+    if (AuthAPI.reportPage[this.index].status == "active") {
+statusDisplay = html`
+
+<style>
+        .mid {
+          background: var(--active-status-color);
+        }
+</style>
+<div class="mid"><span class="bold-text">${AuthAPI.reportPage[this.index].status}</span></div>
+ 
+`;
+    } else if (AuthAPI.reportPage[this.index].status == "closed") {
+
+      statusDisplay = html`
+      
+      <style>
+        .mid {
+          background: var(--closed-status-color);
+        }
+      </style>
+
+      <div class="mid">
+<span class="bold-text">${AuthAPI.reportPage[this.index].status}</span>
+      </div>`;
+    }
+
+
+
 		return html `
 
 <style>
@@ -74,7 +104,7 @@ customElements.define('report-listing', class ReportListing extends LitElement {
  .report-listing {
      display:flex;
      flex-direction: row;
-     width:400px;
+     width:500px;
      margin:20px;
      max-width:80vw;
      padding:10px;
@@ -86,7 +116,16 @@ customElements.define('report-listing', class ReportListing extends LitElement {
      display:flex;
      flex-direction: column;
      align-items:center;
+     justify-content:center;
 }
+ .left, .mid {
+     padding:10px;
+     box-shadow:var(--main-content-box-shadow);
+     border-radius:10px;
+ }
+ .left {
+  width:250px;
+ }
  .right {
      justify-content:center;
 }
@@ -98,7 +137,6 @@ customElements.define('report-listing', class ReportListing extends LitElement {
      font-weight:600;
 }
 
-
 </style>
 
 
@@ -106,9 +144,7 @@ customElements.define('report-listing', class ReportListing extends LitElement {
   <div class="left">
     <span class="bold-text">Topic: ${AuthAPI.reportPage[this.index].topic}</span>
   </div>
-  <div class="mid">
-  <span class="bold-text">${AuthAPI.reportPage[this.index].status}</span>  
-</div>
+    ${statusDisplay}
 <div class="right">
     <sl-button class="view-btn" @click=${(event) => {
       AuthAPI.currentReport = AuthAPI.reportPage[this.index];

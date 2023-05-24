@@ -85,7 +85,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 		const formData = e.detail.formData;
 		try {
 			const response = await ReviewAPI.updateById(this.review._id, formData, false);
-			Toast.show('Review created');
+			Toast.show('Review updated');
 			this.shadowRoot.getElementById('edit-dialog').hide();
 		} catch (err) {
 			Toast.show(err, 'error');
@@ -198,8 +198,8 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	 * @returns Template of vote display
 	 */
 	buildVoteDisplay() {
-		//Disable voting for author and as flagged content in report
-		if (this.review.authorId == AuthAPI.currentUser._id || this.is_report == "true") {
+		//Disable voting for author, restaurant owner, and as flagged content in report
+		if (this.review.authorId == AuthAPI.currentUser._id || this.is_report == "true" || this.review.restaurantId == AuthAPI.currentUser._id) {
 			return html`    
       <div class="vote-container"><sl-button id="upvote-btn" disabled>Upvote</sl-button><div>Upvotes: ${this.review.upvotes}</div></div>
   <div class="vote-container"><sl-button id="downvote-btn" disabled>Downvote</sl-button><div>Downvotes: ${this.review.downvotes}</div></div>`;
@@ -317,8 +317,10 @@ p {
 }
  .bot h3, .bot p {
      padding-left:20px;
-     padding-right:20px;
-     text-align:left;
+     padding-right:20px;  
+}
+.bot h3 {
+	text-align:center;
 }
  .top .left .bot {
      display:flex;

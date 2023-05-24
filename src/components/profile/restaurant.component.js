@@ -109,7 +109,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 
 </style><span class="rating-display-text">${this.avgRating}/10</span>`;
 		//Render mid rating display
-		else if (this.avgRating >= 5 && this.avgRating < 6.9)
+		else if (this.avgRating >= 5 && this.avgRating <= 6.9)
 			return html `
 <style>
   .rating-display {

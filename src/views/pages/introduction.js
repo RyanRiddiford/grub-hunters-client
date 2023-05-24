@@ -52,12 +52,10 @@ class IntrodoctionView {
     <h1>Reviewer Guide</h1>
     <div class="overview-container">
     <h2>Overview</h2>
-    <p>
-      Welcome ${AuthAPI.currentUser.username}. 
-      At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!
-      Don't forget to leave helpful reviews on restaurants you visit. 
-      Your voice can improve and support restaurants, and assist other reviewers in finding good grub!
-    </p>      
+    <p>Welcome ${AuthAPI.currentUser.username}.</p> 
+     <p>At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!</p> 
+     <p>Don't forget to leave helpful reviews on restaurants you visit. </p>
+     <p>Your voice can improve and support restaurants, and assist other reviewers in finding good grub!</p>     
     </div>
 
     <div class="features-container">
@@ -74,12 +72,12 @@ class IntrodoctionView {
 
     <div class="demerits-container">
     <h2>About Demerits</h2>  
-    <p>
-      Breaches in the user guidelines can result in the accumulation of demerit points.
-      Having 1 demerit point will result in a one-time warning message.
-      Having 2 demerit points will result in a 7-day account suspension.
-      Having 3 demerit points will result in an indefinite account ban
-    </p>      
+    <ul>
+      <li>Breaches in the user guidelines can result in the accumulation of demerit points.</li>
+      <li>Having 1 demerit point will result in a one-time warning message.</li>
+      <li>Having 2 demerit points will result in a 7-day account suspension.</li>
+      <li>Having 3 demerit points will result in an indefinite account ban</li>
+    </ul>       
     </div>
     `;
 
@@ -94,10 +92,9 @@ class IntrodoctionView {
     <h1>Restaurant Guide</h1>
     <div class="overview-container">
     <h2>Overview</h2>
-    <p>
-      Welcome ${AuthAPI.currentUser.username}. 
-      At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!
-    </p>
+    <p>Welcome ${AuthAPI.currentUser.resaurantName}.</p> 
+      <p>At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!</p>
+   
   </div>
     <div class="features-container">
     <h2>Current Features</h2>  
@@ -111,12 +108,12 @@ class IntrodoctionView {
   </div>
     <div class="demerits-container">
     <h2>About Demerits</h2>  
-    <p>
-      Breaches in the user guidelines can result in the accumulation of demerit points.
-      Having 1 demerit point will result in a one-time warning message.
-      Having 2 demerit points will result in a 7-day account suspension.
-      Having 3 demerit points will result in an indefinite account ban
-    </p>      
+    <ul>
+      <li>Breaches in the user guidelines can result in the accumulation of demerit points.</li>
+      <li>Having 1 demerit point will result in a one-time warning message.</li>
+      <li>Having 2 demerit points will result in a 7-day account suspension.</li>
+      <li>Having 3 demerit points will result in an indefinite account ban</li>
+    </ul>     
     </div>
     `;
   }
@@ -131,12 +128,9 @@ class IntrodoctionView {
     <h1>Administrator Guide</h1>
     <div class="overview-container">
     <h2>Overview</h2>
-    <p>
-      Welcome ${AuthAPI.currentUser.username}. 
-      At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!
-      As an administrator, your main role is to assess report tickets and determine a course of action on them.
-      Restaurant public profiles and restaurant reviews are the two targets a report can be about.
-    </p>
+    <p>Welcome ${AuthAPI.currentUser.username}.</p>
+    <p>At Grub Hunters, you can view nearby Australian restaurants and make an informed decision on restaurants you dine at!</p>
+    <p>As an administrator, your main role is to assess report tickets and determine the correct course of action.</p>
   </div>
   <div class="features-container">
     <h2>Current Features</h2>  
