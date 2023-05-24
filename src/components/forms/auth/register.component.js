@@ -11,6 +11,10 @@ import {
 	LitElement, html
 }
 from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../../Router';
 import Auth from '../../../services/AuthAPI';
 
 

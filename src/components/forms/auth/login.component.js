@@ -12,7 +12,7 @@ import {
 }
 from '@polymer/lit-element';
 import AuthAPI from '../../../services/AuthAPI';
-
+import App from '../../../App';
 
 //Define custom element
 customElements.define('login-form', class LoginForm extends LitElement {

@@ -11,6 +11,11 @@ import {
 	LitElement, html
 }
 from '@polymer/lit-element';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
+import App from '../../App';
 
 //Define the footer element as a custom element
 customElements.define('app-footer', class AppFooter extends LitElement {

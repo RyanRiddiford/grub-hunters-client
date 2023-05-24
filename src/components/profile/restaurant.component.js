@@ -11,11 +11,16 @@ import {
 	LitElement, html, TemplateResult
 }
 from '@polymer/lit-element';
-import gotoRoute from '../../Router';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
+import App from '../../App';
 import enumUtils from '../../utils/enum.utils';
 import UserAPI from '../../services/UserAPI';
 import ReviewAPI from '../../services/ReviewAPI';
+
 
 
 //Define custom element

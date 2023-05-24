@@ -11,9 +11,12 @@ import {
 	LitElement, html
 }
 from '@polymer/lit-element';
-import gotoRoute from '../../Router';
+import {
+	anchorRoute, gotoRoute
+}
+from '../../Router';
 import AuthAPI from '../../services/AuthAPI';
-
+import App from '../../App';
 
 //Define custom element
 customElements.define('report-listing', class ReportListing extends LitElement {
