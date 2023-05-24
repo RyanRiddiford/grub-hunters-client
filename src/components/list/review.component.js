@@ -29,7 +29,10 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 
 	constructor() {
 		super();
+
+		console.log("in constructor");
 	}
+
 
 	//Configure the element's custom properties
 	static get properties() {
@@ -48,6 +51,9 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 			},
 			is_report: {
 				type: String
+			},
+			index: {
+				type: undefined
 			}
 		};
 	}
@@ -97,7 +103,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	buildRatingDisplay() {
 		//Render low rating display
 		if (this.review.rating < 5 && this.review.rating > 0)
-			return html `
+			return html`
     <style>
       .rating-display {
         background:var(--low-rating);
@@ -106,7 +112,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 <div class="rating-display"><span class="rating-display-text">${this.review.rating}/10</span></div>`;
 		//Render mid rating display
 		else if (this.review.rating >= 5 && this.review.rating < 6.9)
-			return html `
+			return html`
 <style>
   .rating-display {
     background:var(--mid-rating);
@@ -115,7 +121,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 <div class="rating-display"><span class="rating-display-text">${this.review.rating}/10</span></div>`;
 		//Render high rating display
 		else if (this.review.rating >= 7)
-			return html `
+			return html`
 <style>
   .rating-display {
     background:var(--high-rating);
@@ -134,13 +140,13 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	buildReviewActions() {
 		//Build actions for author
 		if (AuthAPI.currentUser._id == this.review.authorId) {
-			return html `       
+			return html`       
       <sl-button id="edit-btn" @click="${() => this.shadowRoot.getElementById('edit-dialog').show()}">Edit</sl-button>  
  <sl-button id="delete-btn" @click="${() => this.shadowRoot.getElementById('delete-dialog').show()}">Delete</sl-button>`;
 		}
 		//Build actions for non-authors and not viewed in report
 		else if (AuthAPI.currentUser._id != this.review.authorId && this.is_report != "true") {
-			return html `<sl-button id="report-btn" @click="${() => this.shadowRoot.getElementById('report-dialog').show()}">Report</sl-button>`;
+			return html`<sl-button id="report-btn" @click="${() => this.shadowRoot.getElementById('report-dialog').show()}">Report</sl-button>`;
 		}
 	}
 
@@ -196,41 +202,33 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	buildVoteDisplay() {
 		//Disable voting for author and as flagged content in report
 		if (this.review.authorId == AuthAPI.currentUser._id || this.is_report == "true") {
-			return html `    
+			return html`    
       <div class="vote-container"><sl-button id="upvote-btn" disabled>Upvote</sl-button><div>Upvotes: ${this.review.upvotes}</div></div>
   <div class="vote-container"><sl-button id="downvote-btn" disabled>Downvote</sl-button><div>Downvotes: ${this.review.downvotes}</div></div>`;
 		}
 		//Enable voting for non-authors 
 		else {
-			return html `
+			return html`
       ${(this.review.upvoters.includes(AuthAPI.currentUser._id) ? 
-        html` <div class="vote-container"><sl-button id= "upvote-btn"
-			disabled @click=${
-				() => {
-					this.voteReview('upvote');
-				}
-			}>Upvote</sl-button><div>Upvotes: ${this.review.upvotes}</div></div> 
-			` : 
-        html` <div class="vote-container"><sl-button id="upvote-btn"@click = ${
-				() => {
-					this.voteReview('upvote');
-				}
-			}>Upvote</sl-button><div>Upvotes: ${this.review.upvotes}</div></div> 
-			`)}
+        html` <div class="vote-container">
+			<sl-button id="upvote-btn"
+			disabled @click=${() => {this.voteReview('upvote');}}>Upvote</sl-button>
+			<div>Upvotes: ${this.review.upvotes}</div>
+		</div>` : 
+        html` <div class="vote-container">
+			<sl-button id="upvote-btn" @click=${() => {this.voteReview('upvote');}}>Upvote</sl-button>
+			<div>Upvotes: ${this.review.upvotes}</div>
+		</div>`)}
       
         ${(this.review.downvoters.includes(AuthAPI.currentUser._id) ? 
-        html` <div class="vote-container"><sl-button id="downvote-btn" disabled @click=${
-				() => {
-					this.voteReview('downvote');
-				}
-			}>Downvote</sl-button><div>Downvotes: ${this.review.downvotes}</div></div> 
-			` : 
-        html` <div class="vote-container"><sl-button id="downvote-btn" @click=${
-				() => {
-					this.voteReview('downvote');
-				}
-			}>Downvote</sl-button><div>Downvotes: ${this.review.downvotes}</div></div> 
-			`)}`;
+        html`<div class="vote-container">
+			<sl-button id="downvote-btn" disabled @click=${()=>{this.voteReview('downvote');}}>Downvote</sl-button>
+			<div>Downvotes: ${this.review.downvotes}</div>
+		</div>` : 
+        html`<div class="vote-container">
+			<sl-button id="downvote-btn" @click=${() => {this.voteReview('downvote');}}>Downvote</sl-button>
+			<div>Downvotes: ${this.review.downvotes}</div>
+		</div>`)}`;
 		}
 	}
 
@@ -243,6 +241,19 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	 */
 	render() {
 
+		console.log(this.index);
+		console.log((this.review));
+ let reviewArr = JSON.parse(localStorage.getItem("restaurantReviews"));
+		console.log("initialising");
+		if (this.index && this.review == undefined) {
+			
+	console.log("finding review listing data");
+	this.review = reviewArr[this.index];
+	console.log(this.review);
+}
+
+
+
 		//Review actions if the user authored the review
 		const reviewActions = this.buildReviewActions();
 		//Review rating UI display
@@ -251,7 +262,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 		let voteDisplay = this.buildVoteDisplay();
 
 
-		return html `
+		return html`
 
 <style>
 
@@ -461,8 +472,7 @@ p {
 
 <div class="left"> 
 
-    ${this.restaurant_name ? html` <div class="target-details"><h3>${this.restaurant_name}</h3></div> ` : html`
-		`}
+    ${this.restaurant_name ? html` <div class="target-details"><h3>${this.restaurant_name}</h3></div> ` : html``}
     <div class="bot">
       <div class="left">
  ${voteDisplay}       

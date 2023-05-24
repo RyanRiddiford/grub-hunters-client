@@ -256,6 +256,9 @@ class ReportAPI {
 		//Convert json and store as data
 		const data = await response.json();
 
+
+		AuthAPI.reportPage = data;
+
 		//Return data
 		return data;
 

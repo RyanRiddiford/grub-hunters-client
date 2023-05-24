@@ -43,10 +43,27 @@ class SearchTicketsView {
     const statusDropdown = document.querySelector('#status-dropdown');
     const targetTypeDropdown = document.querySelector('#target-type-dropdown');
     statusDropdown.addEventListener('sl-select', event => {
+      //Set value for form submission
       this.status = event.detail.item.value;
+
+         let oldEl = statusDropdown.querySelector(".active-item");
+         //Remove active class from old selected option
+   if(oldEl)
+       oldEl.classList.remove("active-item");
+   let newEl = statusDropdown.querySelector(`sl-menu .${event.detail.item.value}`);
+   newEl.classList.add("active-item");
     });
     targetTypeDropdown.addEventListener('sl-select', event => {
+      //Set value for form submission
       this.targetType = event.detail.item.value;
+
+      let oldEl = targetTypeDropdown.querySelector(".active-item");
+      //Remove active class from old selected option
+      if(oldEl)
+      oldEl.classList.remove("active-item");
+      //Add active class to current selected option
+      let newEl = targetTypeDropdown.querySelector(`sl-menu .${event.detail.item.value}`);
+      newEl.classList.add("active-item");
     });
   }
 
@@ -61,8 +78,10 @@ class SearchTicketsView {
         e.preventDefault();
         let submitBtn = document.querySelector('.submit-btn');
         submitBtn.setAttribute('loading', '');
-        this.loadData();
-          submitBtn.removeAttribute('loading');       
+        this.loadData().then(() => {
+          submitBtn.removeAttribute('loading');  
+        });
+               
       }
 
 
@@ -95,7 +114,7 @@ paginationUtils.incrementPage();
       //Get page of data
       const data = await ReportAPI.getPage(this.currPage, this.status, this.targetType);           
       //Render data listing array to container element
-this.renderListings(data);
+this.renderListings(AuthAPI.reportPage);
 
 }
 
@@ -106,22 +125,28 @@ this.renderListings(data);
  */
 async renderListings(data) {
   const listingTemplates = [];
+  let count = 0;
   for (const item of data) {
     let target;
-    if (item.targetType == enumUtils.reportTargetType.review) 
-      target = await ReviewAPI.getById(item.targetId);  
+    if (item.targetType == enumUtils.reportTargetType.review) {
+        target = await ReviewAPI.getById(item.targetId); 
+        AuthAPI.targets.push(target);
+    }
+     
     else if (item.targetType == enumUtils.reportTargetType.restaurant) {
        target = await UserAPI.getById(item.targetId);
+       AuthAPI.targets.push(target);
     }
         
 
-listingTemplates.push(html`<report-listing target=${JSON.stringify(target)} report=${JSON.stringify(item)}></report-listing>`);
-  }
+listingTemplates.push(html`<report-listing index=${count}></report-listing>`);
+
+count++;
+
+}
 
  render(listingTemplates, document.getElementById('reports-container'));
 }
-
-
 
       /**
        * Render the view
@@ -129,6 +154,17 @@ listingTemplates.push(html`<report-listing target=${JSON.stringify(target)} repo
   render() {
 
     const template = html`
+
+
+
+<style>
+
+.active-item {
+  background:var(--secondary-brand-color);
+  color:var(--light-txt-color);
+}
+
+</style> 
 
 
     
@@ -140,23 +176,25 @@ listingTemplates.push(html`<report-listing target=${JSON.stringify(target)} repo
       <h1>Search Tickets</h1>
      <sl-form class="form-search" @sl-submit=${this.searchSubmitHandler.bind(this)}>   
      <div class="dropdown-container">
-     <sl-dropdown id="status-dropdown">
-  <sl-button slot="trigger" caret>Ticket Status</sl-button>
-  <sl-menu>
-    <sl-menu-item value="all">All</sl-menu-item>
-    <sl-menu-item value="active">Active</sl-menu-item>
-    <sl-menu-item value="closed">Closed</sl-menu-item> 
-  </sl-menu>
-</sl-dropdown>   
+           <sl-dropdown id="status-dropdown">
+   <sl-button slot="trigger" caret>Ticket Status</sl-button>
+   <sl-menu>
+     <sl-menu-item class="all active-item" value="all">All</sl-menu-item>
+     <sl-menu-item class="active" value="active">Active</sl-menu-item>
+     <sl-menu-item class="closed" value="closed">Closed</sl-menu-item> 
+   </sl-menu>
+ </sl-dropdown>   
 
-<sl-dropdown id="target-type-dropdown">
-  <sl-button slot="trigger" caret>Target Type</sl-button>
-  <sl-menu>
-    <sl-menu-item value="all">All</sl-menu-item>
-    <sl-menu-item value="review">Review</sl-menu-item>
-    <sl-menu-item value="restaurant">Restaurant</sl-menu-item>
-  </sl-menu>
-</sl-dropdown>          
+ <sl-dropdown id="target-type-dropdown">
+   <sl-button slot="trigger" caret>Target Type</sl-button>
+   <sl-menu>
+     <sl-menu-item class="all active-item" value="all">All</sl-menu-item>
+     <sl-menu-item class="review" value="review">Review</sl-menu-item>
+     <sl-menu-item class="restaurant" value="restaurant">Restaurant</sl-menu-item>
+   </sl-menu>
+ </sl-dropdown> 
+
+         
      </div> 
  
                <sl-button class="submit-btn" id="search-submit-btn" type="primary" submit>Search Reports</sl-button>
@@ -187,9 +225,7 @@ listingTemplates.push(html`<report-listing target=${JSON.stringify(target)} repo
 
 render(template, App.rootEl);
 
-
   }
-
 
 
 }

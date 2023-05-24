@@ -27,11 +27,11 @@ class RestaurantView {
 	 */
 	init() {
 		document.title = 'Restaurant';
+		this.restaurantId = JSON.parse(localStorage.getItem('currentRestaurant'))._id;
 		this.render();
 		this.loadData();
 		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
 	}
-
 
 
 	/**
@@ -39,6 +39,10 @@ class RestaurantView {
 	 * @param {*} isNextPage 
 	 */
 	async loadData(isNextPage) {
+		
+		if (!this.currPage)
+		this.currPage = 0;
+
 		//If loading a subsequent page
 		if (isNextPage == true || isNextPage == false) {
 			//Increment for next page
@@ -52,15 +56,16 @@ class RestaurantView {
 		}
 
 		//Find number of pages
-		const numPages = await ReviewAPI.getNumPages(AuthAPI.currentRestaurant._id);
-
+		const numPages = await ReviewAPI.getNumPages(this.restaurantId);
 		//Disable/enable pagination buttons
 		paginationUtils.updatePaginationButtons(numPages);
 
 		//Get page of data
-		const data = await ReviewAPI.getPage(this.currPage, AuthAPI.currentRestaurant._id, enumUtils.accessLevels.restaurant);
+		const data = await ReviewAPI.getPage(this.currPage, this.restaurantId, enumUtils.accessLevels.restaurant);
+		localStorage.setItem('restaurantReviews', JSON.stringify(data));
+
 		//Render data listing array to container element
-		this.renderListings(data);
+		this.renderListings(JSON.parse(localStorage.getItem('restaurantReviews')));
 
 	}
 
@@ -70,12 +75,15 @@ class RestaurantView {
 	 * @param {*} data array of data to render listings with
 	 */
 	async renderListings(data) {
+		console.log(data);
 		//Build template array of review listings
 		const listingTemplates = [];
+		let count = 0;
 		for (const item of data) {
 			const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
-
-			listingTemplates.push(html `<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
+console.log(item);
+			listingTemplates.push(html`<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} index=${count}></review-listing>`);
+			count++;
 		}
 
 		//Render review listing template array to reviews container
@@ -94,7 +102,7 @@ class RestaurantView {
 
 
 
-     <sl-dialog id="create-dialog" label="Create Review" class="dialog-overview">
+<sl-dialog id="create-dialog" label="Create Review" class="dialog-overview">
 <review-form title=${document.title}></review-form>
 </sl-dialog>   
 
@@ -109,10 +117,10 @@ class RestaurantView {
 
 <div class="top">
   <h2>Reviews</h2>
-  ${(AuthAPI.currentUser.accessLevel == "1") ? html` < sl - button class = "create-review-btn"@
-		click = "${() => document.getElementById('create-dialog').show()}" > Create Review < /sl-button>  
-		`:html`
-		`}
+  ${(AuthAPI.currentUser.accessLevel == "1") ? html`
+        <sl-button class="create-review-btn" @click="${() => document.getElementById('create-dialog').show()}">Create Review</sl-button>  
+        `:html`
+        `}
 </div>
 
 <div class="pagination">

@@ -128,6 +128,8 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 	 */
 	render() {
 
+          this.restaurant = JSON.parse(localStorage.getItem('currentRestaurant'));
+
 		let demeritDisplay = html ``;
 		let deleteAccountBtn = html ``;
 		let reportAccountBtn = html ``;
@@ -151,6 +153,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 		}
 		//Render UI if this is not your profile
 		else if (this.is_visitor == "true" && AuthAPI.currentUser._id != this.restaurant._id) {
+
 			//If this isn't flagged content on a report
 			if (!this.is_report) {
 				reportAccountBtn = html `

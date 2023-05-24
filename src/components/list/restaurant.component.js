@@ -160,6 +160,7 @@ h3 {
 <div class="right">
 <sl-button class="view-btn" @click=${(event) => {
    AuthAPI.currentRestaurant = this.restaurant;
+   localStorage.setItem("currentRestaurant", JSON.stringify(this.restaurant));
  gotoRoute('/restaurant');
     }}>View Restaurant</sl-button>
 </div>

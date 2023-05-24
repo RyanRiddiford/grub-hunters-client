@@ -19,7 +19,6 @@ import Toast from '../../../Toast';
 //Renders report view
 class ReportView {
 
-
   /**
    * Initialise
    */
@@ -27,6 +26,9 @@ class ReportView {
     document.title = 'Report';   
     this.render();
   }
+
+
+  
 
 
 
@@ -40,16 +42,16 @@ class ReportView {
       const btn = document.getElementById('disciplinary-btn');
       btn.setAttribute('loading', '');
                 //Close the report ticket
-                ReportAPI.closeTicket(AuthAPI.currentReport._id);
+                ReportAPI.closeTicket(this.currentReport._id);
                 //If profile is flagged, get user id from report
-                if (AuthAPI.currentReport.targetType == "restaurant") {
-            UserAPI.giveDemerit(AuthAPI.currentReport.targetId).then(() => {
+                if (this.currentReport.targetType == "restaurant") {
+            UserAPI.giveDemerit(this.currentReport.targetId).then(() => {
               btn.removeAttribute('loading');
               Toast.show('User has been given a demerit');
             });
                 }
                 //If restaurant review is flagged, get user id from review
-                else if (AuthAPI.currentReport.targetType == "review") {
+                else if (this.currentReport.targetType == "review") {
                   UserAPI.giveDemerit(AuthAPI.currentTarget.authorId).then(() => {
                     btn.removeAttribute('loading');
                   Toast.show('User has been given a demerit');
@@ -70,13 +72,13 @@ ReportAPI.closeTicket(AuthAPI.currentReport._id).then(() => {
 
 
 
-
-
-
   /**
    * Renders the restaurant page
    */
   render(){
+
+    AuthAPI.currentReport = JSON.parse(localStorage.getItem("currentReport"));
+    AuthAPI.currentTarget = JSON.parse(localStorage.getItem("currentTarget"));
 
     let flaggedContent;
 
@@ -156,15 +158,27 @@ const template = html`
             }
 
 
-            sl-dialog::part(header) {
-width:100%;
-            }
+
+
+
 
        
 sl-dialog::part(panel) {
-    width:95vw;
-    align-items:center;
+  width:fit-content;
+}
 
+sl-dialog::part(base) {
+ padding:50px;
+}
+
+sl-dialog::part(header) {
+width:100%;
+}
+
+sl-dialog::part(footer) {
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
 }
 
 
@@ -177,8 +191,9 @@ sl-dialog::part(panel) {
 @media all and (max-width: 768px) { 
 
   #report-container {
-      width: 90vw;
+      width: 100vw;
       border: none;
+
       }
 
             .bot {
@@ -186,8 +201,25 @@ sl-dialog::part(panel) {
               gap:20px;
             }
 
+
+            sl-dialog {
+              margin:0;
+            }
+
+
+
             sl-dialog::part(panel) {
-    width:100vw;
+              width: 100vw; 
+              margin:0;
+
+}
+
+sl-dialog::part(base) {
+ padding:0px;
+}
+
+sl-dialog::part(header) {
+width:100%;
 }
 
 

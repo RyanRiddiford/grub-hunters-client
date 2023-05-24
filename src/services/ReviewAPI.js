@@ -236,6 +236,8 @@ async getPage(page, restaurantId, accessLevel) {
 
     //Convert json and store as data
     const data = await response.json();
+console.log(data);
+    AuthAPI.restaurantReviews = data;
     
     //Return data
     return data;
@@ -269,39 +271,6 @@ async getNumPages(id) {
           
           //Return data
           return data;
-}
-
-
-
-/**
- * Get array of ten reviews max
- * @param {*} page Specifies what page of ten to get from server
- * @returns Array of reviews
- */
-async getRestaurantReviews(page) {
-
-
-             //Fetch json array
-             const response = await fetch(`${App.apiBase}/review/${AuthAPI.currentRestaurant._id}/${page}/${enumUtils.accessLevels.restaurant}`, {
-              headers: { "Authorization": `Bearer ${localStorage.accessToken}`},
-            }) 
-
-
-    //If response is not ok
-    if(!response.ok){ 
-        //Log error to console
-        const err = await response.json()
-        if(err) console.log(err)
-        //Throw new error  
-        throw new Error('Problem getting reviews')
-      }
-
-    //Convert json and store as data
-    const data = await response.json();
-    
-    //Return data
-    return data;
-
 }
 
 

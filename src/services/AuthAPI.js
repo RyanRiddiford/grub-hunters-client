@@ -22,6 +22,15 @@ class AuthAPI {
 		this.currentUser = {};
 		//Restaurant object being viewed
 		this.currentRestaurant = {};
+		//Objects for restaurant page
+		this.restaurantPage = [];
+		//Objects for report page
+		this.reportPage = [];
+		//Target content for reports
+		this.targets = [];
+		//Review page for the current restaurant
+		this.restaurantReviews = [];
+
 		//Report object being viewed
 		this.currentReport = {};
 		//Report target (restaurant or review) object being viewed
@@ -208,6 +217,10 @@ class AuthAPI {
 		this.currentRestaurant = null;
 		this.currentReport = null;
 		this.currentTarget = null;
+		this.restaurantPage = null;
+		this.reportPage = null;
+		this.targets = null;
+		this.restaurantReviews = null;
 
 	}
 }

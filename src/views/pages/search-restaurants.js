@@ -43,17 +43,16 @@ class SearchRestaurantsView {
 			this.currPage = 0;
 
 		e.preventDefault();
-
 		const formData = e.detail.formData;
-
 		this.keywords = formData.get("keywords");
+
 		let submitBtn = document.getElementById('search-submit-btn');
 		submitBtn.setAttribute('loading', '');
 
-		this.loadData();
-
-		submitBtn.removeAttribute('loading');
-
+		this.loadData().then(() => {
+			submitBtn.removeAttribute('loading');
+		});
+		
 	}
 
 
@@ -81,7 +80,7 @@ class SearchRestaurantsView {
 		//Get page of data
 		const data = await UserAPI.getPage(this.currPage, enumUtils.accessLevels.restaurant, this.keywords);
 		//Render data listing array to container element
-		this.renderListings(data);
+		this.renderListings(AuthAPI.restaurantPage);
 	}
 
 

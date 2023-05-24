@@ -33,14 +33,28 @@ customElements.define('report-listing', class ReportListing extends LitElement {
 	//Configure the element's custom properties
 	static get properties() {
 		return {
-			report: {
-				type: Object
-			},
-			target: {
-				type: Object
-			}
+      index: {
+        type: Number
+      },
+      currentTarget: {
+        type:Object
+      },
+      currentReport: {
+        type:Object
+      }
 		};
 	}
+
+
+
+	firstUpdated() {
+    console.log("first updated");
+		this.render();
+	}
+
+
+
+
 
 
 	/**
@@ -90,15 +104,19 @@ customElements.define('report-listing', class ReportListing extends LitElement {
 
 <div class="report-listing">
   <div class="left">
-    <span class="bold-text">Topic: ${this.report.topic}</span>
+    <span class="bold-text">Topic: ${AuthAPI.reportPage[this.index].topic}</span>
   </div>
   <div class="mid">
-  <span class="bold-text">${this.report.status}</span>  
+  <span class="bold-text">${AuthAPI.reportPage[this.index].status}</span>  
 </div>
 <div class="right">
     <sl-button class="view-btn" @click=${(event) => {
-      AuthAPI.currentReport = this.report;
-      AuthAPI.currentTarget = this.target;
+      AuthAPI.currentReport = AuthAPI.reportPage[this.index];
+      AuthAPI.currentTarget = AuthAPI.targets[this.index];
+
+      localStorage.setItem("currentReport", JSON.stringify(AuthAPI.reportPage[this.index]));
+      localStorage.setItem("currentTarget", JSON.stringify(AuthAPI.targets[this.index]));
+
       gotoRoute('/report');
     }}>View Report</sl-button>
 </div>

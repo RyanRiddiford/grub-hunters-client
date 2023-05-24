@@ -208,6 +208,8 @@ class UserAPI {
 		//Convert json and store as data
 		const data = await response.json();
 
+		AuthAPI.restaurantPage = data;
+
 		//Return data
 		return data;
 
