@@ -326,6 +326,9 @@ p {
 	 padding-left:20px;
 	 padding-right:20px;
 }
+.target-details h3 {
+	color:var(--light-txt-color);
+}
 
 .bot-container {
 	display:flex;
@@ -349,6 +352,12 @@ p {
 	min-width:250px;
 	margin:20px;
 	margin-left:0;
+}
+.right {
+	display:flex;
+	flex-direction:column;
+	padding:20px;
+	box-shadow: var(--main-content-box-shadow);
 }
  #delete-btn {
      width:150px;
@@ -441,12 +450,29 @@ font-size:var(--button-font-size);
          flex-direction:column;
     }
 	.review-listing {
-		flex-direction:column-reverse;
+		flex-direction:column;
 	}
      sl-button, #delete-btn {
          width:100px;
          padding:10px;
     }
+	.right {
+		flex-direction:row;
+	}
+	.review-heading-container {
+	 width:75%;
+	 align-self:center;
+	 padding:10px;
+	 margin: 0 auto;
+	 flex-direction:row;
+    }
+	.review-text-container {
+		width:75%;
+		align-self:center;
+		padding:10px;
+		margin: 0 auto;
+		margin-bottom:20px;
+	}
 }
 
 

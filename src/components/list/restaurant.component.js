@@ -130,17 +130,7 @@ padding:20px;
 }
  @media all and (max-width: 768px){
      .restaurant-listing {
-         flex-direction:column;
          width:80vw;
-         padding:10px;
-         height:200px;
-    }
-     .left {
-         flex-direction:row-reverse;
-         padding:10px;
-    }
-    .restaurant-listing .bot .right {
-         align-items:end;
     }
      sl-button {
          width:100%;
@@ -154,12 +144,6 @@ padding:20px;
          border:none;
          margin:0;
          padding:0;
-    }
-     .mid p {
-         display:none;
-    }
-     .right {
-         align-items:start;
     }
      sl-avatar {
          --size: 80px;
@@ -199,7 +183,7 @@ padding:20px;
   <div class="mid">
     <div class="bold-text info-header">Information</div>
   <div class="info-container">
-    <div><span class="bold-text">Location </span>${this.restaurant.cuisine}</div>
+    <div><span class="bold-text">Location </span>${this.restaurant.location}</div>
   <div><span class="bold-text">Cuisine </span>${this.restaurant.cuisine}</div>
   </div>
 </div>
@@ -216,31 +200,3 @@ padding:20px;
 
 
 });
-
-
-
-{/* <div class="restaurant-listing">
-
-
-
-  <div class="left">
-     <h3>${this.restaurant.restaurantName}</h3>  
-     ${AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar ? html` <sl-avatar shape="rounded"
-		image=${
-			(AuthAPI.currentRestaurant && AuthAPI.currentRestaurant.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''
-		} > </sl-avatar>
-		`:html` <sl-avatar shape="rounded"></sl-avatar>
-		`}
-  </div>
-  <div class="mid">
-  <div><span class="bold-text">Location</span>${this.restaurant.cuisine}</div>
-  <div><span class="bold-text">Cuisine</span>${this.restaurant.cuisine}</div>
-</div>
-<div class="right">
-<sl-button class="view-btn" @click=${(event) => {
-   AuthAPI.currentRestaurant = this.restaurant;
-   localStorage.setItem("currentRestaurant", JSON.stringify(AuthAPI.currentRestaurant));
- gotoRoute('/restaurant');
-    }}>View Restaurant</sl-button>
-</div>
-</div> */}
