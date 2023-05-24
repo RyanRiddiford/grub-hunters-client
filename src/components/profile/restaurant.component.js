@@ -128,6 +128,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 	 */
 	render() {
 
+          if (this.restaurant == undefined)
           this.restaurant = JSON.parse(localStorage.getItem('currentRestaurant'));
 
 		let demeritDisplay = html ``;
