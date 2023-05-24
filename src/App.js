@@ -16,8 +16,8 @@ class App {
   constructor(){
     this.name = "Grub Hunters";
     this.version = "1.0.0";
-    //Establish the api url. Use this when testing the api live: 'https://grub-hunters-api.herokuapp.com';
-    this.apiBase = 'http://localhost:3000';
+    //Establish the api url. Use this when testing the api live: 'http://localhost:3000';
+    this.apiBase = 'https://grub-hunters-api.herokuapp.com';
     this.rootEl = document.getElementById("root");
   }
   
