@@ -40,7 +40,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 				type: String
 			},
 			restaurant: {
-				type: Object
+				type: Object || undefined
 			},
 			avgRating: {
 				type: String
@@ -57,11 +57,15 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 
 
 	/**
-	 * Build average rating template and re-render after first component update
+	 * Build average rating template, load restaurant from localstorage, and re-render after first component update
 	 */
 	firstUpdated() {
 		super.firstUpdated();
-		this.getAvgRating();
+          if (Object.keys(this.restaurant).length === 0) {
+               let json = localStorage.getItem('currentRestaurant');
+               this.restaurant = JSON.parse(json);     
+          }	
+          this.getAvgRating();
 		this.render();
 	}
 
@@ -127,9 +131,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends LitE
 	 * @returns Render of restaurant profile component
 	 */
 	render() {
-
-          if (this.restaurant == undefined)
-          this.restaurant = JSON.parse(localStorage.getItem('currentRestaurant'));
+      
 
 		let demeritDisplay = html ``;
 		let deleteAccountBtn = html ``;
@@ -382,12 +384,23 @@ h1 {
     </div>
 
     <div class="mid">
-    ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html` <sl-avatar shape="rounded"
+     ${(this.is_visitor == "true") ? html`
+     ${this.restaurant && this.restaurant.avatar ? html` <sl-avatar shape="rounded"
+		image = ${
+			(this.restaurant && this.restaurant.avatar) ? `${enumUtils.BUCKET_URI}/${this.restaurant.avatar}` : ''
+		} > </sl-avatar>
+		`:html` <sl-avatar shape="rounded"></sl-avatar>
+		`}   
+     ` : html`
+         ${AuthAPI.currentUser && AuthAPI.currentUser.avatar ? html` <sl-avatar shape="rounded"
 		image = ${
 			(AuthAPI.currentUser && AuthAPI.currentUser.avatar) ? `${enumUtils.BUCKET_URI}/${AuthAPI.currentUser.avatar}` : ''
 		} > </sl-avatar>
 		`:html` <sl-avatar shape="rounded"></sl-avatar>
-		`}
+		`}   
+     `
+}
+
                  <div class="rating-container">
                 <div class="rating-display">${this.ratingDisplayTemplate}</div>
                 <span class="rating-display-text">${this.numReviewsMsg}</span>

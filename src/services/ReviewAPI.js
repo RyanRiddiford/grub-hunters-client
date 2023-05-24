@@ -236,7 +236,7 @@ async getPage(page, restaurantId, accessLevel) {
 
     //Convert json and store as data
     const data = await response.json();
-console.log(data);
+
     AuthAPI.restaurantReviews = data;
     
     //Return data

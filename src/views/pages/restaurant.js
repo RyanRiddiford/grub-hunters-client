@@ -75,13 +75,13 @@ class RestaurantView {
 	 * @param {*} data array of data to render listings with
 	 */
 	async renderListings(data) {
-		console.log(data);
+
 		//Build template array of review listings
 		const listingTemplates = [];
 		let count = 0;
 		for (const item of data) {
 			const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
-console.log(item);
+
 			listingTemplates.push(html`<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} index=${count}></review-listing>`);
 			count++;
 		}

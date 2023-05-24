@@ -8499,7 +8499,6 @@ class ReviewAPI {
 
     //Convert json and store as data
     const data = await response.json();
-    console.log(data);
     _AuthAPI.default.restaurantReviews = data;
 
     //Return data
@@ -8970,13 +8969,11 @@ class RestaurantView {
    * @param {*} data array of data to render listings with
    */
   async renderListings(data) {
-    console.log(data);
     //Build template array of review listings
     const listingTemplates = [];
     let count = 0;
     for (const item of data) {
       const restaurant = await _UserAPI.default.getRestaurantName(item.restaurantId);
-      console.log(item);
       listingTemplates.push((0, _litHtml.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["<review-listing is_report=\"false\" restaurant_name=", " index=", "></review-listing>"])), restaurant.restaurantName, count));
       count++;
     }
@@ -11337,7 +11334,6 @@ function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(
 customElements.define('review-listing', class ReviewListing extends _litElement.LitElement {
   constructor() {
     super();
-    console.log("in constructor");
   }
 
   //Configure the element's custom properties
@@ -11493,14 +11489,9 @@ customElements.define('review-listing', class ReviewListing extends _litElement.
    * @returns Render of review listing
    */
   render() {
-    console.log(this.index);
-    console.log(this.review);
     let reviewArr = JSON.parse(localStorage.getItem("restaurantReviews"));
-    console.log("initialising");
     if (this.index && this.review == undefined) {
-      console.log("finding review listing data");
       this.review = reviewArr[this.index];
-      console.log(this.review);
     }
 
     //Review actions if the user authored the review
@@ -11553,7 +11544,7 @@ customElements.define('restaurant-listing', class RestaurantListing extends _lit
   render() {
     return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n<style>\n\nh3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n     margin:10px;\n     padding:0px;\n     text-align:center;\n}\n .bold-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .restaurant-listing {\n     display:flex;\n     flex-direction: row;\n     width:700px;\n     height:250px;\n     margin:20px;\n     justify-content: space-between;\n     box-shadow: var(--main-content-box-shadow);\n     border-radius: 20px;\n}\n .left {\n     display:flex;\n     flex-direction: column;\n     align-items:center;\n     justify-content:center;\n}\n .mid {\n     border-left: 4px solid var(--brand-color);\n     border-right: 4px solid var(--brand-color);\n     overflow-y:scroll;\n}\n .mid p {\n     padding:20px;\n}\n sl-button {\n     padding:10px;\n}\n sl-button::part(base) {\n     font-size:1rem;\n     font-weight:600;\n}\n sl-avatar {\n     --size: 100px;\n     margin:10px;\n}\n @media all and (max-width: 768px){\n     .restaurant-listing {\n         flex-direction:column;\n         width:80vw;\n         padding:10px;\n         height:200px;\n    }\n     .left {\n         flex-direction:row-reverse;\n         padding:10px;\n    }\n     .right {\n         align-items:end;\n    }\n     sl-button {\n         width:100%;\n         height:100px;\n    }\n     sl-button::part(base) {\n         font-size:1rem;\n         font-weight:600;\n    }\n     .mid {\n         border:none;\n         margin:0;\n         padding:0;\n    }\n     .mid p {\n         display:none;\n    }\n     .right {\n         align-items:start;\n    }\n     sl-avatar {\n         --size: 80px;\n         margin: 1em;\n    }\n}\n\n  \n\n</style>\n\n\n\n<div class=\"restaurant-listing\">\n\n\n\n  <div class=\"left\">\n     <h3>", "</h3>  \n     ", "\n  </div>\n  <div class=\"mid\">\n  <p>", "</p>\n</div>\n<div class=\"right\">\n<sl-button class=\"view-btn\" @click=", ">View Restaurant</sl-button>\n</div>\n</div>\n"])), this.restaurant.restaurantName, _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? (0, _litElement.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"\n\t\timage=", " > </sl-avatar>\n\t\t"])), _AuthAPI.default.currentRestaurant && _AuthAPI.default.currentRestaurant.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"></sl-avatar>\n\t\t"]))), this.restaurant.bio, event => {
       _AuthAPI.default.currentRestaurant = this.restaurant;
-      localStorage.setItem("currentRestaurant", JSON.stringify(this.restaurant));
+      localStorage.setItem("currentRestaurant", JSON.stringify(_AuthAPI.default.currentRestaurant));
       (0, _Router.gotoRoute)('/restaurant');
     });
   }
@@ -11659,7 +11650,7 @@ var _App = _interopRequireDefault(require("../../App"));
 var _enum = _interopRequireDefault(require("../../utils/enum.utils"));
 var _UserAPI = _interopRequireDefault(require("../../services/UserAPI"));
 var _ReviewAPI = _interopRequireDefault(require("../../services/ReviewAPI"));
-var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8, _templateObject9, _templateObject10, _templateObject11, _templateObject12, _templateObject13, _templateObject14, _templateObject15, _templateObject16;
+var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8, _templateObject9, _templateObject10, _templateObject11, _templateObject12, _templateObject13, _templateObject14, _templateObject15, _templateObject16, _templateObject17, _templateObject18, _templateObject19, _templateObject20;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
                                                                                                                                                                                          * Restaurant profile component
@@ -11683,7 +11674,7 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
         type: String
       },
       restaurant: {
-        type: Object
+        type: Object || undefined
       },
       avgRating: {
         type: String
@@ -11698,10 +11689,14 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
   }
 
   /**
-   * Build average rating template and re-render after first component update
+   * Build average rating template, load restaurant from localstorage, and re-render after first component update
    */
   firstUpdated() {
     super.firstUpdated();
+    if (Object.keys(this.restaurant).length === 0) {
+      let json = localStorage.getItem('currentRestaurant');
+      this.restaurant = JSON.parse(json);
+    }
     this.getAvgRating();
     this.render();
   }
@@ -11738,7 +11733,6 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
    * @returns Render of restaurant profile component
    */
   render() {
-    this.restaurant = JSON.parse(localStorage.getItem('currentRestaurant'));
     let demeritDisplay = (0, _litElement.html)(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral([""])));
     let deleteAccountBtn = (0, _litElement.html)(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral([""])));
     let reportAccountBtn = (0, _litElement.html)(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral([""])));
@@ -11758,10 +11752,10 @@ customElements.define('restaurant-profile', class RestaurantProfile extends _lit
       }
     }
     let restaurantInfo = (0, _litElement.html)(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral([""])));
-    restaurantInfo = (0, _litElement.html)(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral(["\n          \n          <style>\n\n\nh1 {\n     font-size: var(--h1-font-size);\n     font-weight:var(--h1-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n}\n h2 {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n}\n h3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n}\n .info-label, .rating-display-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .rating-display-text {\n     margin: 0 auto;\n}\n #restaurant-info {\n     display: flex;\n     flex-direction: column;\n     align-items: center;\n     justify-content: center;\n     align-self: center;\n     width: 900px;\n     border: 4px solid var(--brand-color);\n     padding:20px;\n     gap:20px;\n     border-radius:20px;\n}\n .top {\n     display:flex;\n     flex-direction: row;\n     justify-content:space-between;\n     align-items: center;\n     padding-right:20px;\n}\n .mid {\n     display:flex;\n     flex-direction:row;\n     align-items:start;\n     gap:20px;\n     padding-left:20px;\n}\n .rating-container {\n     display:flex;\n     flex-direction:column;\n     align-items:center;\n     padding:10px;\n     box-shadow: var(--main-content-box-shadow);\n}\n .rating-container h3 {\n     margin-top:5px;\n     text-align:center;\n}\n .rating-display {\n     display:flex;\n     flex-direction:column;\n     justify-content:center;\n     width:100px;\n     height:100px;\n     border:4px solid var(--brand-color);\n     border-radius:80px;\n     text-align:center;\n}\n .point-display {\n     display:flex;\n     flex-direction:row;\n     justify-content:center;\n     gap:15px;\n     width:150px;\n     height:auto;\n     background: var(--brand-color);\n     color:var(--light-txt-color);\n     margin-top:5px;\n     margin-bottom:5px;\n     padding:5px;\n     padding-left:10px;\n     border-radius:20px;\n}\n .bot {\n     display:flex;\n     flex-direction:row;\n     justify-content:center;\n     gap:50px;\n}\n .bio-container {\n     box-shadow: var(--main-content-box-shadow);\n     width:60%;\n     padding:20px;\n}\n .profile-info {\n     box-shadow: var(--main-content-box-shadow);\n     padding:20px;\n}\n ul {\n     padding:0;\n}\n li {\n     list-style-type:none;\n     margin-top:5px;\n     margin-bottom:5px;\n}\n #edit-btn {\n     align-self:start;\n}\n #delete-btn {\n    /*Right-align element to parent */\n     margin-left: auto;\n     margin-right: 0;\n     width:150px;\n     padding:5px;\n     height: auto;\n     text-align:center;\n     margin-top:40px;\n}\n #delete-btn::part(base) {\n     background:red;\n     border: 2px solid black;\n     border-radius:10px;\n     color:black;\n     font-weight:600;\n}\n sl-dialog::part(panel) {\n     border-radius:20px;\n     box-shadow:var(--dialog-box-shadow);\n}\n sl-dialog::part(overlay) {\n     height:100vh;\n}\n sl-dialog::part(header) {\n     padding:5px;\n     background: var(--brand-color);\n     border-top-left-radius:20px;\n     border-top-right-radius:20px;\n}\n sl-dialog::part(title) {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n     text-align:center;\n     color:var(--light-txt-color);\n}\n sl-dialog::part(body) {\n     font-size: 1rem;\n     font-weight:600;\n     font-family: var(--base-font-family);\n     text-align:center;\n     color:var(--base-txt-color);\n}\n sl-dialog::part(footer) {\n     display:flex;\n     flex-direction:row;\n     justify-content:space-between;\n     margin-left:50px;\n     margin-right:50px;\n}\n sl-avatar {\n     --size: 200px;\n     margin-bottom: 1em;\n}\n @media all and (max-width: 1000px){\n     #restaurant-info {\n         width: 90vw;\n         border: none;\n    }\n     .bot {\n         flex-direction:column-reverse;\n         align-items:center;\n    }\n     .bio-container, .profile-info {\n         width:80%;\n    }\n}\n\n\n          </style>\n\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\">\n  <span>Are you sure you want to permanently delete your account?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n<sl-dialog id=\"report-dialog\" label=\"Submit Report\">\n  <report-form title=", " target_id=", " target_type=", " ></report-form>\n</sl-dialog>\n          \n          \n          \n          <div id=\"restaurant-info\">\n\n            <div class=\"top\">   \n             <h1>", "</h1> \n              ", "\n              ", "\n    </div>\n\n    <div class=\"mid\">\n    ", "\n                 <div class=\"rating-container\">\n                <div class=\"rating-display\">", "</div>\n                <span class=\"rating-display-text\">", "</span>\n              </div>\n    </div>         \n        \n\n            <div class=\"bot\">\n              <div class=\"bio-container\">\n                <h3>About Us</h3>\n                <p>", "</p>\n</div>\n                <div class=\"profile-info\">\n                 <h3>Business Information</h3>\n                <ul>\n                  <li><span class=\"info-label\">Cuisine </span>", "</li>\n                  <li><span class=\"info-label\">Address </span>", "</li>\n                  <li><span class=\"info-label\">Contact </span>", "</li>\n                  <li><span class=\"info-label\">Established </span>", "</li>\n                </ul>\n                ", "                 \n                </div>\n</div>\n ", "\n          </div>       \n      "])), () => {
+    restaurantInfo = (0, _litElement.html)(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral(["\n          \n          <style>\n\n\nh1 {\n     font-size: var(--h1-font-size);\n     font-weight:var(--h1-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n}\n h2 {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n}\n h3 {\n     font-size: var(--h3-font-size);\n     font-weight:var(--h3-font-weight);\n     font-family:var(--heading-font-family);\n     color:var(--heading-txt-color);\n}\n .info-label, .rating-display-text {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n .rating-display-text {\n     margin: 0 auto;\n}\n #restaurant-info {\n     display: flex;\n     flex-direction: column;\n     align-items: center;\n     justify-content: center;\n     align-self: center;\n     width: 900px;\n     border: 4px solid var(--brand-color);\n     padding:20px;\n     gap:20px;\n     border-radius:20px;\n}\n .top {\n     display:flex;\n     flex-direction: row;\n     justify-content:space-between;\n     align-items: center;\n     padding-right:20px;\n}\n .mid {\n     display:flex;\n     flex-direction:row;\n     align-items:start;\n     gap:20px;\n     padding-left:20px;\n}\n .rating-container {\n     display:flex;\n     flex-direction:column;\n     align-items:center;\n     padding:10px;\n     box-shadow: var(--main-content-box-shadow);\n}\n .rating-container h3 {\n     margin-top:5px;\n     text-align:center;\n}\n .rating-display {\n     display:flex;\n     flex-direction:column;\n     justify-content:center;\n     width:100px;\n     height:100px;\n     border:4px solid var(--brand-color);\n     border-radius:80px;\n     text-align:center;\n}\n .point-display {\n     display:flex;\n     flex-direction:row;\n     justify-content:center;\n     gap:15px;\n     width:150px;\n     height:auto;\n     background: var(--brand-color);\n     color:var(--light-txt-color);\n     margin-top:5px;\n     margin-bottom:5px;\n     padding:5px;\n     padding-left:10px;\n     border-radius:20px;\n}\n .bot {\n     display:flex;\n     flex-direction:row;\n     justify-content:center;\n     gap:50px;\n}\n .bio-container {\n     box-shadow: var(--main-content-box-shadow);\n     width:60%;\n     padding:20px;\n}\n .profile-info {\n     box-shadow: var(--main-content-box-shadow);\n     padding:20px;\n}\n ul {\n     padding:0;\n}\n li {\n     list-style-type:none;\n     margin-top:5px;\n     margin-bottom:5px;\n}\n #edit-btn {\n     align-self:start;\n}\n #delete-btn {\n    /*Right-align element to parent */\n     margin-left: auto;\n     margin-right: 0;\n     width:150px;\n     padding:5px;\n     height: auto;\n     text-align:center;\n     margin-top:40px;\n}\n #delete-btn::part(base) {\n     background:red;\n     border: 2px solid black;\n     border-radius:10px;\n     color:black;\n     font-weight:600;\n}\n sl-dialog::part(panel) {\n     border-radius:20px;\n     box-shadow:var(--dialog-box-shadow);\n}\n sl-dialog::part(overlay) {\n     height:100vh;\n}\n sl-dialog::part(header) {\n     padding:5px;\n     background: var(--brand-color);\n     border-top-left-radius:20px;\n     border-top-right-radius:20px;\n}\n sl-dialog::part(title) {\n     font-size: var(--h2-font-size);\n     font-weight:var(--h2-font-weight);\n     font-family:var(--heading-font-family);\n     text-align:center;\n     color:var(--light-txt-color);\n}\n sl-dialog::part(body) {\n     font-size: 1rem;\n     font-weight:600;\n     font-family: var(--base-font-family);\n     text-align:center;\n     color:var(--base-txt-color);\n}\n sl-dialog::part(footer) {\n     display:flex;\n     flex-direction:row;\n     justify-content:space-between;\n     margin-left:50px;\n     margin-right:50px;\n}\n sl-avatar {\n     --size: 200px;\n     margin-bottom: 1em;\n}\n @media all and (max-width: 1000px){\n     #restaurant-info {\n         width: 90vw;\n         border: none;\n    }\n     .bot {\n         flex-direction:column-reverse;\n         align-items:center;\n    }\n     .bio-container, .profile-info {\n         width:80%;\n    }\n}\n\n\n          </style>\n\n\n\n<sl-dialog id=\"delete-dialog\" label=\"Confirmation\">\n  <span>Are you sure you want to permanently delete your account?</span>\n  <sl-button @click=\"", "\" slot=\"footer\">Yes</sl-button>\n  <sl-button @click=\"", "\" slot=\"footer\">No</sl-button>\n</sl-dialog>\n\n<sl-dialog id=\"report-dialog\" label=\"Submit Report\">\n  <report-form title=", " target_id=", " target_type=", " ></report-form>\n</sl-dialog>\n          \n          \n          \n          <div id=\"restaurant-info\">\n\n            <div class=\"top\">   \n             <h1>", "</h1> \n              ", "\n              ", "\n    </div>\n\n    <div class=\"mid\">\n     ", "\n\n                 <div class=\"rating-container\">\n                <div class=\"rating-display\">", "</div>\n                <span class=\"rating-display-text\">", "</span>\n              </div>\n    </div>         \n        \n\n            <div class=\"bot\">\n              <div class=\"bio-container\">\n                <h3>About Us</h3>\n                <p>", "</p>\n</div>\n                <div class=\"profile-info\">\n                 <h3>Business Information</h3>\n                <ul>\n                  <li><span class=\"info-label\">Cuisine </span>", "</li>\n                  <li><span class=\"info-label\">Address </span>", "</li>\n                  <li><span class=\"info-label\">Contact </span>", "</li>\n                  <li><span class=\"info-label\">Established </span>", "</li>\n                </ul>\n                ", "                 \n                </div>\n</div>\n ", "\n          </div>       \n      "])), () => {
       this.shadowRoot.getElementById('delete-dialog').hide();
       _UserAPI.default.deleteById(_AuthAPI.default.currentUser._id);
-    }, () => this.shadowRoot.getElementById('delete-dialog').hide(), document.title, this.restaurant._id, _enum.default.reportTargetType.restaurant, this.restaurant.restaurantName, reportAccountBtn, editProfileBtn, _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject15 || (_templateObject15 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"\n\t\timage = ", " > </sl-avatar>\n\t\t"])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject16 || (_templateObject16 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"></sl-avatar>\n\t\t"]))), this.ratingDisplayTemplate, this.numReviewsMsg, this.restaurant.bio, this.restaurant.cuisine, this.restaurant.location, this.restaurant.phoneNumber, this.restaurant.established, demeritDisplay, deleteAccountBtn);
+    }, () => this.shadowRoot.getElementById('delete-dialog').hide(), document.title, this.restaurant._id, _enum.default.reportTargetType.restaurant, this.restaurant.restaurantName, reportAccountBtn, editProfileBtn, this.is_visitor == "true" ? (0, _litElement.html)(_templateObject15 || (_templateObject15 = _taggedTemplateLiteral(["\n     ", "   \n     "])), this.restaurant && this.restaurant.avatar ? (0, _litElement.html)(_templateObject16 || (_templateObject16 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"\n\t\timage = ", " > </sl-avatar>\n\t\t"])), this.restaurant && this.restaurant.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(this.restaurant.avatar) : '') : (0, _litElement.html)(_templateObject17 || (_templateObject17 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"></sl-avatar>\n\t\t"])))) : (0, _litElement.html)(_templateObject18 || (_templateObject18 = _taggedTemplateLiteral(["\n         ", "   \n     "])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? (0, _litElement.html)(_templateObject19 || (_templateObject19 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"\n\t\timage = ", " > </sl-avatar>\n\t\t"])), _AuthAPI.default.currentUser && _AuthAPI.default.currentUser.avatar ? "".concat(_enum.default.BUCKET_URI, "/").concat(_AuthAPI.default.currentUser.avatar) : '') : (0, _litElement.html)(_templateObject20 || (_templateObject20 = _taggedTemplateLiteral([" <sl-avatar shape=\"rounded\"></sl-avatar>\n\t\t"])))), this.ratingDisplayTemplate, this.numReviewsMsg, this.restaurant.bio, this.restaurant.cuisine, this.restaurant.location, this.restaurant.phoneNumber, this.restaurant.established, demeritDisplay, deleteAccountBtn);
     return restaurantInfo;
   }
 });
@@ -11915,7 +11909,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49953" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56612" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -29,8 +29,6 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 
 	constructor() {
 		super();
-
-		console.log("in constructor");
 	}
 
 
@@ -241,18 +239,10 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	 */
 	render() {
 
-		console.log(this.index);
-		console.log((this.review));
  let reviewArr = JSON.parse(localStorage.getItem("restaurantReviews"));
-		console.log("initialising");
 		if (this.index && this.review == undefined) {
-			
-	console.log("finding review listing data");
 	this.review = reviewArr[this.index];
-	console.log(this.review);
 }
-
-
 
 		//Review actions if the user authored the review
 		const reviewActions = this.buildReviewActions();
