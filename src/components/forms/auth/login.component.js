@@ -103,8 +103,8 @@ sl-button::part(base) {
 
 
 <sl-form class="form-signin" @sl-submit=${this.signInSubmitHandler}>    
-<sl-input label="Email" name="email" type="email" value="nick@reviewer.com.au" placeholder="Email" required></sl-input>         
- <sl-input label="Password" name="password" type="password" value="reviewer123" placeholder="Password" required toggle-password></sl-input>
+<sl-input label="Email" name="email" type="email" placeholder="Email" required></sl-input>         
+ <sl-input label="Password" name="password" type="password" placeholder="Password" required toggle-password></sl-input>
 
  <sl-button id="login-btn" type="primary" class="submit-btn" submit>Login</sl-button>
           </sl-form>`;
