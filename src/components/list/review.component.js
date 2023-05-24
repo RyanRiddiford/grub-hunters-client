@@ -138,7 +138,7 @@ customElements.define('review-listing', class ReviewListing extends LitElement {
 	buildReviewActions() {
 		//Build actions for author
 		if (AuthAPI.currentUser._id == this.review.authorId) {
-			return html`     
+			return html`
 			<div class="action-container">
 				<sl-button id="edit-btn" @click="${() => this.shadowRoot.getElementById('edit-dialog').show()}">Edit</sl-button>  
  				<sl-button id="delete-btn" @click="${() => this.shadowRoot.getElementById('delete-dialog').show()}">Delete</sl-button>
@@ -437,9 +437,12 @@ font-size:var(--button-font-size);
      .review-listing {
          width:90vw;
     }
-     .top .right {
-         gap:10px;
+     .bot-container {
+         flex-direction:column;
     }
+	.review-listing {
+		flex-direction:column-reverse;
+	}
      sl-button, #delete-btn {
          width:100px;
          padding:10px;
