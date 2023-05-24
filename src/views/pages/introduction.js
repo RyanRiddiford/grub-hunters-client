@@ -92,7 +92,7 @@ class IntrodoctionView {
     <h1>Restaurant Guide</h1>
     <div class="overview-container">
     <h2>Overview</h2>
-    <p>Welcome ${AuthAPI.currentUser.resaurantName}.</p> 
+    <p>Welcome ${AuthAPI.currentUser.restaurantName}.</p> 
       <p>At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!</p>
    
   </div>

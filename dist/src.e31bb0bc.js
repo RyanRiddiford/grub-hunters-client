@@ -7983,6 +7983,7 @@ class SearchRestaurantsView {
   async searchSubmitHandler(e) {
     //Reset page for new filter
     _pagination.default.setCurrentPage(0);
+    _pagination.default.disableButton('.prev-page-btn, .next-page-btn');
     e.preventDefault();
     const formData = e.detail.formData;
     this.keywords = formData.get("keywords");
@@ -8632,6 +8633,7 @@ class SearchTicketsView {
   async searchSubmitHandler(e) {
     //Reset page for new filter
     _pagination.default.setCurrentPage(0);
+    _pagination.default.disableButton('.prev-page-btn, .next-page-btn');
     e.preventDefault();
     let submitBtn = document.querySelector('.submit-btn');
     submitBtn.setAttribute('loading', '');
@@ -8869,8 +8871,8 @@ class ReviewsView {
     document.title = 'Your Reviews';
     //Reset page for new filter
     _pagination.default.setCurrentPage(0);
-    this.render();
     _pagination.default.disableButton('.prev-page-btn, .next-page-btn');
+    this.render();
     this.loadData();
   }
 
@@ -8928,7 +8930,7 @@ class ReviewsView {
    * Render review page
    */
   render() {
-    const template = (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n       \n       \n        <app-header title=\"Reviews\" user=", "></app-header>\n        <div class=\"page-content main-container\">\n      \n  <h1>Your Reviews</h1>\n\n  <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n\n      <div id=\"reviews-container\">\n      </div>\n\n\n      <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev hidden\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n        </div>\n<app-footer title=", "></app-footer>\n\n\n        \n        "])), JSON.stringify(_AuthAPI.default.currentUser), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
+    const template = (0, _litHtml.html)(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n       \n       \n        <app-header title=\"Reviews\" user=", "></app-header>\n        <div class=\"page-content main-container\">\n      \n  <h1>Your Reviews</h1>\n\n  <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n\n      <div id=\"reviews-container\">\n      </div>\n\n\n      <div class=\"pagination\">\n        <sl-button class=\"prev-page-btn\" @click=", " class=\"prev\">Previous</sl-button>\n        <sl-button class=\"next-page-btn\" @click=", " class=\"next\">Next</sl-button>\n      </div>\n\n        </div>\n<app-footer title=", "></app-footer>\n\n\n        \n        "])), JSON.stringify(_AuthAPI.default.currentUser), () => this.loadData(false), () => this.loadData(true), () => this.loadData(false), () => this.loadData(true), document.title);
     (0, _litHtml.render)(template, _App.default.rootEl);
   }
 }
@@ -9091,7 +9093,7 @@ class IntrodoctionView {
    * Template containing guide for new restaurants
    */
   restaurantTemplate() {
-    return (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    \n    <h1>Restaurant Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>Welcome ", ".</p> \n      <p>At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!</p>\n   \n  </div>\n    <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>Delete your account</li>\n      <li>View restaurants and reviews</li>\n      <li>Create, edit, and delete restaurant reviews</li>\n    </ul> \n  </div>\n    <div class=\"demerits-container\">\n    <h2>About Demerits</h2>  \n    <ul>\n      <li>Breaches in the user guidelines can result in the accumulation of demerit points.</li>\n      <li>Having 1 demerit point will result in a one-time warning message.</li>\n      <li>Having 2 demerit points will result in a 7-day account suspension.</li>\n      <li>Having 3 demerit points will result in an indefinite account ban</li>\n    </ul>     \n    </div>\n    "])), _AuthAPI.default.currentUser.resaurantName);
+    return (0, _litHtml.html)(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n    \n    <h1>Restaurant Guide</h1>\n    <div class=\"overview-container\">\n    <h2>Overview</h2>\n    <p>Welcome ", ".</p> \n      <p>At Grub Hunters, you can better engage with consumers by having them view your profile and engage with reviews!</p>\n   \n  </div>\n    <div class=\"features-container\">\n    <h2>Current Features</h2>  \n    <ul>\n      <li>Upload a profile image</li>\n      <li>Edit profile details</li>\n      <li>Delete your account</li>\n      <li>View restaurants and reviews</li>\n      <li>Create, edit, and delete restaurant reviews</li>\n    </ul> \n  </div>\n    <div class=\"demerits-container\">\n    <h2>About Demerits</h2>  \n    <ul>\n      <li>Breaches in the user guidelines can result in the accumulation of demerit points.</li>\n      <li>Having 1 demerit point will result in a one-time warning message.</li>\n      <li>Having 2 demerit points will result in a 7-day account suspension.</li>\n      <li>Having 3 demerit points will result in an indefinite account ban</li>\n    </ul>     \n    </div>\n    "])), _AuthAPI.default.currentUser.restaurantName);
   }
 
   /**
@@ -9251,8 +9253,8 @@ class App {
   constructor() {
     this.name = "Grub Hunters";
     this.version = "1.0.0";
+    //Establish the live server url. Use this when testing locally: 'https://grub-hunters-api.herokuapp.com';
     this.apiBase = 'http://localhost:3000';
-    //this.apiBase = 'https://grub-hunters-api.herokuapp.com';
     this.rootEl = document.getElementById("root");
   }
   init() {
@@ -11028,7 +11030,7 @@ customElements.define('login-form', class LoginForm extends _litElement.LitEleme
    * @returns Render of login form
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input , sl-textarea {\n  margin-top: var(--sl-spacing-large);\n  font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\n.form-signin {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\n\n</style> \n\n\n\n<sl-form class=\"form-signin\" @sl-submit=", ">    \n<sl-input label=\"Email\" name=\"email\" type=\"email\" value=\"nick@reviewer.com.au\" placeholder=\"Email\" required></sl-input>         \n <sl-input label=\"Password\" name=\"password\" type=\"password\" value=\"reviewer123\" placeholder=\"Password\" required toggle-password></sl-input>\n\n <sl-button id=\"login-btn\" type=\"primary\" class=\"submit-btn\" submit>Login</sl-button>\n          </sl-form>"])), this.signInSubmitHandler);
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-input {\n--label-width:6rem;\n--gap-width:2rem;\n}\n\nsl-input , sl-textarea {\n  margin-top: var(--sl-spacing-large);\n  font-size:var(--label-font-size);\n  font-weight:var(--label-font-weight);\n}\n\nsl-input::part(input) {\n  font-size:var(--input-font-size);\n  font-weight:var(--input-font-weight);\n}\n\n\nsl-input::part(form-control-label) {\n  text-align: right;\n  align-self: center;\n  margin-right:20px;\n}\n\n\nsl-input::part(form-control) {\n  display:grid;\n  grid: auto / var(--label-width) 1fr;\n  gap: 20px;\n}\n\nsl-button {\n  width:50%;\n  margin-top:40px;\n  left:25%;\n  right:25%;\n}\n\nsl-button::part(base) {\n  font-size:var(--button-font-size);\n  font-weight:var(--button-font-weight);\n}\n\n.form-signin {\n  display:flex;\n  flex-direction: column;\n  align-items:center;\n}\n\n\n</style> \n\n\n\n<sl-form class=\"form-signin\" @sl-submit=", ">    \n<sl-input label=\"Email\" name=\"email\" type=\"email\" placeholder=\"Email\" required></sl-input>         \n <sl-input label=\"Password\" name=\"password\" type=\"password\" placeholder=\"Password\" required toggle-password></sl-input>\n\n <sl-button id=\"login-btn\" type=\"primary\" class=\"submit-btn\" submit>Login</sl-button>\n          </sl-form>"])), this.signInSubmitHandler);
   }
 });
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../services/AuthAPI":"services/AuthAPI.js"}],"components/forms/auth/register.component.js":[function(require,module,exports) {
@@ -11242,7 +11244,7 @@ customElements.define('review-form', class ReviewForm extends _litElement.LitEle
    * @returns Render of register form
    */
   render() {
-    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-form {\n     align-items:center;\n}\n sl-input::part(input) {\n     font-size:var(--input-font-size);\n     font-weight:var(--input-font-weight);\n}\n sl-input {\n     --label-width:6rem;\n     --gap-width:2rem;\n     margin-top: var(--sl-spacing-medium);\n}\n label, sl-input {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n sl-input::part(form-control-label) {\n     text-align: right;\n     align-self: center;\n     margin-right:20px;\n}\n sl-input::part(form-control) {\n     display:grid;\n     grid: auto / var(--label-width) 1fr;\n     gap: 20px;\n}\n\n\n</style>\n\n\n<sl-form class=\"page-form\" @sl-submit=", ">\n \n<input type=\"hidden\" name=\"authorId\" value=\"", "\" >\n<input type=\"hidden\" name=\"targetType\" value=\"", "\" >\n<input type=\"hidden\" name=\"restaurantId\" value=\"", "\" >\n\n<sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" required></sl-input>\n<sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"I found this restaurant to be...\" required></sl-input>\n\n\n<sl-range label=\"Rating\" min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" required></sl-range>\n\n            <sl-button id=\"review-btn\" type=\"primary\" class=\"submit-btn\" submit>Post Review</sl-button>\n          </sl-form>"])), this.createReviewSubmitHandler.bind(this), _AuthAPI.default.currentUser._id, _AuthAPI.default.currentUser.accessLevel, _AuthAPI.default.currentRestaurant._id);
+    return (0, _litElement.html)(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n\n\n<style>\n\nsl-form {\n     align-items:center;\n}\n sl-input::part(input) {\n     font-size:var(--input-font-size);\n     font-weight:var(--input-font-weight);\n}\n sl-input {\n     --label-width:6rem;\n     --gap-width:2rem;\n     margin-top: var(--sl-spacing-medium);\n}\n label, sl-input {\n     font-size:var(--label-font-size);\n     font-weight:var(--label-font-weight);\n}\n sl-input::part(form-control-label) {\n     text-align: right;\n     align-self: center;\n     margin-right:20px;\n}\n sl-input::part(form-control) {\n     display:grid;\n     grid: auto / var(--label-width) 1fr;\n     gap: 20px;\n}\n\n\n</style>\n\n\n<sl-form class=\"page-form\" @sl-submit=", ">\n \n<input type=\"hidden\" name=\"authorId\" value=\"", "\" >\n<input type=\"hidden\" name=\"targetType\" value=\"", "\" >\n<input type=\"hidden\" name=\"restaurantId\" value=\"", "\" >\n\n<sl-input label=\"Title\" type=\"text\" name=\"title\" placeholder=\"Title\" required></sl-input>\n<sl-input label=\"Description\" type=\"text\" name=\"text\" placeholder=\"I found this restaurant to be...\" required></sl-input>\n\n\n<sl-range label=\"Rating\" min=\"0.1\" max=\"10\" step=\"0.1\" name=\"rating\" required></sl-range>\n\n            <sl-button id=\"review-btn\" type=\"primary\" class=\"submit-btn\" submit>Post Review</sl-button>\n          </sl-form>"])), this.createReviewSubmitHandler.bind(this), _AuthAPI.default.currentUser._id, _AuthAPI.default.currentUser.accessLevel, JSON.parse(localStorage.getItem('currentRestaurant'))._id);
   }
 });
 },{"@polymer/lit-element":"../node_modules/@polymer/lit-element/lit-element.js","../../../Router":"Router.js","../../../App":"App.js","../../../Toast":"Toast.js","../../../services/ReviewAPI":"services/ReviewAPI.js","../../../services/AuthAPI":"services/AuthAPI.js"}],"components/forms/edit/profile.component.js":[function(require,module,exports) {
@@ -11961,7 +11963,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55664" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57581" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

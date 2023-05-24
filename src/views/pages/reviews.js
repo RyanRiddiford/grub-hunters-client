@@ -28,8 +28,8 @@ class ReviewsView {
 		document.title = 'Your Reviews';
 	    //Reset page for new filter
 		paginationUtils.setCurrentPage(0);
-		this.render();
-		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
+		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');	
+		this.render();	
 		this.loadData();
 	}
 
@@ -78,8 +78,7 @@ class ReviewsView {
 		const listingTemplates = [];
 		for (const item of data) {
 			const restaurant = await UserAPI.getRestaurantName(item.restaurantId);
-
-			listingTemplates.push(html `<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
+			listingTemplates.push(html`<review-listing is_report="false" restaurant_name=${restaurant.restaurantName} review=${JSON.stringify(item)}></review-listing>`);
 		}
 
 		//Render review listing template array to reviews container
@@ -101,7 +100,7 @@ class ReviewsView {
   <h1>Your Reviews</h1>
 
   <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev hidden">Previous</sl-button>
+        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
         <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
       </div>
 
@@ -111,7 +110,7 @@ class ReviewsView {
 
 
       <div class="pagination">
-        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev hidden">Previous</sl-button>
+        <sl-button class="prev-page-btn" @click=${()=> this.loadData(false)} class="prev">Previous</sl-button>
         <sl-button class="next-page-btn" @click=${()=> this.loadData(true)} class="next">Next</sl-button>
       </div>
 

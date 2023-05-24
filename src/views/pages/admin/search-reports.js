@@ -75,6 +75,7 @@ class SearchTicketsView {
       async searchSubmitHandler(e) {
 		    //Reset page for new filter
 		    paginationUtils.setCurrentPage(0);
+        paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
         e.preventDefault();
         let submitBtn = document.querySelector('.submit-btn');
         submitBtn.setAttribute('loading', '');

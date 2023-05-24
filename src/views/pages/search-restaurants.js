@@ -43,6 +43,8 @@ class SearchRestaurantsView {
 		//Reset page for new filter
 		paginationUtils.setCurrentPage(0);
 
+		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
+
 		e.preventDefault();
 		const formData = e.detail.formData;
 		this.keywords = formData.get("keywords");

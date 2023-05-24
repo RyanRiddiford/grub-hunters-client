@@ -103,7 +103,7 @@ sl-form {
  
 <input type="hidden" name="authorId" value="${AuthAPI.currentUser._id}" >
 <input type="hidden" name="targetType" value="${AuthAPI.currentUser.accessLevel}" >
-<input type="hidden" name="restaurantId" value="${AuthAPI.currentRestaurant._id}" >
+<input type="hidden" name="restaurantId" value="${JSON.parse(localStorage.getItem('currentRestaurant'))._id}" >
 
 <sl-input label="Title" type="text" name="title" placeholder="Title" required></sl-input>
 <sl-input label="Description" type="text" name="text" placeholder="I found this restaurant to be..." required></sl-input>

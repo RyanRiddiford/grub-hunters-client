@@ -27,7 +27,7 @@ class RestaurantView {
 	 */
 	init() {
 		document.title = 'Restaurant';
-		this.restaurantId = JSON.parse(localStorage.getItem('currentRestaurant'))._id;
+		this.restaurantId = JSON.parse(localStorage.getItem('currentRestaurant'))._id;	
 		this.render();
 		this.loadData();
 		paginationUtils.disableButton('.prev-page-btn, .next-page-btn');
